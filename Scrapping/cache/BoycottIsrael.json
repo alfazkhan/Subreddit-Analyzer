@@ -1,0 +1,5804 @@
+{
+    "t3_1t5b065": {
+        "id": "t3_1t5b065",
+        "timestamp": "2026-05-06T12:09:47.157Z",
+        "title": "Should i boycott Pepsi?",
+        "body": "I am looking for an alternative for Coca-Cola and realized that Pepsi isn't on the BDS boycott list, but some people say that we should boycott Pepsi. Does someone know the answer?",
+        "keywords": {
+            "boycott": 3,
+            "pepsi": 3,
+            "looking": 1,
+            "alternative": 1,
+            "realized": 1,
+            "bd": 1,
+            "list": 1,
+            "people": 1,
+            "say": 1,
+            "answer": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Pepsi",
+                "label": "ORG"
+            },
+            {
+                "text": "Coca-Cola",
+                "label": "ORG"
+            },
+            {
+                "text": "Pepsi",
+                "label": "ORG"
+            },
+            {
+                "text": "BDS",
+                "label": "ORG"
+            },
+            {
+                "text": "Pepsi",
+                "label": "ORG"
+            }
+        ],
+        "last_cached": true
+    },
+    "t3_1t4yem6": {
+        "id": "t3_1t4yem6",
+        "timestamp": "2026-05-06T01:14:21.508Z",
+        "title": "Booking accomodation for travel",
+        "body": "Looking for suggestions on best ways to book accomodation in Europe (France, Poland) without using AirBnB or Booking dot com.\n\nAlso if there are any other key accommodation websites that are boycotted?\n\nThanks!",
+        "keywords": {
+            "booking": 2,
+            "accomodation": 2,
+            "travel": 1,
+            "looking": 1,
+            "suggestion": 1,
+            "best": 1,
+            "way": 1,
+            "book": 1,
+            "europe": 1,
+            "france": 1,
+            "poland": 1,
+            "without": 1,
+            "using": 1,
+            "airbnb": 1,
+            "dot": 1,
+            "key": 1,
+            "accommodation": 1,
+            "website": 1,
+            "boycotted": 1,
+            "thanks": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Europe",
+                "label": "LOC"
+            },
+            {
+                "text": "France",
+                "label": "GPE"
+            },
+            {
+                "text": "Poland",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1t576l0": {
+        "id": "t3_1t576l0",
+        "timestamp": "2026-05-06T08:50:53.911Z",
+        "title": "Disoccupied",
+        "body": "Hi folks! I am posting here because I want to know what you think of Disoccupied\u2019s ranking system. I have researched brands that are less than 10% owned in part by Vanguard for example, but other sites like No Thanks cite them as boycotted, but disoccupied has this system.\n\nWhat do you guys think?",
+        "keywords": {
+            "disoccupied": 3,
+            "hi": 1,
+            "folk": 1,
+            "posting": 1,
+            "think": 2,
+            "ranking": 1,
+            "system": 2,
+            "researched": 1,
+            "brand": 1,
+            "less": 1,
+            "10": 1,
+            "owned": 1,
+            "part": 1,
+            "vanguard": 1,
+            "example": 1,
+            "site": 1,
+            "thanks": 1,
+            "cite": 1,
+            "boycotted": 1,
+            "guy": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Disoccupied",
+                "label": "ORG"
+            },
+            {
+                "text": "less than 10%",
+                "label": "PERCENT"
+            },
+            {
+                "text": "Vanguard",
+                "label": "ORG"
+            }
+        ]
+    },
+    "t3_1t4s0kt": {
+        "id": "t3_1t4s0kt",
+        "timestamp": "2026-05-05T20:49:50.611Z",
+        "title": "Is Jellycat a boycott-safe company?",
+        "body": "I was thinking about buying a Jellycat for fidgeting (Sky Dragon) but I wanted to also make sure that Jellycat does not support Israel or have any connections. Should I buy a Jellycat? Is it safe?",
+        "keywords": {
+            "jellycat": 4,
+            "company": 1,
+            "thinking": 1,
+            "buying": 1,
+            "fidgeting": 1,
+            "sky": 1,
+            "dragon": 1,
+            "sure": 1,
+            "support": 1,
+            "israel": 1,
+            "connection": 1,
+            "buy": 1,
+            "safe": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Sky Dragon",
+                "label": "PERSON"
+            },
+            {
+                "text": "Jellycat",
+                "label": "GPE"
+            },
+            {
+                "text": "Israel",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1t4rehf": {
+        "id": "t3_1t4rehf",
+        "timestamp": "2026-05-05T20:27:20.096Z",
+        "title": "Is it safe to watch a 3D movie which had animated with a problematic software",
+        "body": "I was thinking about watching the TADC: The Last Act movie when it comes out and I wanted to know if it was okay for me to watch and enjoy it even though Glitch Productions used a problematic animation software. Please help cause I am super paranoid right now! Thanks!",
+        "keywords": {
+            "safe": 1,
+            "watch": 2,
+            "3d": 1,
+            "movie": 2,
+            "animated": 1,
+            "problematic": 2,
+            "software": 2,
+            "thinking": 1,
+            "watching": 1,
+            "tadc": 1,
+            "last": 1,
+            "act": 1,
+            "come": 1,
+            "okay": 1,
+            "enjoy": 1,
+            "though": 1,
+            "glitch": 1,
+            "production": 1,
+            "used": 1,
+            "animation": 1,
+            "please": 1,
+            "help": 1,
+            "cause": 1,
+            "super": 1,
+            "paranoid": 1,
+            "right": 1,
+            "thanks": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Glitch Productions",
+                "label": "ORG"
+            }
+        ]
+    },
+    "t3_1t460qx": {
+        "id": "t3_1t460qx",
+        "timestamp": "2026-05-05T05:16:54.203Z",
+        "title": "Graphic Novels by Palestinians",
+        "body": "",
+        "keywords": {
+            "graphic": 1,
+            "novel": 1,
+            "palestinian": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Graphic Novels",
+                "label": "PERSON"
+            },
+            {
+                "text": "Palestinians",
+                "label": "NORP"
+            }
+        ]
+    },
+    "t3_1t3h9uw": {
+        "id": "t3_1t3h9uw",
+        "timestamp": "2026-05-04T13:10:05.660Z",
+        "title": "Do companies still benefit if you use a birthday coupon for a free gift? would it go against bds?",
+        "body": "So I got a birthday coupon from a place I personally boycott and one on the bds list. should i use it and unsubscribe for the future?",
+        "keywords": {
+            "company": 1,
+            "benefit": 1,
+            "use": 2,
+            "birthday": 2,
+            "coupon": 2,
+            "free": 1,
+            "gift": 1,
+            "bd": 2,
+            "place": 1,
+            "personally": 1,
+            "boycott": 1,
+            "one": 1,
+            "list": 1,
+            "unsubscribe": 1,
+            "future": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "bds",
+                "label": "ORG"
+            }
+        ]
+    },
+    "t3_1t3fd4w": {
+        "id": "t3_1t3fd4w",
+        "timestamp": "2026-05-04T11:49:38.666Z",
+        "title": "Iran says it turns back US warship from Strait of Hormuz, according to their news Agency.",
+        "body": "",
+        "keywords": {
+            "iran": 1,
+            "say": 1,
+            "turn": 1,
+            "back": 1,
+            "warship": 1,
+            "strait": 1,
+            "hormuz": 1,
+            "according": 1,
+            "news": 1,
+            "agency": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Iran",
+                "label": "GPE"
+            },
+            {
+                "text": "US",
+                "label": "GPE"
+            },
+            {
+                "text": "Strait of Hormuz",
+                "label": "LOC"
+            },
+            {
+                "text": "Agency",
+                "label": "ORG"
+            }
+        ]
+    },
+    "t3_1t4cf6k": {
+        "id": "t3_1t4cf6k",
+        "timestamp": "2026-05-05T11:17:15.449Z",
+        "title": "Hair dye alternatives",
+        "body": "Hey\n\nI was wondering whether there was a cheap hair dye alternatives in norway. I used to dye my own hair using Garnier or Schwarzkopf. I am looking for something with red shades, something that could perhaps be found in stores, and something that won't break my bank account.\n\nThanks in advance",
+        "keywords": {
+            "hair": 3,
+            "dye": 3,
+            "alternative": 2,
+            "hey": 1,
+            "wondering": 1,
+            "whether": 1,
+            "cheap": 1,
+            "norway": 1,
+            "used": 1,
+            "using": 1,
+            "garnier": 1,
+            "schwarzkopf": 1,
+            "looking": 1,
+            "something": 3,
+            "red": 1,
+            "shade": 1,
+            "perhaps": 1,
+            "found": 1,
+            "store": 1,
+            "wo": 1,
+            "break": 1,
+            "bank": 1,
+            "account": 1,
+            "thanks": 1,
+            "advance": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "norway",
+                "label": "GPE"
+            },
+            {
+                "text": "Garnier",
+                "label": "PERSON"
+            },
+            {
+                "text": "Schwarzkopf",
+                "label": "PERSON"
+            }
+        ]
+    },
+    "t3_1t2n2pk": {
+        "id": "t3_1t2n2pk",
+        "timestamp": "2026-05-03T14:33:15.374Z",
+        "title": "Boycott safe e-book websites?",
+        "body": "I don\u2019t wanna get pirated content since I value creators\u2019 work and it\u2019s haram. Either way where can I buy e-books? Amazon and Kobo are both boycotted.\n\nAlso, feel free to list any authors that you know are pro-zionism. For me and others to be wary. I know that Jordan Peterson is a zionist.\n\nEdit: Many typos, I wrote it in a rush.",
+        "keywords": {
+            "boycott": 1,
+            "safe": 1,
+            "website": 1,
+            "wan": 1,
+            "na": 1,
+            "pirated": 1,
+            "content": 1,
+            "since": 1,
+            "value": 1,
+            "creator": 1,
+            "work": 1,
+            "haram": 1,
+            "either": 1,
+            "way": 1,
+            "buy": 1,
+            "amazon": 1,
+            "kobo": 1,
+            "boycotted": 1,
+            "feel": 1,
+            "free": 1,
+            "list": 1,
+            "author": 1,
+            "others": 1,
+            "wary": 1,
+            "jordan": 1,
+            "peterson": 1,
+            "zionist": 1,
+            "typo": 1,
+            "wrote": 1,
+            "rush": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Boycott",
+                "label": "PERSON"
+            },
+            {
+                "text": "Amazon",
+                "label": "ORG"
+            },
+            {
+                "text": "Kobo",
+                "label": "PERSON"
+            },
+            {
+                "text": "Jordan Peterson",
+                "label": "PERSON"
+            }
+        ]
+    },
+    "t3_1t2tqiw": {
+        "id": "t3_1t2tqiw",
+        "timestamp": "2026-05-03T18:42:39.770Z",
+        "title": "Where are we buying fruit and veg from (UK)?",
+        "body": "So I was exclusively buying from Aldi since Asda was put on the boycott list. Just discovered Aldi's primary fruit and veg supplier is now on the No Thanks list. The only other major supermarket I know is safe is Co-op, and even if we had one nearby, I can't afford that kind of money regularly.\n\nWhere are you guys getting fruit and veg? There're no local suppliers near me. Do I just have to bite the bullet on this one?",
+        "keywords": {
+            "buying": 2,
+            "fruit": 3,
+            "veg": 3,
+            "uk": 1,
+            "exclusively": 1,
+            "aldi": 2,
+            "since": 1,
+            "asda": 1,
+            "put": 1,
+            "boycott": 1,
+            "list": 2,
+            "discovered": 1,
+            "primary": 1,
+            "supplier": 2,
+            "thanks": 1,
+            "major": 1,
+            "supermarket": 1,
+            "safe": 1,
+            "one": 2,
+            "nearby": 1,
+            "ca": 1,
+            "afford": 1,
+            "kind": 1,
+            "money": 1,
+            "regularly": 1,
+            "guy": 1,
+            "local": 1,
+            "near": 1,
+            "bite": 1,
+            "bullet": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "UK",
+                "label": "GPE"
+            },
+            {
+                "text": "Aldi",
+                "label": "ORG"
+            },
+            {
+                "text": "Asda",
+                "label": "ORG"
+            },
+            {
+                "text": "Aldi",
+                "label": "ORG"
+            }
+        ]
+    },
+    "t3_1t2jcv3": {
+        "id": "t3_1t2jcv3",
+        "timestamp": "2026-05-03T11:51:48.188Z",
+        "title": "Israel boycott",
+        "body": "Hey can someone confirm that is keune shampoo on boycott list in 2026 or not google is being sceptical",
+        "keywords": {
+            "israel": 1,
+            "boycott": 2,
+            "hey": 1,
+            "confirm": 1,
+            "keune": 1,
+            "shampoo": 1,
+            "list": 1,
+            "2026": 1,
+            "google": 1,
+            "sceptical": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Israel",
+                "label": "GPE"
+            },
+            {
+                "text": "2026",
+                "label": "DATE"
+            }
+        ]
+    },
+    "t3_1t35jqw": {
+        "id": "t3_1t35jqw",
+        "timestamp": "2026-05-04T02:55:06.431Z",
+        "title": "Alternative Haircare for Dry/Frizzy Curly Hair? (Herbal Essences)",
+        "body": "Hi folks!\n\nI\u2019m from Canada and have been trying to find alternatives to my Herbal Essences conditioner for a while now after learning they are invested in Israel. My hair is super dry, between 2C and 3B depending on the season, and gets weighed down by heavy products. A light leave-in conditioner would be great to find too. Right now I\u2019ve just been using coconut oil, but it makes my hair super greasy if I use it too often, and it doesn\u2019t do much to define my curls.\n\nThank you all so much in advance for the help! <3",
+        "keywords": {
+            "alternative": 2,
+            "haircare": 1,
+            "curly": 1,
+            "hair": 3,
+            "herbal": 2,
+            "essence": 2,
+            "hi": 1,
+            "folk": 1,
+            "canada": 1,
+            "trying": 1,
+            "find": 2,
+            "conditioner": 2,
+            "learning": 1,
+            "invested": 1,
+            "israel": 1,
+            "super": 2,
+            "dry": 1,
+            "2c": 1,
+            "3b": 1,
+            "depending": 1,
+            "season": 1,
+            "get": 1,
+            "weighed": 1,
+            "heavy": 1,
+            "product": 1,
+            "light": 1,
+            "great": 1,
+            "right": 1,
+            "using": 1,
+            "coconut": 1,
+            "oil": 1,
+            "make": 1,
+            "greasy": 1,
+            "use": 1,
+            "often": 1,
+            "define": 1,
+            "curl": 1,
+            "thank": 1,
+            "advance": 1,
+            "help": 1,
+            "3": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Dry/Frizzy Curly Hair",
+                "label": "ORG"
+            },
+            {
+                "text": "Herbal Essences",
+                "label": "ORG"
+            },
+            {
+                "text": "Canada",
+                "label": "GPE"
+            },
+            {
+                "text": "Herbal Essences",
+                "label": "ORG"
+            },
+            {
+                "text": "Israel",
+                "label": "GPE"
+            },
+            {
+                "text": "2C",
+                "label": "CARDINAL"
+            },
+            {
+                "text": "3B",
+                "label": "CARDINAL"
+            },
+            {
+                "text": "the season",
+                "label": "DATE"
+            }
+        ]
+    },
+    "t3_1t1k2ce": {
+        "id": "t3_1t1k2ce",
+        "timestamp": "2026-05-02T08:25:24.058Z",
+        "title": "Born during Israel\u2019s genocide: Gaza\u2019s child survivors bear the scars of war",
+        "body": "",
+        "keywords": {
+            "born": 1,
+            "israel": 1,
+            "genocide": 1,
+            "gaza": 1,
+            "child": 1,
+            "survivor": 1,
+            "bear": 1,
+            "scar": 1,
+            "war": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Israel",
+                "label": "GPE"
+            },
+            {
+                "text": "Gaza",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1t1mu7k": {
+        "id": "t3_1t1mu7k",
+        "timestamp": "2026-05-02T11:03:03.642Z",
+        "title": "Edible locusts not from Occupied Palestine?",
+        "body": "I know this is kinda a wild ask but I\u2019ve been wanting to try incorporating locusts in my diet for a good form of protein, but a lot of edible locusts on the market are farmed in Occupied Palestine. I\u2019ve found a few brands that claim to be either Thai or Chinese but don\u2019t have their farm location disclosed so I\u2019m distrusting. If anyone knows of a good brand where I can try them without suppprting apartheid I\u2019d appreciate it!",
+        "keywords": {
+            "edible": 2,
+            "locust": 3,
+            "occupied": 2,
+            "palestine": 2,
+            "kinda": 1,
+            "wild": 1,
+            "ask": 1,
+            "wanting": 1,
+            "try": 2,
+            "incorporating": 1,
+            "diet": 1,
+            "good": 2,
+            "form": 1,
+            "protein": 1,
+            "market": 1,
+            "farmed": 1,
+            "found": 1,
+            "brand": 2,
+            "claim": 1,
+            "either": 1,
+            "thai": 1,
+            "chinese": 1,
+            "farm": 1,
+            "location": 1,
+            "disclosed": 1,
+            "distrusting": 1,
+            "without": 1,
+            "suppprting": 1,
+            "apartheid": 1,
+            "appreciate": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Palestine",
+                "label": "GPE"
+            },
+            {
+                "text": "Palestine",
+                "label": "GPE"
+            },
+            {
+                "text": "Thai",
+                "label": "NORP"
+            },
+            {
+                "text": "Chinese",
+                "label": "NORP"
+            }
+        ]
+    },
+    "t3_1t2hk75": {
+        "id": "t3_1t2hk75",
+        "timestamp": "2026-05-03T10:14:52.940Z",
+        "title": "Alternatives to Aussie 3 minute miracle conditioner",
+        "body": "I used to use Aussie 3 minute miracle reconstructer conditioner, and I've been looking for ages and nothing seems to work quite as well. Palmer's and Monday conditioners seem to work okay (Monday more than Palmer's), but wondering if anyone's aware of any good alternatives, ideally ones that are leave-in but not ones that you apply when the hair is damp & don't wash off, nor ones where you leave it in for several minutes and then wash off but washing it off requires cold water.",
+        "keywords": {
+            "alternative": 2,
+            "aussie": 2,
+            "3": 2,
+            "minute": 3,
+            "miracle": 2,
+            "conditioner": 3,
+            "used": 1,
+            "use": 1,
+            "reconstructer": 1,
+            "looking": 1,
+            "age": 1,
+            "nothing": 1,
+            "seems": 1,
+            "work": 2,
+            "well": 1,
+            "palmer": 2,
+            "monday": 2,
+            "seem": 1,
+            "okay": 1,
+            "wondering": 1,
+            "aware": 1,
+            "good": 1,
+            "ideally": 1,
+            "one": 3,
+            "apply": 1,
+            "hair": 1,
+            "damp": 1,
+            "wash": 2,
+            "leave": 1,
+            "several": 1,
+            "washing": 1,
+            "requires": 1,
+            "cold": 1,
+            "water": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Aussie 3 minute miracle",
+                "label": "PERSON"
+            },
+            {
+                "text": "3 minute",
+                "label": "TIME"
+            },
+            {
+                "text": "Monday",
+                "label": "DATE"
+            },
+            {
+                "text": "Monday",
+                "label": "DATE"
+            },
+            {
+                "text": "several minutes",
+                "label": "TIME"
+            }
+        ]
+    },
+    "t3_1t0z73j": {
+        "id": "t3_1t0z73j",
+        "timestamp": "2026-05-01T16:59:51.247Z",
+        "title": "How AI *should* answer questions about israel but never does",
+        "body": "Probably the first honest answer I've seen from any AI platform...\n\nGOOD ON THEM!!!\n\nEdit: I want to add that I'm not some pro-AI stan. But chances are you know someone using AI and I urge you to point people towards platforms that are willing to be (RIGHTFULLY) critical of Israel. ChatGPT and Claude combined have something like 1b users being told \"The situation between Israel and Gaza is complicated\" and whatever other BS response.",
+        "keywords": {
+            "ai": 3,
+            "answer": 2,
+            "question": 1,
+            "israel": 3,
+            "never": 1,
+            "first": 1,
+            "honest": 1,
+            "seen": 1,
+            "platform": 2,
+            "good": 1,
+            "add": 1,
+            "stan": 1,
+            "chance": 1,
+            "using": 1,
+            "urge": 1,
+            "point": 1,
+            "people": 1,
+            "towards": 1,
+            "willing": 1,
+            "rightfully": 1,
+            "critical": 1,
+            "chatgpt": 1,
+            "claude": 1,
+            "combined": 1,
+            "something": 1,
+            "1b": 1,
+            "user": 1,
+            "told": 1,
+            "situation": 1,
+            "gaza": 1,
+            "complicated": 1,
+            "whatever": 1,
+            "b": 1,
+            "response": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "israel",
+                "label": "GPE"
+            },
+            {
+                "text": "first",
+                "label": "ORDINAL"
+            },
+            {
+                "text": "AI",
+                "label": "GPE"
+            },
+            {
+                "text": "AI",
+                "label": "GPE"
+            },
+            {
+                "text": "RIGHTFULLY",
+                "label": "ORG"
+            },
+            {
+                "text": "Israel",
+                "label": "GPE"
+            },
+            {
+                "text": "Claude",
+                "label": "ORG"
+            },
+            {
+                "text": "1b",
+                "label": "CARDINAL"
+            },
+            {
+                "text": "Israel",
+                "label": "GPE"
+            },
+            {
+                "text": "Gaza",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1t0y5mg": {
+        "id": "t3_1t0y5mg",
+        "timestamp": "2026-05-01T16:22:02.508Z",
+        "title": "Duck Duck Go",
+        "body": "The search engine Duck Duck Go comes up as green on No Thanks. But asking questions of its duck.ai version of Grok or Chat GPT reveals a clear pro Israel bias. I tried to ask it questions about the recent Golders Green stabbing in London. The media are going with an anti-Semitic narrative, which would be fair enough if that were the actual motive. They\u2019re using it as an excuse to condemn the Genocide Protests in London as antisemitism. So I asked duck.ai how many victims there were, and it was able to name two Jewish victims, one aged 76 and one aged 34. It found its info from the Times of Israel and the BBC. Both Zionist news institutions. I probed duck.ai further because I happen to know, from the Crown Prosecution Website, that the same suspect is charged with not two but three victims, one of whom is a Muslim, although the CPS don\u2019t actually name any of the victims or state a motive. The duck.ai first denied all knowledge of victim 3, then tried to paint the third person as a suspect, then it renamed the Muslim guy as a Jewish person. So it goes to show, the Zionists can get their teeth into any software, \u201cGood For Now\u201d or not.",
+        "keywords": {
+            "duck": 4,
+            "search": 1,
+            "engine": 1,
+            "come": 1,
+            "green": 2,
+            "thanks": 1,
+            "asking": 1,
+            "question": 2,
+            "version": 1,
+            "grok": 1,
+            "chat": 1,
+            "gpt": 1,
+            "reveals": 1,
+            "clear": 1,
+            "pro": 1,
+            "israel": 2,
+            "bias": 1,
+            "tried": 2,
+            "ask": 1,
+            "recent": 1,
+            "golders": 1,
+            "stabbing": 1,
+            "london": 2,
+            "medium": 1,
+            "going": 1,
+            "narrative": 1,
+            "fair": 1,
+            "enough": 1,
+            "actual": 1,
+            "motive": 2,
+            "using": 1,
+            "excuse": 1,
+            "condemn": 1,
+            "genocide": 1,
+            "protest": 1,
+            "antisemitism": 1,
+            "asked": 1,
+            "victim": 5,
+            "able": 1,
+            "name": 2,
+            "two": 2,
+            "jewish": 2,
+            "one": 3,
+            "aged": 2,
+            "76": 1,
+            "found": 1,
+            "info": 1,
+            "time": 1,
+            "bbc": 1,
+            "zionist": 2,
+            "news": 1,
+            "institution": 1,
+            "probed": 1,
+            "happen": 1,
+            "crown": 1,
+            "prosecution": 1,
+            "website": 1,
+            "suspect": 2,
+            "charged": 1,
+            "three": 1,
+            "muslim": 2,
+            "although": 1,
+            "cps": 1,
+            "state": 1,
+            "first": 1,
+            "denied": 1,
+            "knowledge": 1,
+            "3": 1,
+            "paint": 1,
+            "third": 1,
+            "person": 2,
+            "renamed": 1,
+            "guy": 1,
+            "show": 1,
+            "teeth": 1,
+            "software": 1,
+            "good": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Duck Duck",
+                "label": "PERSON"
+            },
+            {
+                "text": "Grok",
+                "label": "PERSON"
+            },
+            {
+                "text": "Chat GPT",
+                "label": "PERSON"
+            },
+            {
+                "text": "Israel",
+                "label": "GPE"
+            },
+            {
+                "text": "Golders Green",
+                "label": "ORG"
+            },
+            {
+                "text": "London",
+                "label": "GPE"
+            },
+            {
+                "text": "the Genocide Protests",
+                "label": "WORK_OF_ART"
+            },
+            {
+                "text": "London",
+                "label": "GPE"
+            },
+            {
+                "text": "two",
+                "label": "CARDINAL"
+            },
+            {
+                "text": "Jewish",
+                "label": "NORP"
+            },
+            {
+                "text": "one",
+                "label": "CARDINAL"
+            },
+            {
+                "text": "76",
+                "label": "DATE"
+            },
+            {
+                "text": "one",
+                "label": "CARDINAL"
+            },
+            {
+                "text": "34",
+                "label": "DATE"
+            },
+            {
+                "text": "the Times of Israel",
+                "label": "ORG"
+            },
+            {
+                "text": "BBC",
+                "label": "ORG"
+            },
+            {
+                "text": "Zionist",
+                "label": "NORP"
+            },
+            {
+                "text": "the Crown Prosecution Website",
+                "label": "ORG"
+            },
+            {
+                "text": "two",
+                "label": "CARDINAL"
+            },
+            {
+                "text": "three",
+                "label": "CARDINAL"
+            },
+            {
+                "text": "one",
+                "label": "CARDINAL"
+            },
+            {
+                "text": "Muslim",
+                "label": "NORP"
+            },
+            {
+                "text": "CPS",
+                "label": "ORG"
+            },
+            {
+                "text": "3",
+                "label": "CARDINAL"
+            },
+            {
+                "text": "third",
+                "label": "ORDINAL"
+            },
+            {
+                "text": "Muslim",
+                "label": "NORP"
+            },
+            {
+                "text": "Jewish",
+                "label": "NORP"
+            },
+            {
+                "text": "Zionists",
+                "label": "NORP"
+            },
+            {
+                "text": "Good For Now",
+                "label": "WORK_OF_ART"
+            }
+        ]
+    },
+    "t3_1t15jjy": {
+        "id": "t3_1t15jjy",
+        "timestamp": "2026-05-01T20:50:04.532Z",
+        "title": "make it make sense \ud83e\udd14",
+        "body": "I'm vegan and I was asking a vegan forum for good vegan ice cream suggestions. I couldn't find much. Some people suggested I get the non dairy Ben & Jerry's flavors. I said I won't be buying Ben & Jerry's because I have boycotted them a long time ago. suddenly, everyone attacked me.\n\nSo, am I the only vegan person who also is boycotting isreal? No one I know who boycotted Isreal is vegan, and none of the other vegans in these spaces are boycotting Isreal.\n\nI find it extremely hypnotical to pick and choose whether to boycott human genocide vs animal genocide. why not boycott both?\n\nAny other vegans here?",
+        "keywords": {
+            "sense": 1,
+            "vegan": 7,
+            "asking": 1,
+            "forum": 1,
+            "good": 1,
+            "ice": 1,
+            "cream": 1,
+            "suggestion": 1,
+            "find": 2,
+            "people": 1,
+            "suggested": 1,
+            "non": 1,
+            "dairy": 1,
+            "ben": 2,
+            "jerry": 2,
+            "flavor": 1,
+            "said": 1,
+            "wo": 1,
+            "buying": 1,
+            "boycotted": 2,
+            "long": 1,
+            "time": 1,
+            "ago": 1,
+            "suddenly": 1,
+            "everyone": 1,
+            "attacked": 1,
+            "person": 1,
+            "boycotting": 2,
+            "isreal": 3,
+            "one": 1,
+            "none": 1,
+            "space": 1,
+            "extremely": 1,
+            "hypnotical": 1,
+            "pick": 1,
+            "choose": 1,
+            "whether": 1,
+            "boycott": 2,
+            "human": 1,
+            "genocide": 2,
+            "v": 1,
+            "animal": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "\ud83e\udd14",
+                "label": "PERSON"
+            },
+            {
+                "text": "Ben & Jerry's",
+                "label": "ORG"
+            },
+            {
+                "text": "Isreal",
+                "label": "ORG"
+            },
+            {
+                "text": "Isreal",
+                "label": "ORG"
+            }
+        ]
+    },
+    "t3_1t0op1m": {
+        "id": "t3_1t0op1m",
+        "timestamp": "2026-05-01T09:41:43.475Z",
+        "title": "Are the following movies okay to watch? They came out recently.",
+        "body": "Animal Farm\n\nMicheal\n\nThe Super Mario Galaxy Movie",
+        "keywords": {
+            "following": 1,
+            "movie": 2,
+            "okay": 1,
+            "watch": 1,
+            "came": 1,
+            "recently": 1,
+            "animal": 1,
+            "farm": 1,
+            "micheal": 1,
+            "super": 1,
+            "mario": 1,
+            "galaxy": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Animal Farm\n\nMicheal\n\nThe Super Mario Galaxy Movie",
+                "label": "ORG"
+            }
+        ]
+    },
+    "t3_1t0idef": {
+        "id": "t3_1t0idef",
+        "timestamp": "2026-05-01T03:55:05.271Z",
+        "title": "What kind of chocolate can I buy in Europe that doesn't support genocide ?",
+        "body": "Am more into dark chocolate, but any kind of suggestions is good,",
+        "keywords": {
+            "kind": 2,
+            "chocolate": 2,
+            "buy": 1,
+            "europe": 1,
+            "support": 1,
+            "genocide": 1,
+            "dark": 1,
+            "suggestion": 1,
+            "good": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Europe",
+                "label": "LOC"
+            }
+        ]
+    },
+    "t3_1t0r9sc": {
+        "id": "t3_1t0r9sc",
+        "timestamp": "2026-05-01T11:54:34.464Z",
+        "title": "Non USA and ProIsrael peripherics please!",
+        "body": "Im looking for a vertical mouse from some brand that isnt from the USA (sorry for any USA members, is nothing against you, is againts your goverment) and that doesnt support Israhell, and i cant really find anything that has good reviews. Thank you very much in advance <3\nPS: Im based in Spain!",
+        "keywords": {
+            "non": 1,
+            "usa": 3,
+            "proisrael": 1,
+            "peripherics": 1,
+            "please": 1,
+            "im": 2,
+            "looking": 1,
+            "vertical": 1,
+            "mouse": 1,
+            "brand": 1,
+            "isnt": 1,
+            "sorry": 1,
+            "member": 1,
+            "nothing": 1,
+            "againts": 1,
+            "goverment": 1,
+            "doesnt": 1,
+            "support": 1,
+            "israhell": 1,
+            "cant": 1,
+            "find": 1,
+            "anything": 1,
+            "good": 1,
+            "review": 1,
+            "thank": 1,
+            "advance": 1,
+            "3": 1,
+            "p": 1,
+            "based": 1,
+            "spain": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Non USA",
+                "label": "ORG"
+            },
+            {
+                "text": "ProIsrael",
+                "label": "ORG"
+            },
+            {
+                "text": "USA",
+                "label": "GPE"
+            },
+            {
+                "text": "USA",
+                "label": "GPE"
+            },
+            {
+                "text": "Israhell",
+                "label": "ORG"
+            },
+            {
+                "text": "Spain",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1szxqvw": {
+        "id": "t3_1szxqvw",
+        "timestamp": "2026-04-30T14:30:53.223Z",
+        "title": "Non-Zionist Yoga Brand",
+        "body": "Sorry for the low effort post. I'm looking to purchase a yoga / athlesuire brand gift card but I want to avoid any zio linked trash. Obviously shit like Alo, and Lululemon is out. Checking to see if anyone knows any brands off hand that would be good. Gymshark comes to mind, but curious if anyone has some good ideas.",
+        "keywords": {
+            "yoga": 2,
+            "brand": 3,
+            "sorry": 1,
+            "low": 1,
+            "effort": 1,
+            "looking": 1,
+            "purchase": 1,
+            "athlesuire": 1,
+            "gift": 1,
+            "card": 1,
+            "avoid": 1,
+            "zio": 1,
+            "linked": 1,
+            "trash": 1,
+            "obviously": 1,
+            "shit": 1,
+            "alo": 1,
+            "lululemon": 1,
+            "checking": 1,
+            "see": 1,
+            "hand": 1,
+            "good": 2,
+            "gymshark": 1,
+            "come": 1,
+            "mind": 1,
+            "curious": 1,
+            "idea": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Non-Zionist Yoga Brand",
+                "label": "ORG"
+            },
+            {
+                "text": "Alo",
+                "label": "PRODUCT"
+            },
+            {
+                "text": "Lululemon",
+                "label": "PERSON"
+            }
+        ]
+    },
+    "t3_1sxkpsw": {
+        "id": "t3_1sxkpsw",
+        "timestamp": "2026-04-27T23:42:54.837Z",
+        "title": "Inexpensive Clothing Brands",
+        "body": "I am looking for brands that sell basic clothing items (like plain t-shirts, shorts, pants, socks, underwear) that are inexpensive, if possible. It seems like every major clothing brand is connected to Israel, and I have only seen a few alternatives listed on sites like Disoccupied, most of which seem to be on the more expensive side.\n\nThe two brands that seemed like possibilities that were listed as safe alternatives by Disoccupied were Honest Basics and Pact, but it seems that Honest Basics does not ship to the US anymore, and I saw comments saying that Pact has inconsistent quality. I know that thrifting is usually the safest option, but some clothing items I would only want to buy new for the sake of hygiene.\n\nDoes anyone have any suggestions?\n\nThank you!",
+        "keywords": {
+            "inexpensive": 2,
+            "clothing": 4,
+            "brand": 4,
+            "looking": 1,
+            "sell": 1,
+            "basic": 3,
+            "item": 2,
+            "plain": 1,
+            "short": 1,
+            "pant": 1,
+            "sock": 1,
+            "underwear": 1,
+            "possible": 1,
+            "seems": 2,
+            "every": 1,
+            "major": 1,
+            "connected": 1,
+            "israel": 1,
+            "seen": 1,
+            "alternative": 2,
+            "listed": 2,
+            "site": 1,
+            "disoccupied": 2,
+            "seem": 1,
+            "expensive": 1,
+            "side": 1,
+            "two": 1,
+            "seemed": 1,
+            "possibility": 1,
+            "safe": 1,
+            "honest": 2,
+            "pact": 2,
+            "ship": 1,
+            "anymore": 1,
+            "saw": 1,
+            "saying": 1,
+            "inconsistent": 1,
+            "quality": 1,
+            "thrifting": 1,
+            "usually": 1,
+            "safest": 1,
+            "option": 1,
+            "buy": 1,
+            "new": 1,
+            "sake": 1,
+            "hygiene": 1,
+            "suggestion": 1,
+            "thank": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Israel",
+                "label": "GPE"
+            },
+            {
+                "text": "Disoccupied",
+                "label": "ORG"
+            },
+            {
+                "text": "two",
+                "label": "CARDINAL"
+            },
+            {
+                "text": "Disoccupied",
+                "label": "ORG"
+            },
+            {
+                "text": "Honest Basics and Pact",
+                "label": "ORG"
+            },
+            {
+                "text": "Honest Basics",
+                "label": "ORG"
+            },
+            {
+                "text": "US",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1sytlr7": {
+        "id": "t3_1sytlr7",
+        "timestamp": "2026-04-29T09:17:28.050Z",
+        "title": "I found this wallpaper on another subreddit so i wanted to share it with everyone here.",
+        "body": "Credit to u/Lenoxx97",
+        "keywords": {
+            "found": 1,
+            "wallpaper": 1,
+            "another": 1,
+            "share": 1,
+            "everyone": 1,
+            "credit": 1
+        },
+        "sentiment": "Neutral",
+        "entities": []
+    },
+    "t3_1sz8s39": {
+        "id": "t3_1sz8s39",
+        "timestamp": "2026-04-29T19:20:43.824Z",
+        "title": "Microsoft removes Israeli names for occupied West Bank",
+        "body": "The primary group that pressured Microsoft to change the labels on Bing Maps is the\u00a0Arab Center for the Advancement of Social Media, also known as\u00a07amleh\n\nActivism Matters",
+        "keywords": {
+            "microsoft": 2,
+            "remove": 1,
+            "israeli": 1,
+            "name": 1,
+            "occupied": 1,
+            "west": 1,
+            "bank": 1,
+            "primary": 1,
+            "group": 1,
+            "pressured": 1,
+            "change": 1,
+            "label": 1,
+            "bing": 1,
+            "map": 1,
+            "arab": 1,
+            "center": 1,
+            "advancement": 1,
+            "social": 1,
+            "medium": 1,
+            "known": 1,
+            "7amleh": 1,
+            "activism": 1,
+            "matter": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Microsoft",
+                "label": "ORG"
+            },
+            {
+                "text": "Israeli",
+                "label": "NORP"
+            },
+            {
+                "text": "West Bank",
+                "label": "GPE"
+            },
+            {
+                "text": "Microsoft",
+                "label": "ORG"
+            },
+            {
+                "text": "Bing Maps",
+                "label": "PERSON"
+            },
+            {
+                "text": "the\u00a0Arab Center",
+                "label": "ORG"
+            },
+            {
+                "text": "the Advancement of Social Media",
+                "label": "ORG"
+            }
+        ]
+    },
+    "t3_1sw4zw1": {
+        "id": "t3_1sw4zw1",
+        "timestamp": "2026-04-26T11:25:48.448Z",
+        "title": "Alternatives to NYX cosmetics that are cruelty free, and vegan and available in Denmark",
+        "body": "Hey Reddit i found out my favorite makeup brand is sadly on the boycott list. The issue is that a lot of the brands that is not on the list is sadly not vegan and cruelty free.\n\nI know about essence and Catrice which is not on the list and is also cruelty free but I need some other good recommendations for brands that are cruelty free and cheap.\n\nIt is very important for me to only support ethical brands because I am a punk/alternative person and also vegetarian trying to be vegan",
+        "keywords": {
+            "alternative": 1,
+            "nyx": 1,
+            "cosmetic": 1,
+            "cruelty": 4,
+            "free": 4,
+            "vegan": 3,
+            "available": 1,
+            "denmark": 1,
+            "hey": 1,
+            "found": 1,
+            "favorite": 1,
+            "makeup": 1,
+            "brand": 4,
+            "sadly": 2,
+            "boycott": 1,
+            "list": 3,
+            "issue": 1,
+            "essence": 1,
+            "catrice": 1,
+            "need": 1,
+            "good": 1,
+            "recommendation": 1,
+            "cheap": 1,
+            "important": 1,
+            "support": 1,
+            "ethical": 1,
+            "person": 1,
+            "vegetarian": 1,
+            "trying": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "NYX",
+                "label": "ORG"
+            },
+            {
+                "text": "Denmark",
+                "label": "GPE"
+            },
+            {
+                "text": "Catrice",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1suw294": {
+        "id": "t3_1suw294",
+        "timestamp": "2026-04-24T23:43:03.720Z",
+        "title": "Catherine O'Neill Thorn (@caitoneill)",
+        "body": "Yup. It\u2019s pretty judgey, I realise that. It\u2019s all most of us can do while a million men, women and children are losing their precious lives in horrific ways. Surely we can break our addiction to the extraction machine that is using our money to slaughter hundreds of thousands of people.",
+        "keywords": {
+            "catherine": 1,
+            "thorn": 1,
+            "caitoneill": 1,
+            "yup": 1,
+            "pretty": 1,
+            "judgey": 1,
+            "realise": 1,
+            "million": 1,
+            "men": 1,
+            "woman": 1,
+            "child": 1,
+            "losing": 1,
+            "precious": 1,
+            "life": 1,
+            "horrific": 1,
+            "way": 1,
+            "surely": 1,
+            "break": 1,
+            "addiction": 1,
+            "extraction": 1,
+            "machine": 1,
+            "using": 1,
+            "money": 1,
+            "slaughter": 1,
+            "hundred": 1,
+            "thousand": 1,
+            "people": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Catherine O'Neill Thorn",
+                "label": "PERSON"
+            },
+            {
+                "text": "million",
+                "label": "CARDINAL"
+            },
+            {
+                "text": "hundreds of thousands",
+                "label": "CARDINAL"
+            }
+        ]
+    },
+    "t3_1sur7ud": {
+        "id": "t3_1sur7ud",
+        "timestamp": "2026-04-24T20:27:42.499Z",
+        "title": "I mean my generation lost faith in Wikipedia so long ago even for trivial informations, but I think this post may be of help for ppl who are unaware",
+        "body": "",
+        "keywords": {
+            "mean": 1,
+            "generation": 1,
+            "lost": 1,
+            "faith": 1,
+            "wikipedia": 1,
+            "long": 1,
+            "ago": 1,
+            "trivial": 1,
+            "information": 1,
+            "think": 1,
+            "help": 1,
+            "ppl": 1,
+            "unaware": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Wikipedia",
+                "label": "ORG"
+            }
+        ]
+    },
+    "t3_1svo5s1": {
+        "id": "t3_1svo5s1",
+        "timestamp": "2026-04-25T21:14:11.390Z",
+        "title": "Is Jessica Simpson brand on the boycott list? Parent company is With You Inc",
+        "body": "I tried to look online but I couldn\u2019t find anything about it, wanted to know if it\u2019s ok to buy this brand. I couldn\u2019t find anything about her stance either",
+        "keywords": {
+            "jessica": 1,
+            "simpson": 1,
+            "brand": 2,
+            "boycott": 1,
+            "list": 1,
+            "parent": 1,
+            "company": 1,
+            "inc": 1,
+            "tried": 1,
+            "online": 1,
+            "find": 2,
+            "anything": 2,
+            "ok": 1,
+            "buy": 1,
+            "stance": 1,
+            "either": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Jessica Simpson",
+                "label": "PERSON"
+            }
+        ]
+    },
+    "t3_1ssu0tz": {
+        "id": "t3_1ssu0tz",
+        "timestamp": "2026-04-22T18:31:02.798Z",
+        "title": "Are these dates really from Jordan?",
+        "body": "I came across these Medjool dates at Lidl in Belgium. I was wondering if they really were from Jordan as they claim on the label or it is 'date laundering' as I've read it called in order to hide their Israeli origin and sell.\n\nThank you",
+        "keywords": {
+            "date": 2,
+            "jordan": 2,
+            "came": 1,
+            "across": 1,
+            "medjool": 1,
+            "lidl": 1,
+            "belgium": 1,
+            "wondering": 1,
+            "claim": 1,
+            "label": 1,
+            "laundering": 1,
+            "read": 1,
+            "called": 1,
+            "order": 1,
+            "hide": 1,
+            "israeli": 1,
+            "origin": 1,
+            "sell": 1,
+            "thank": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Jordan",
+                "label": "GPE"
+            },
+            {
+                "text": "Lidl",
+                "label": "GPE"
+            },
+            {
+                "text": "Belgium",
+                "label": "GPE"
+            },
+            {
+                "text": "Jordan",
+                "label": "GPE"
+            },
+            {
+                "text": "Israeli",
+                "label": "NORP"
+            }
+        ]
+    },
+    "t3_1stp4g0": {
+        "id": "t3_1stp4g0",
+        "timestamp": "2026-04-23T17:18:04.853Z",
+        "title": "It's hilarious how Israel is doing the same thing they say the Nazis did",
+        "body": "I always watched these shows or movies that showed how vile the Nazis were, but Israel is doing worse things and nobody is doing anything to stop it.",
+        "keywords": {
+            "hilarious": 1,
+            "israel": 2,
+            "say": 1,
+            "nazi": 2,
+            "always": 1,
+            "watched": 1,
+            "show": 1,
+            "movie": 1,
+            "showed": 1,
+            "vile": 1,
+            "worse": 1,
+            "nobody": 1,
+            "anything": 1,
+            "stop": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Israel",
+                "label": "GPE"
+            },
+            {
+                "text": "Nazis",
+                "label": "NORP"
+            },
+            {
+                "text": "Nazis",
+                "label": "NORP"
+            },
+            {
+                "text": "Israel",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1sumb7b": {
+        "id": "t3_1sumb7b",
+        "timestamp": "2026-04-24T17:27:40.527Z",
+        "title": "I think takis might be on the boycott list",
+        "body": "So for explanation, the parent company of takis is Grupo bimbo and they invested in an Israeli food tech company. I'm unsure and I did some research.\n\nSource:\n\nhttps://disoccupied.com/brand/takis\n\nhttps://israelproducts.cloud/does-takis-support-israel/",
+        "keywords": {
+            "think": 1,
+            "takis": 2,
+            "boycott": 1,
+            "list": 1,
+            "explanation": 1,
+            "parent": 1,
+            "company": 2,
+            "grupo": 1,
+            "bimbo": 1,
+            "invested": 1,
+            "israeli": 1,
+            "food": 1,
+            "tech": 1,
+            "unsure": 1,
+            "research": 1,
+            "source": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Grupo",
+                "label": "ORG"
+            },
+            {
+                "text": "Israeli",
+                "label": "NORP"
+            }
+        ]
+    },
+    "t3_1srtzw5": {
+        "id": "t3_1srtzw5",
+        "timestamp": "2026-04-21T17:09:27.042Z",
+        "title": "Credit Unions",
+        "body": "I\u2019m looking to switch from Scotiabank due to their ties with Israel and being on BDS.\n\nThe credit union I\u2019m joining was originally established by the Lithuanian community - when I looked it up, it appears that Lithuania is supportive of Israel (please correct me if I\u2019m wrong).\n\nI\u2019m worried joining this CU may also supoort/fund Israel\u2019s genocide. Should I just check the CU\u2019s funding/investment history as laid out online, and if there are no ties to Israel stated, do you think it\u2019s okay to open an account? I just don\u2019t want to go from one complicit institution to another.\n\nThank you!",
+        "keywords": {
+            "credit": 2,
+            "union": 2,
+            "looking": 1,
+            "switch": 1,
+            "scotiabank": 1,
+            "due": 1,
+            "tie": 2,
+            "israel": 4,
+            "bd": 1,
+            "joining": 2,
+            "originally": 1,
+            "established": 1,
+            "lithuanian": 1,
+            "community": 1,
+            "looked": 1,
+            "appears": 1,
+            "lithuania": 1,
+            "supportive": 1,
+            "please": 1,
+            "correct": 1,
+            "wrong": 1,
+            "worried": 1,
+            "cu": 2,
+            "genocide": 1,
+            "check": 1,
+            "history": 1,
+            "laid": 1,
+            "online": 1,
+            "stated": 1,
+            "think": 1,
+            "okay": 1,
+            "open": 1,
+            "account": 1,
+            "one": 1,
+            "complicit": 1,
+            "institution": 1,
+            "another": 1,
+            "thank": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Scotiabank",
+                "label": "ORG"
+            },
+            {
+                "text": "Israel",
+                "label": "GPE"
+            },
+            {
+                "text": "BDS",
+                "label": "ORG"
+            },
+            {
+                "text": "Lithuanian",
+                "label": "NORP"
+            },
+            {
+                "text": "Lithuania",
+                "label": "GPE"
+            },
+            {
+                "text": "Israel",
+                "label": "GPE"
+            },
+            {
+                "text": "CU",
+                "label": "ORG"
+            },
+            {
+                "text": "Israel",
+                "label": "GPE"
+            },
+            {
+                "text": "CU",
+                "label": "ORG"
+            },
+            {
+                "text": "Israel",
+                "label": "GPE"
+            },
+            {
+                "text": "one",
+                "label": "CARDINAL"
+            }
+        ]
+    },
+    "t3_1srvxgu": {
+        "id": "t3_1srvxgu",
+        "timestamp": "2026-04-21T18:14:14.709Z",
+        "title": "Ethical shoe brands/ stores not on the boycott list",
+        "body": "Hello! So i live in Germany and i need urgently a new pair of shoes (i moved here during the winter and i don't have any shoes for warmer weather). I tried going to thrift stores but it's a bit challenging cause the choices are extremely limited and the prices are quite high and i feel like every brand of clothing/ shoes is on the boycott list.\n\nIf you have any suggestions, please help\n\nThank you all",
+        "keywords": {
+            "ethical": 1,
+            "shoe": 4,
+            "store": 2,
+            "boycott": 2,
+            "list": 2,
+            "hello": 1,
+            "live": 1,
+            "germany": 1,
+            "need": 1,
+            "urgently": 1,
+            "new": 1,
+            "pair": 1,
+            "moved": 1,
+            "winter": 1,
+            "warmer": 1,
+            "weather": 1,
+            "tried": 1,
+            "going": 1,
+            "thrift": 1,
+            "bit": 1,
+            "challenging": 1,
+            "cause": 1,
+            "choice": 1,
+            "extremely": 1,
+            "limited": 1,
+            "price": 1,
+            "high": 1,
+            "feel": 1,
+            "every": 1,
+            "brand": 1,
+            "suggestion": 1,
+            "please": 1,
+            "help": 1,
+            "thank": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Germany",
+                "label": "GPE"
+            },
+            {
+                "text": "the winter",
+                "label": "DATE"
+            }
+        ]
+    },
+    "t3_1ssebu8": {
+        "id": "t3_1ssebu8",
+        "timestamp": "2026-04-22T07:24:07.653Z",
+        "title": "Is United Colours of Benetton safe?",
+        "body": "I remember they used to be on some lists, but can't find any info now. Would like to confirm before I go ahead with my purchase.",
+        "keywords": {
+            "united": 1,
+            "colour": 1,
+            "benetton": 1,
+            "safe": 1,
+            "remember": 1,
+            "used": 1,
+            "list": 1,
+            "ca": 1,
+            "find": 1,
+            "info": 1,
+            "confirm": 1,
+            "ahead": 1,
+            "purchase": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Benetton",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1sqpw84": {
+        "id": "t3_1sqpw84",
+        "timestamp": "2026-04-20T13:49:06.303Z",
+        "title": "The difficult question about computer processors",
+        "body": "I would like to ask this community because I got a really helpful answer here before.\n\nLet\u2019s talk computers, phones. Anything that needs a CPU, computer processing unit.\n\nDisclaimer, my technical and political knowledge is not 100%, open to corrections.\n\nAll the information below is alleged to the best of my memory.\n\nIntel. AMD. I\u2019ve looked into the big names. All addicted to military.\n\nNew RISC-V processors. Mostly developed by Chinese companies where the Chinese government had a majority shareholder stake. Problematic because of Ughyur people, Taiwan, Tibet.\n\nThere\u2019s Sifive, but that\u2019s partially owned by Intel. So still problematic.\n\nIndependent processors like Raspberry Pi. But they use Broadcom. Problematic.\n\nI found Japanese brand Renesas. But they use ARM chips. ARM is used in a lot of military im guessing in enterprise deals.\n\nI know the complication. Having the finances and resources to develop this technology even in a small scale is very very expensive.\n\nIs there anyone out there developing medium to fast pace processors that have an ethical supply chain?\n\nAny insights anyone?",
+        "keywords": {
+            "difficult": 1,
+            "question": 1,
+            "computer": 3,
+            "processor": 4,
+            "ask": 1,
+            "community": 1,
+            "helpful": 1,
+            "answer": 1,
+            "let": 1,
+            "talk": 1,
+            "phone": 1,
+            "anything": 1,
+            "need": 1,
+            "cpu": 1,
+            "processing": 1,
+            "unit": 1,
+            "disclaimer": 1,
+            "technical": 1,
+            "political": 1,
+            "knowledge": 1,
+            "100": 1,
+            "open": 1,
+            "correction": 1,
+            "information": 1,
+            "alleged": 1,
+            "best": 1,
+            "memory": 1,
+            "intel": 2,
+            "amd": 1,
+            "looked": 1,
+            "big": 1,
+            "name": 1,
+            "addicted": 1,
+            "military": 2,
+            "new": 1,
+            "mostly": 1,
+            "developed": 1,
+            "chinese": 2,
+            "company": 1,
+            "government": 1,
+            "majority": 1,
+            "shareholder": 1,
+            "stake": 1,
+            "problematic": 3,
+            "ughyur": 1,
+            "people": 1,
+            "taiwan": 1,
+            "tibet": 1,
+            "sifive": 1,
+            "partially": 1,
+            "owned": 1,
+            "independent": 1,
+            "raspberry": 1,
+            "pi": 1,
+            "use": 2,
+            "broadcom": 1,
+            "found": 1,
+            "japanese": 1,
+            "brand": 1,
+            "renesas": 1,
+            "arm": 2,
+            "chip": 1,
+            "used": 1,
+            "im": 1,
+            "guessing": 1,
+            "enterprise": 1,
+            "deal": 1,
+            "complication": 1,
+            "finance": 1,
+            "resource": 1,
+            "develop": 1,
+            "technology": 1,
+            "small": 1,
+            "scale": 1,
+            "expensive": 1,
+            "developing": 1,
+            "medium": 1,
+            "fast": 1,
+            "pace": 1,
+            "ethical": 1,
+            "supply": 1,
+            "chain": 1,
+            "insight": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "CPU",
+                "label": "ORG"
+            },
+            {
+                "text": "100%",
+                "label": "PERCENT"
+            },
+            {
+                "text": "Intel",
+                "label": "ORG"
+            },
+            {
+                "text": "AMD",
+                "label": "ORG"
+            },
+            {
+                "text": "Chinese",
+                "label": "NORP"
+            },
+            {
+                "text": "Chinese",
+                "label": "NORP"
+            },
+            {
+                "text": "Ughyur",
+                "label": "NORP"
+            },
+            {
+                "text": "Taiwan",
+                "label": "GPE"
+            },
+            {
+                "text": "Tibet",
+                "label": "GPE"
+            },
+            {
+                "text": "Intel",
+                "label": "ORG"
+            },
+            {
+                "text": "Raspberry Pi",
+                "label": "PERSON"
+            },
+            {
+                "text": "Broadcom.",
+                "label": "WORK_OF_ART"
+            },
+            {
+                "text": "Japanese",
+                "label": "NORP"
+            },
+            {
+                "text": "Renesas",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1sqajh1": {
+        "id": "t3_1sqajh1",
+        "timestamp": "2026-04-20T00:57:09.454Z",
+        "title": "Protonmail is not accepted everywhere",
+        "body": "So I've been using proton as my mainemail provider for more than a year, almost 2\n\nbut sometimes I had to either drop some services/apps because they don't have sign up by email option or they have it but don't accept proton domain\n\nI tried disroot, but it wasn't enough either\n\nso I found back then that Yahoo although horrible for safety, but at least the least of evils as it's not on the official BDS\n\nand it's recognized enough,\n\nBUT, I learnt today that it's categorized as red in gaza . nu although not on the official bds\n\nTL;DR\n\nSo my question is there a provider that is recognized enough yet Israeli-safe",
+        "keywords": {
+            "protonmail": 1,
+            "accepted": 1,
+            "everywhere": 1,
+            "using": 1,
+            "proton": 2,
+            "mainemail": 1,
+            "provider": 2,
+            "year": 1,
+            "almost": 1,
+            "2": 1,
+            "sometimes": 1,
+            "either": 2,
+            "drop": 1,
+            "sign": 1,
+            "email": 1,
+            "option": 1,
+            "accept": 1,
+            "domain": 1,
+            "tried": 1,
+            "disroot": 1,
+            "enough": 3,
+            "found": 1,
+            "back": 1,
+            "yahoo": 1,
+            "although": 2,
+            "horrible": 1,
+            "safety": 1,
+            "least": 2,
+            "evil": 1,
+            "official": 2,
+            "bd": 2,
+            "recognized": 2,
+            "learnt": 1,
+            "today": 1,
+            "categorized": 1,
+            "red": 1,
+            "gaza": 1,
+            "nu": 1,
+            "tl": 1,
+            "dr": 1,
+            "question": 1,
+            "yet": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Protonmail",
+                "label": "ORG"
+            },
+            {
+                "text": "more than a year",
+                "label": "DATE"
+            },
+            {
+                "text": "almost 2",
+                "label": "CARDINAL"
+            },
+            {
+                "text": "Yahoo",
+                "label": "ORG"
+            },
+            {
+                "text": "BDS",
+                "label": "ORG"
+            },
+            {
+                "text": "today",
+                "label": "DATE"
+            },
+            {
+                "text": "gaza",
+                "label": "GPE"
+            },
+            {
+                "text": "Israeli",
+                "label": "NORP"
+            }
+        ]
+    },
+    "t3_1spw1z8": {
+        "id": "t3_1spw1z8",
+        "timestamp": "2026-04-19T15:28:18.744Z",
+        "title": "RISC-V (Opensource ISA) 2026 update",
+        "body": "This video from Explaining Computers gives an update in 2026 on the development of the opensource RISC-V ISA (instruction set architecture).\n\nCurrently, most PCs and laptops use Intel, Nvidia, or AMD chips which run on x86 architecture. And most mobiles and Apple devices run on Qualcomm's chips, MediaTek's chips, or Apple's A-series / M-series chips all of which which run on ARM architecture.\n\nThe x86 and ARM architectures are both closed source and require licenses to develop chips based on them - from Intel and ARM Holdings (which is owned by SoftBank Group), respectively.\n\nIntel, Nvidia, and AMD are all boycott worthy and have deep ties with Israeli companies - Intel is a BDS Priority target. Out of these three, AMD is least worst.\n\nARM (SoftBank Group), Qualcomm, Apple are all also boycott worthy. MediaTek seems to be safe, but someone can correct me on that.\n\nThe RISC-V architecture is opensource and is currently used in niche and other less common devices.\n\nWhilst it may not be ready for them yet, in the coming years, we may see PCs, laptops, mobiles, and other modern electronic devices made with chips using RISC-V architecture.\n\nThe video mentions some manufacturers, companies, and organisations also involved in developing for RISC-V - some safe, some unsafe, some unknown.",
+        "keywords": {
+            "opensource": 3,
+            "isa": 2,
+            "2026": 2,
+            "update": 2,
+            "video": 2,
+            "explaining": 1,
+            "computer": 1,
+            "give": 1,
+            "development": 1,
+            "instruction": 1,
+            "set": 1,
+            "architecture": 6,
+            "currently": 2,
+            "pc": 2,
+            "laptop": 2,
+            "use": 1,
+            "intel": 4,
+            "nvidia": 2,
+            "amd": 3,
+            "chip": 6,
+            "run": 3,
+            "x86": 2,
+            "mobile": 2,
+            "apple": 3,
+            "device": 3,
+            "qualcomm": 2,
+            "mediatek": 2,
+            "arm": 4,
+            "closed": 1,
+            "source": 1,
+            "require": 1,
+            "license": 1,
+            "develop": 1,
+            "based": 1,
+            "holding": 1,
+            "owned": 1,
+            "softbank": 2,
+            "group": 2,
+            "respectively": 1,
+            "boycott": 2,
+            "worthy": 2,
+            "deep": 1,
+            "tie": 1,
+            "israeli": 1,
+            "company": 2,
+            "bd": 1,
+            "priority": 1,
+            "target": 1,
+            "three": 1,
+            "least": 1,
+            "worst": 1,
+            "seems": 1,
+            "safe": 2,
+            "correct": 1,
+            "used": 1,
+            "niche": 1,
+            "less": 1,
+            "common": 1,
+            "whilst": 1,
+            "ready": 1,
+            "yet": 1,
+            "coming": 1,
+            "year": 1,
+            "see": 1,
+            "modern": 1,
+            "electronic": 1,
+            "using": 1,
+            "mention": 1,
+            "manufacturer": 1,
+            "organisation": 1,
+            "involved": 1,
+            "developing": 1,
+            "unsafe": 1,
+            "unknown": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "2026",
+                "label": "DATE"
+            },
+            {
+                "text": "Explaining Computers",
+                "label": "ORG"
+            },
+            {
+                "text": "2026",
+                "label": "DATE"
+            },
+            {
+                "text": "ISA",
+                "label": "ORG"
+            },
+            {
+                "text": "Intel",
+                "label": "ORG"
+            },
+            {
+                "text": "Nvidia",
+                "label": "GPE"
+            },
+            {
+                "text": "AMD",
+                "label": "ORG"
+            },
+            {
+                "text": "Apple",
+                "label": "ORG"
+            },
+            {
+                "text": "Qualcomm",
+                "label": "PERSON"
+            },
+            {
+                "text": "MediaTek",
+                "label": "ORG"
+            },
+            {
+                "text": "Apple",
+                "label": "ORG"
+            },
+            {
+                "text": "Intel",
+                "label": "ORG"
+            },
+            {
+                "text": "ARM Holdings",
+                "label": "ORG"
+            },
+            {
+                "text": "SoftBank Group",
+                "label": "ORG"
+            },
+            {
+                "text": "Intel",
+                "label": "ORG"
+            },
+            {
+                "text": "Nvidia",
+                "label": "GPE"
+            },
+            {
+                "text": "AMD",
+                "label": "ORG"
+            },
+            {
+                "text": "Israeli",
+                "label": "NORP"
+            },
+            {
+                "text": "Intel",
+                "label": "ORG"
+            },
+            {
+                "text": "BDS Priority",
+                "label": "ORG"
+            },
+            {
+                "text": "three",
+                "label": "CARDINAL"
+            },
+            {
+                "text": "AMD",
+                "label": "ORG"
+            },
+            {
+                "text": "SoftBank Group",
+                "label": "ORG"
+            },
+            {
+                "text": "Qualcomm",
+                "label": "PERSON"
+            },
+            {
+                "text": "Apple",
+                "label": "ORG"
+            },
+            {
+                "text": "MediaTek",
+                "label": "ORG"
+            },
+            {
+                "text": "the coming years",
+                "label": "DATE"
+            }
+        ]
+    },
+    "t3_1sqpm2r": {
+        "id": "t3_1sqpm2r",
+        "timestamp": "2026-04-20T13:38:40.552Z",
+        "title": "Alternative list ? Help needed",
+        "body": "Hello everyone, I've been searching for an entertainment app like netflix. according to the no thanks app (which truly is a blessing btw) almost everything is on the boycott list. Please help a buddy out \ud83d\ude1b",
+        "keywords": {
+            "alternative": 1,
+            "list": 2,
+            "help": 2,
+            "needed": 1,
+            "hello": 1,
+            "everyone": 1,
+            "searching": 1,
+            "entertainment": 1,
+            "app": 2,
+            "netflix": 1,
+            "according": 1,
+            "thanks": 1,
+            "truly": 1,
+            "blessing": 1,
+            "btw": 1,
+            "almost": 1,
+            "everything": 1,
+            "boycott": 1,
+            "please": 1,
+            "buddy": 1
+        },
+        "sentiment": "Positive",
+        "entities": [
+            {
+                "text": "netflix",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1so1m3h": {
+        "id": "t3_1so1m3h",
+        "timestamp": "2026-04-17T13:51:44.030Z",
+        "title": "Does Joe & The Juice support israel?",
+        "body": "I\u2019ve seen a video on instagram of protestors going against Joe & The Juice in Lebanon because their support of israel, but I can\u2019t find any info about the reason? It\u2019s a Danish comp and not publicly traded, so does anyone have any more information?",
+        "keywords": {
+            "joe": 2,
+            "juice": 2,
+            "support": 2,
+            "israel": 2,
+            "seen": 1,
+            "video": 1,
+            "instagram": 1,
+            "protestors": 1,
+            "going": 1,
+            "lebanon": 1,
+            "find": 1,
+            "info": 1,
+            "reason": 1,
+            "danish": 1,
+            "comp": 1,
+            "publicly": 1,
+            "traded": 1,
+            "information": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "israel",
+                "label": "GPE"
+            },
+            {
+                "text": "Joe & The Juice",
+                "label": "ORG"
+            },
+            {
+                "text": "Lebanon",
+                "label": "GPE"
+            },
+            {
+                "text": "israel",
+                "label": "GPE"
+            },
+            {
+                "text": "Danish",
+                "label": "NORP"
+            }
+        ]
+    },
+    "t3_1spolb8": {
+        "id": "t3_1spolb8",
+        "timestamp": "2026-04-19T09:47:09.896Z",
+        "title": "Remember to always carry your watermelons with you if you ever encounter them.",
+        "body": "",
+        "keywords": {
+            "remember": 1,
+            "always": 1,
+            "carry": 1,
+            "watermelon": 1,
+            "ever": 1,
+            "encounter": 1
+        },
+        "sentiment": "Positive",
+        "entities": []
+    },
+    "t3_1snr3sv": {
+        "id": "t3_1snr3sv",
+        "timestamp": "2026-04-17T04:53:16.586Z",
+        "title": "Safe music streaming platforms?",
+        "body": "Apple, spotify and amazon all are on the boycott list, are there any good music streaming platforms that are ethical?",
+        "keywords": {
+            "safe": 1,
+            "music": 2,
+            "streaming": 2,
+            "platform": 2,
+            "apple": 1,
+            "spotify": 1,
+            "amazon": 1,
+            "boycott": 1,
+            "list": 1,
+            "good": 1,
+            "ethical": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Apple",
+                "label": "ORG"
+            }
+        ]
+    },
+    "t3_1sovalw": {
+        "id": "t3_1sovalw",
+        "timestamp": "2026-04-18T11:37:44.198Z",
+        "title": "loreal elvive alternatives?",
+        "body": "hello! I\u2019ve been boycotting for a while now but recently looking up hair product recommendations and all I\u2019m getting is loreal elvive\u2026does anybody have any alternatives for their hylaroun line please?",
+        "keywords": {
+            "loreal": 2,
+            "elvive": 1,
+            "alternative": 2,
+            "hello": 1,
+            "boycotting": 1,
+            "recently": 1,
+            "looking": 1,
+            "hair": 1,
+            "product": 1,
+            "recommendation": 1,
+            "anybody": 1,
+            "hylaroun": 1,
+            "line": 1,
+            "please": 1
+        },
+        "sentiment": "Negative",
+        "entities": []
+    },
+    "t3_1snhimv": {
+        "id": "t3_1snhimv",
+        "timestamp": "2026-04-16T21:46:14.437Z",
+        "title": "Nail Polish Brands you recommend",
+        "body": "I\u2019ve been looking to get some new nail polish but the only two brands I was considering ship to you know where, I\u2019m considering emailing them to inquire as to why but in the meantime if there are any brands you recommend I\u2019d appreciate it. I\u2019m looking for a glass nail file as well so a brand that also has one of those would be appreciated.",
+        "keywords": {
+            "nail": 3,
+            "polish": 2,
+            "brand": 4,
+            "recommend": 2,
+            "looking": 2,
+            "new": 1,
+            "two": 1,
+            "considering": 2,
+            "ship": 1,
+            "emailing": 1,
+            "inquire": 1,
+            "meantime": 1,
+            "appreciate": 1,
+            "glass": 1,
+            "file": 1,
+            "well": 1,
+            "one": 1,
+            "appreciated": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Polish",
+                "label": "NORP"
+            },
+            {
+                "text": "only two",
+                "label": "CARDINAL"
+            }
+        ]
+    },
+    "t3_1snpl93": {
+        "id": "t3_1snpl93",
+        "timestamp": "2026-04-17T03:38:04.280Z",
+        "title": "I feel guilty bc the dates I ordered ended up being Israeli, what should I do",
+        "body": "So my family gets our regular groceries delivered, which means I can\u2019t rlly check where the product is from, I usually get dates from a local market cuz they\u2019re a bit cheaper, and the owners of the stall are, I believe, Lebanese. Which I imagine would mean non-Israeli dates but now that I think of it I should double check and look at the boxes they\u2019re in. Anyway, the market isn\u2019t available for a bit so I just tacked them on the order cuz last time I saw them in the store they were all Moroccan. Delivery came and I was out so when I got home everything was already unpacked by family, including the dates. I had it nagging in my head to make sure so I found the packaging in the bin and saw they were a \u201cproduct of israel\u201d.\n\nI haven\u2019t eaten them yet but I just feel really guilty now havent inadvertently helped israeli profits and shi the store a demand for a product they sometimes source from israel, but I don\u2019t wanna encourage that.\n\nI know it probably is minor compared to everything else but I just wanted some opinions on what other people would do, since they\u2019ve bee opened and moved it\u2019s not like I can return and refund them to then not be giving my money to them, so idk if anything will make me not get feel guilty about it now, I\u2019ve debated binning the but also feel like that would be dumb to just waste food especially when others across the world and in Palestine are being starved, it would feel hypocritical yk? But I\u2019d feel like a twat for snacking on an israeli product. What should I do?\n\nAny suggestions on how to make sure my dates in future are not israeli, even at local grocery markets, specifically for the UK if possible?",
+        "keywords": {
+            "feel": 6,
+            "guilty": 3,
+            "bc": 1,
+            "date": 5,
+            "ordered": 1,
+            "ended": 1,
+            "israeli": 4,
+            "family": 2,
+            "get": 1,
+            "regular": 1,
+            "grocery": 2,
+            "delivered": 1,
+            "mean": 2,
+            "rlly": 1,
+            "check": 2,
+            "product": 4,
+            "usually": 1,
+            "local": 2,
+            "market": 3,
+            "cuz": 2,
+            "bit": 2,
+            "cheaper": 1,
+            "owner": 1,
+            "stall": 1,
+            "believe": 1,
+            "lebanese": 1,
+            "imagine": 1,
+            "think": 1,
+            "double": 1,
+            "box": 1,
+            "anyway": 1,
+            "available": 1,
+            "tacked": 1,
+            "order": 1,
+            "last": 1,
+            "time": 1,
+            "saw": 2,
+            "store": 2,
+            "moroccan": 1,
+            "delivery": 1,
+            "came": 1,
+            "home": 1,
+            "everything": 2,
+            "already": 1,
+            "unpacked": 1,
+            "including": 1,
+            "nagging": 1,
+            "head": 1,
+            "sure": 2,
+            "found": 1,
+            "packaging": 1,
+            "bin": 1,
+            "israel": 2,
+            "eaten": 1,
+            "yet": 1,
+            "havent": 1,
+            "inadvertently": 1,
+            "helped": 1,
+            "profit": 1,
+            "shi": 1,
+            "demand": 1,
+            "sometimes": 1,
+            "source": 1,
+            "wan": 1,
+            "na": 1,
+            "encourage": 1,
+            "minor": 1,
+            "compared": 1,
+            "else": 1,
+            "opinion": 1,
+            "people": 1,
+            "since": 1,
+            "bee": 1,
+            "opened": 1,
+            "moved": 1,
+            "return": 1,
+            "refund": 1,
+            "giving": 1,
+            "money": 1,
+            "idk": 1,
+            "anything": 1,
+            "debated": 1,
+            "binning": 1,
+            "dumb": 1,
+            "waste": 1,
+            "food": 1,
+            "especially": 1,
+            "others": 1,
+            "across": 1,
+            "world": 1,
+            "palestine": 1,
+            "starved": 1,
+            "hypocritical": 1,
+            "yk": 1,
+            "twat": 1,
+            "snacking": 1,
+            "suggestion": 1,
+            "future": 1,
+            "specifically": 1,
+            "uk": 1,
+            "possible": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Israeli",
+                "label": "NORP"
+            },
+            {
+                "text": "Lebanese",
+                "label": "NORP"
+            },
+            {
+                "text": "non-Israeli",
+                "label": "NORP"
+            },
+            {
+                "text": "Moroccan",
+                "label": "NORP"
+            },
+            {
+                "text": "bin",
+                "label": "PERSON"
+            },
+            {
+                "text": "israel",
+                "label": "GPE"
+            },
+            {
+                "text": "israeli",
+                "label": "NORP"
+            },
+            {
+                "text": "israel",
+                "label": "GPE"
+            },
+            {
+                "text": "Palestine",
+                "label": "GPE"
+            },
+            {
+                "text": "israeli",
+                "label": "NORP"
+            },
+            {
+                "text": "israeli",
+                "label": "NORP"
+            },
+            {
+                "text": "UK",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1sn829c": {
+        "id": "t3_1sn829c",
+        "timestamp": "2026-04-16T16:10:21.432Z",
+        "title": "Record breaking signing petition",
+        "body": "Sharing in case someone here can put their hand in. This is the link: Click here or type 'EU petition israel'",
+        "keywords": {
+            "record": 1,
+            "breaking": 1,
+            "signing": 1,
+            "petition": 2,
+            "sharing": 1,
+            "case": 1,
+            "put": 1,
+            "hand": 1,
+            "link": 1,
+            "click": 1,
+            "type": 1,
+            "israel": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Sharing",
+                "label": "PERSON"
+            },
+            {
+                "text": "EU",
+                "label": "ORG"
+            },
+            {
+                "text": "israel",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1snb6js": {
+        "id": "t3_1snb6js",
+        "timestamp": "2026-04-16T17:58:29.071Z",
+        "title": "Why was the post including Isn'treal supporting celebs deleted? Is there another like it?",
+        "body": "There was a post on this subreddit with a list of celebrities who support Palestine nd the ones who support Isn'treal. It seems to have been removed. Can anyone provide another such list? Thanks in advance.",
+        "keywords": {
+            "including": 1,
+            "supporting": 1,
+            "celebs": 1,
+            "another": 2,
+            "list": 2,
+            "celebrity": 1,
+            "support": 2,
+            "palestine": 1,
+            "nd": 1,
+            "one": 1,
+            "seems": 1,
+            "provide": 1,
+            "thanks": 1,
+            "advance": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Palestine",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1slsbpu": {
+        "id": "t3_1slsbpu",
+        "timestamp": "2026-04-15T01:47:15.250Z",
+        "title": "Uk skincare?",
+        "body": "Hello! I\u2019ve been boycotting the bigger companies and shops for quite a while now, however I have just learned that boots has ties to Isreal. I have been trying to find out if Superdrug also supports Isreal, as they are my only two options near me. If anyone has any information that I am unaware of, please do let me know!",
+        "keywords": {
+            "uk": 1,
+            "skincare": 1,
+            "hello": 1,
+            "boycotting": 1,
+            "bigger": 1,
+            "company": 1,
+            "shop": 1,
+            "however": 1,
+            "learned": 1,
+            "boot": 1,
+            "tie": 1,
+            "isreal": 2,
+            "trying": 1,
+            "find": 1,
+            "superdrug": 1,
+            "support": 1,
+            "two": 1,
+            "option": 1,
+            "near": 1,
+            "information": 1,
+            "unaware": 1,
+            "please": 1,
+            "let": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Uk",
+                "label": "GPE"
+            },
+            {
+                "text": "Superdrug",
+                "label": "PERSON"
+            },
+            {
+                "text": "Isreal",
+                "label": "ORG"
+            },
+            {
+                "text": "only two",
+                "label": "CARDINAL"
+            }
+        ]
+    },
+    "t3_1slofgp": {
+        "id": "t3_1slofgp",
+        "timestamp": "2026-04-14T22:57:18.265Z",
+        "title": "They showed up first\u2026 but nobody talks about what happened next",
+        "body": "",
+        "keywords": {
+            "showed": 1,
+            "nobody": 1,
+            "talk": 1,
+            "happened": 1,
+            "next": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "first",
+                "label": "ORDINAL"
+            }
+        ]
+    },
+    "t3_1sm8bl7": {
+        "id": "t3_1sm8bl7",
+        "timestamp": "2026-04-15T14:51:26.685Z",
+        "title": "Say NO to the Orange Genocide: Boycott easyJet at Eurovision Song Contest 2026",
+        "body": "Why you should boycott:\n\nThe campaign by Catrin Feelings will focus on 35 countries and its slogan ''Get Out There'' for the participating countries, including on support Israel's participation for the event.\n\nThe airline's funding was contributed with Martin Green in support of the EBU to give its extension deal since 2024. It is already known that the main beauty partner MoroccanOil is currently already on target.\n\nFive countries Spain, Ireland, the Netherlands, Slovenia and Iceland have withdrawn from the competition in protest of Israel's participation. The campaign to have exclusion on those countries as easyJet travels to those countries only outside Eurovision to do so.\n\nLinks to target:\n\nhttps://www.facebook.com/share/r/1Now8aEEZY/\n\nhttps://www.instagram.com/easyjet/reel/DXJukrqD0TS/\n\nhttps://www.youtube.com/shorts/WdghLLqQues\n\nhttps://www.tiktok.com/@easyjet/video/7628958948766321953\n\nGoals:\n\nBlock Catrin Feelings on Instagram, Spotify and all other accounts on social media if you are planning not to watch Eurovision 2026.\n\nContact with rte.ie, rtve.es, rtvslo.si, ruv.is and avrotros.nl at GMail on to file of complaint for easyJet's Eurovision 2026 campaign has a connection with Israel's participation for the event.\n\nKey comments to write on Instagram, Youtube, Facebook and TikTok after you found the link: #noeasyjetforeurovision, #boycotteasyjet #pinkwashing, #moneytalks, \ud83c\uddea\ud83c\uddf8\ud83c\uddee\ud83c\uddea\ud83c\uddf3\ud83c\uddf1\ud83c\uddf8\ud83c\uddee\ud83c\uddee\ud83c\uddf8, and multiple times of \ud83c\uddf5\ud83c\uddf8\ud83c\uddf5\ud83c\uddf8\ud83c\uddf5\ud83c\uddf8\ud83c\uddf5\ud83c\uddf8\ud83c\uddf5\ud83c\uddf8\ud83c\uddf5\ud83c\uddf8.\n\nKeep in mind on support gaza.nu, disoccupied.com and nothanks.app\n\nNoting that I have delayed the boycott campaign earlier by being today, instead of April 16th CEST 00:00 due to my important sleep at midnight and my other personal reasons.",
+        "keywords": {
+            "say": 1,
+            "orange": 1,
+            "genocide": 1,
+            "boycott": 3,
+            "easyjet": 3,
+            "eurovision": 4,
+            "song": 1,
+            "contest": 1,
+            "2026": 2,
+            "campaign": 4,
+            "catrin": 2,
+            "feeling": 2,
+            "focus": 1,
+            "35": 1,
+            "country": 5,
+            "slogan": 1,
+            "participating": 1,
+            "including": 1,
+            "support": 3,
+            "israel": 3,
+            "participation": 3,
+            "event": 2,
+            "airline": 1,
+            "funding": 1,
+            "contributed": 1,
+            "martin": 1,
+            "green": 1,
+            "ebu": 1,
+            "give": 1,
+            "extension": 1,
+            "deal": 1,
+            "since": 1,
+            "already": 2,
+            "known": 1,
+            "main": 1,
+            "beauty": 1,
+            "partner": 1,
+            "moroccanoil": 1,
+            "currently": 1,
+            "target": 2,
+            "five": 1,
+            "spain": 1,
+            "ireland": 1,
+            "netherlands": 1,
+            "slovenia": 1,
+            "iceland": 1,
+            "withdrawn": 1,
+            "competition": 1,
+            "protest": 1,
+            "exclusion": 1,
+            "travel": 1,
+            "outside": 1,
+            "link": 2,
+            "goal": 1,
+            "block": 1,
+            "instagram": 2,
+            "spotify": 1,
+            "account": 1,
+            "social": 1,
+            "medium": 1,
+            "planning": 1,
+            "watch": 1,
+            "contact": 1,
+            "gmail": 1,
+            "file": 1,
+            "complaint": 1,
+            "connection": 1,
+            "key": 1,
+            "write": 1,
+            "youtube": 1,
+            "facebook": 1,
+            "tiktok": 1,
+            "found": 1,
+            "noeasyjetforeurovision": 1,
+            "boycotteasyjet": 1,
+            "pinkwashing": 1,
+            "moneytalks": 1,
+            "multiple": 1,
+            "time": 1,
+            "keep": 1,
+            "mind": 1,
+            "noting": 1,
+            "delayed": 1,
+            "earlier": 1,
+            "today": 1,
+            "instead": 1,
+            "april": 1,
+            "16th": 1,
+            "cest": 1,
+            "due": 1,
+            "important": 1,
+            "sleep": 1,
+            "midnight": 1,
+            "personal": 1,
+            "reason": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "the Orange Genocide: Boycott easyJet",
+                "label": "ORG"
+            },
+            {
+                "text": "2026",
+                "label": "DATE"
+            },
+            {
+                "text": "Catrin Feelings",
+                "label": "ORG"
+            },
+            {
+                "text": "35",
+                "label": "CARDINAL"
+            },
+            {
+                "text": "Get Out There''",
+                "label": "WORK_OF_ART"
+            },
+            {
+                "text": "Israel",
+                "label": "GPE"
+            },
+            {
+                "text": "Martin Green",
+                "label": "PERSON"
+            },
+            {
+                "text": "EBU",
+                "label": "ORG"
+            },
+            {
+                "text": "2024",
+                "label": "DATE"
+            },
+            {
+                "text": "MoroccanOil",
+                "label": "ORG"
+            },
+            {
+                "text": "Five",
+                "label": "CARDINAL"
+            },
+            {
+                "text": "Spain",
+                "label": "GPE"
+            },
+            {
+                "text": "Ireland",
+                "label": "GPE"
+            },
+            {
+                "text": "Netherlands",
+                "label": "GPE"
+            },
+            {
+                "text": "Slovenia",
+                "label": "GPE"
+            },
+            {
+                "text": "Iceland",
+                "label": "GPE"
+            },
+            {
+                "text": "Israel",
+                "label": "GPE"
+            },
+            {
+                "text": "Instagram",
+                "label": "GPE"
+            },
+            {
+                "text": "Spotify",
+                "label": "GPE"
+            },
+            {
+                "text": "Eurovision 2026",
+                "label": "LAW"
+            },
+            {
+                "text": "Israel",
+                "label": "GPE"
+            },
+            {
+                "text": "Instagram",
+                "label": "GPE"
+            },
+            {
+                "text": "Youtube",
+                "label": "GPE"
+            },
+            {
+                "text": "TikTok",
+                "label": "ORG"
+            },
+            {
+                "text": "#",
+                "label": "CARDINAL"
+            },
+            {
+                "text": "\ud83c\uddea",
+                "label": "ORG"
+            },
+            {
+                "text": "\ud83c\uddee",
+                "label": "CARDINAL"
+            },
+            {
+                "text": "\ud83c\uddf8",
+                "label": "NORP"
+            },
+            {
+                "text": "\ud83c\uddee\ud83c\uddee\ud83c\uddf8",
+                "label": "PRODUCT"
+            },
+            {
+                "text": "\ud83c\uddf5\ud83c\uddf8",
+                "label": "NORP"
+            },
+            {
+                "text": "\ud83c\uddf8\ud83c\uddf5",
+                "label": "PERSON"
+            },
+            {
+                "text": "\ud83c\uddf8\ud83c\uddf5",
+                "label": "PERSON"
+            },
+            {
+                "text": "\ud83c\uddf8\ud83c\uddf5",
+                "label": "PERSON"
+            },
+            {
+                "text": "\ud83c\uddf8\ud83c\uddf5",
+                "label": "PERSON"
+            },
+            {
+                "text": "\ud83c\uddf8",
+                "label": "PERSON"
+            },
+            {
+                "text": "today",
+                "label": "DATE"
+            },
+            {
+                "text": "April 16th",
+                "label": "DATE"
+            },
+            {
+                "text": "midnight",
+                "label": "TIME"
+            }
+        ]
+    },
+    "t3_1slhbrm": {
+        "id": "t3_1slhbrm",
+        "timestamp": "2026-04-14T18:34:36.883Z",
+        "title": "Should caprisun be boycotted?",
+        "body": "I have a question about capri-sun\n\nI have doubts about if caprisun is boycott or no because the american caprisun is owned by kraft and the european is owned by capri sun group holding ag so i wanted to ask",
+        "keywords": {
+            "caprisun": 3,
+            "boycotted": 1,
+            "question": 1,
+            "doubt": 1,
+            "boycott": 1,
+            "american": 1,
+            "owned": 2,
+            "kraft": 1,
+            "european": 1,
+            "capri": 1,
+            "sun": 1,
+            "group": 1,
+            "holding": 1,
+            "ag": 1,
+            "ask": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "american",
+                "label": "NORP"
+            },
+            {
+                "text": "european",
+                "label": "NORP"
+            },
+            {
+                "text": "capri sun",
+                "label": "ORG"
+            },
+            {
+                "text": "ag",
+                "label": "ORG"
+            }
+        ]
+    },
+    "t3_1sl7jjl": {
+        "id": "t3_1sl7jjl",
+        "timestamp": "2026-04-14T12:40:33.479Z",
+        "title": "Vitacost magnesium oxide",
+        "body": "I just noticed that the Vitacost Everyday brand magnesium oxide is a product of Israel. It\u2019s a small thing but I will not be buying this again. I also left a review on their site mentioning it.",
+        "keywords": {
+            "vitacost": 2,
+            "magnesium": 2,
+            "oxide": 2,
+            "noticed": 1,
+            "everyday": 1,
+            "brand": 1,
+            "product": 1,
+            "israel": 1,
+            "small": 1,
+            "buying": 1,
+            "left": 1,
+            "review": 1,
+            "site": 1,
+            "mentioning": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Vitacost Everyday",
+                "label": "ORG"
+            },
+            {
+                "text": "Israel",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1skyfnd": {
+        "id": "t3_1skyfnd",
+        "timestamp": "2026-04-14T04:30:53.447Z",
+        "title": "Ms Rachel toys I saw at Kohl",
+        "body": "",
+        "keywords": {
+            "m": 1,
+            "rachel": 1,
+            "toy": 1,
+            "saw": 1,
+            "kohl": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Ms Rachel",
+                "label": "PERSON"
+            },
+            {
+                "text": "Kohl",
+                "label": "PERSON"
+            }
+        ]
+    },
+    "t3_1skwr7c": {
+        "id": "t3_1skwr7c",
+        "timestamp": "2026-04-14T03:09:34.659Z",
+        "title": "For those looking for alternatives: use bowl and basket!",
+        "body": "I buy from this company called Bowl and Basket, and they sell over 3,500 alternatives! The down side is, they're a private label brand and are only sold at these stores:\n\nPrice Rite Marketplace\n\nThe Fresh Grocer\n\nFairway Market\n\nGourmet Garage\n\nDearborn Market\u00a0",
+        "keywords": {
+            "looking": 1,
+            "alternative": 2,
+            "use": 1,
+            "bowl": 2,
+            "basket": 2,
+            "buy": 1,
+            "company": 1,
+            "called": 1,
+            "sell": 1,
+            "side": 1,
+            "private": 1,
+            "label": 1,
+            "brand": 1,
+            "sold": 1,
+            "store": 1,
+            "price": 1,
+            "rite": 1,
+            "marketplace": 1,
+            "fresh": 1,
+            "grocer": 1,
+            "fairway": 1,
+            "market": 2,
+            "gourmet": 1,
+            "garage": 1,
+            "dearborn": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Bowl",
+                "label": "WORK_OF_ART"
+            },
+            {
+                "text": "3,500",
+                "label": "CARDINAL"
+            },
+            {
+                "text": "Rite Marketplace",
+                "label": "PERSON"
+            }
+        ]
+    },
+    "t3_1skqkl7": {
+        "id": "t3_1skqkl7",
+        "timestamp": "2026-04-13T22:42:02.506Z",
+        "title": "Allergy season help? What OTC meds and medical supplies would would be good alternatives to pro-genocide meds/supplies companies and brands?",
+        "body": "My springtime allergies have already started acting up and then I ended up in the hospital with bronchitis from a flu I got and I'm living in a sea of kleenex and some fog lifts from my brain for just a brief a second to let me realize that I am floating in an actual sea of blood and genocide.\n\nPuffs is as bad, it seems.\n\nDoes anyone know of anywhere that lists some alternatives for otc allergy supplies (or flu, whatever) that are not pro-genocide? Or can we just start a list here?\n\nI also noticed that BDS is doing a push against TEVA which might help produce lists of different types of meds that would be good to switch to. Just even reading about it involves way too many spoons than I have, so I'm asking for help with that, too.\n\nI have a few pennies I'd like to spend to get supplies to our neighbors out there living downtown, so this would help with that too.\n\nAll help appreciated!",
+        "keywords": {
+            "allergy": 3,
+            "season": 1,
+            "help": 5,
+            "otc": 2,
+            "med": 2,
+            "medical": 1,
+            "supply": 3,
+            "good": 2,
+            "alternative": 2,
+            "company": 1,
+            "brand": 1,
+            "springtime": 1,
+            "already": 1,
+            "started": 1,
+            "acting": 1,
+            "ended": 1,
+            "hospital": 1,
+            "bronchitis": 1,
+            "flu": 2,
+            "living": 2,
+            "sea": 2,
+            "kleenex": 1,
+            "fog": 1,
+            "lift": 1,
+            "brain": 1,
+            "brief": 1,
+            "second": 1,
+            "let": 1,
+            "realize": 1,
+            "floating": 1,
+            "actual": 1,
+            "blood": 1,
+            "genocide": 1,
+            "puff": 1,
+            "bad": 1,
+            "seems": 1,
+            "anywhere": 1,
+            "list": 3,
+            "whatever": 1,
+            "start": 1,
+            "noticed": 1,
+            "bd": 1,
+            "push": 1,
+            "teva": 1,
+            "produce": 1,
+            "different": 1,
+            "type": 1,
+            "switch": 1,
+            "reading": 1,
+            "involves": 1,
+            "way": 1,
+            "spoon": 1,
+            "asking": 1,
+            "penny": 1,
+            "spend": 1,
+            "neighbor": 1,
+            "downtown": 1,
+            "appreciated": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "second",
+                "label": "ORDINAL"
+            },
+            {
+                "text": "Puffs",
+                "label": "PERSON"
+            },
+            {
+                "text": "BDS",
+                "label": "ORG"
+            }
+        ]
+    },
+    "t3_1skpu4m": {
+        "id": "t3_1skpu4m",
+        "timestamp": "2026-04-13T22:12:13.382Z",
+        "title": "Fuck Israel",
+        "body": "that's it. just had to say it",
+        "keywords": {
+            "fuck": 1,
+            "israel": 1,
+            "say": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Israel",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1sju4f3": {
+        "id": "t3_1sju4f3",
+        "timestamp": "2026-04-12T23:28:14.793Z",
+        "title": "improperly calling cuisines as \"israeli\"?",
+        "body": "local biz near me, pressed caf\u00e9, owned by israelis, a lotta cuisine from the MENA region labeled \"israeli\" like shakshuka, hummus, taboul\u00e9 etc.\n\nI get it's ridiculous to call that stuff \"Israeli\", but many of the Jews living in the state of israel *do* have origins in the maghreb or mashriq, especially the mizrachim and sephardim, so those dishes they took with them during the expulsions and migrations of the last century while shared w/ the arabs they lived among, are also \"theirs\" by sheer weight of centuries of living together.\n\nperhaps it'd be more honest to label some of that stuff as \"sephardi\" or \"mizrachi\" if it's a legit carryover? some of the stuff like hummus, yeah it seems to be more broadly \"levantine\" and not historically associated w/ jewish communities, so calling that stuff palestinian or lebanese or even just levantine would make more sense.\n\nthoughts on this? the cultural erasure is kinda ridiculous, but a lotta foodways are just super mixed up and people have shared history, and I'm not sure how I personally would parse it.",
+        "keywords": {
+            "improperly": 1,
+            "calling": 2,
+            "cuisine": 2,
+            "israeli": 4,
+            "local": 1,
+            "biz": 1,
+            "near": 1,
+            "pressed": 1,
+            "caf\u00e9": 1,
+            "owned": 1,
+            "lotta": 2,
+            "mena": 1,
+            "region": 1,
+            "labeled": 1,
+            "shakshuka": 1,
+            "hummus": 2,
+            "taboul\u00e9": 1,
+            "etc": 1,
+            "ridiculous": 2,
+            "call": 1,
+            "jew": 1,
+            "living": 2,
+            "state": 1,
+            "israel": 1,
+            "origin": 1,
+            "maghreb": 1,
+            "mashriq": 1,
+            "especially": 1,
+            "mizrachim": 1,
+            "sephardi": 2,
+            "dish": 1,
+            "expulsion": 1,
+            "migration": 1,
+            "last": 1,
+            "century": 2,
+            "shared": 2,
+            "arab": 1,
+            "lived": 1,
+            "among": 1,
+            "sheer": 1,
+            "weight": 1,
+            "together": 1,
+            "perhaps": 1,
+            "honest": 1,
+            "label": 1,
+            "mizrachi": 1,
+            "legit": 1,
+            "carryover": 1,
+            "yeah": 1,
+            "seems": 1,
+            "broadly": 1,
+            "levantine": 2,
+            "historically": 1,
+            "associated": 1,
+            "jewish": 1,
+            "community": 1,
+            "palestinian": 1,
+            "lebanese": 1,
+            "sense": 1,
+            "thought": 1,
+            "cultural": 1,
+            "erasure": 1,
+            "kinda": 1,
+            "foodways": 1,
+            "super": 1,
+            "mixed": 1,
+            "people": 1,
+            "history": 1,
+            "sure": 1,
+            "personally": 1,
+            "parse": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "israeli",
+                "label": "NORP"
+            },
+            {
+                "text": "caf\u00e9",
+                "label": "PERSON"
+            },
+            {
+                "text": "israelis",
+                "label": "NORP"
+            },
+            {
+                "text": "lotta",
+                "label": "GPE"
+            },
+            {
+                "text": "MENA",
+                "label": "NORP"
+            },
+            {
+                "text": "israeli",
+                "label": "NORP"
+            },
+            {
+                "text": "shakshuka",
+                "label": "PERSON"
+            },
+            {
+                "text": "Israeli",
+                "label": "NORP"
+            },
+            {
+                "text": "Jews",
+                "label": "NORP"
+            },
+            {
+                "text": "israel",
+                "label": "GPE"
+            },
+            {
+                "text": "sephardim",
+                "label": "GPE"
+            },
+            {
+                "text": "the last century",
+                "label": "DATE"
+            },
+            {
+                "text": "arabs",
+                "label": "NORP"
+            },
+            {
+                "text": "centuries",
+                "label": "DATE"
+            },
+            {
+                "text": "jewish",
+                "label": "NORP"
+            },
+            {
+                "text": "palestinian",
+                "label": "NORP"
+            },
+            {
+                "text": "lebanese",
+                "label": "NORP"
+            },
+            {
+                "text": "levantine",
+                "label": "PERSON"
+            }
+        ]
+    },
+    "t3_1sjsnaf": {
+        "id": "t3_1sjsnaf",
+        "timestamp": "2026-04-12T22:25:29.993Z",
+        "title": "Organic non gmo seeds",
+        "body": "Does anyone have experience in gardening with reputable seeds? I\u2019m looking for vegetabl and fruit seeds.\n\nthanks!",
+        "keywords": {
+            "organic": 1,
+            "non": 1,
+            "gmo": 1,
+            "seed": 3,
+            "experience": 1,
+            "gardening": 1,
+            "reputable": 1,
+            "looking": 1,
+            "vegetabl": 1,
+            "fruit": 1,
+            "thanks": 1
+        },
+        "sentiment": "Neutral",
+        "entities": []
+    },
+    "t3_1sk0sxl": {
+        "id": "t3_1sk0sxl",
+        "timestamp": "2026-04-13T04:41:04.807Z",
+        "title": "Total wine Israeli wine section",
+        "body": "I went to total wine and noticed the Israeli wine section. the isle had info tabs hanging about the various wine regions in israel and it had an Israeli flag hanging. BUT when you walk down the French sections, Italian, Spain, Argentina, etc. there are no flags hanging! It seemed to be the only section with a flag\u2026 I\u2019m not sure if the other sections had the info tabs about the particular region for wine reference but their area looked more decorated than the others.\n\nNow I don\u2019t know if every wine sold in that section supports zionism but I think it\u2019s safe to assume total wine is on the boycott list \ud83e\udd37\u200d\u2640\ufe0f let me know if it\u2019s not\u2026 And I did take the flag down!",
+        "keywords": {
+            "total": 3,
+            "wine": 8,
+            "israeli": 3,
+            "section": 6,
+            "noticed": 1,
+            "isle": 1,
+            "info": 2,
+            "tab": 2,
+            "hanging": 3,
+            "various": 1,
+            "region": 2,
+            "israel": 1,
+            "flag": 3,
+            "walk": 1,
+            "french": 1,
+            "italian": 1,
+            "spain": 1,
+            "argentina": 1,
+            "etc": 1,
+            "seemed": 1,
+            "sure": 1,
+            "particular": 1,
+            "reference": 1,
+            "area": 1,
+            "looked": 1,
+            "decorated": 1,
+            "others": 1,
+            "every": 1,
+            "sold": 1,
+            "support": 1,
+            "zionism": 1,
+            "think": 1,
+            "safe": 1,
+            "assume": 1,
+            "boycott": 1,
+            "list": 1,
+            "let": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Israeli",
+                "label": "NORP"
+            },
+            {
+                "text": "Israeli",
+                "label": "NORP"
+            },
+            {
+                "text": "israel",
+                "label": "GPE"
+            },
+            {
+                "text": "Israeli",
+                "label": "NORP"
+            },
+            {
+                "text": "French",
+                "label": "NORP"
+            },
+            {
+                "text": "Italian",
+                "label": "NORP"
+            },
+            {
+                "text": "Spain",
+                "label": "GPE"
+            },
+            {
+                "text": "Argentina",
+                "label": "GPE"
+            },
+            {
+                "text": "\ud83e\udd37\u200d",
+                "label": "PERSON"
+            }
+        ]
+    },
+    "t3_1sjiu7z": {
+        "id": "t3_1sjiu7z",
+        "timestamp": "2026-04-12T16:17:05.908Z",
+        "title": "Asda Pineapple",
+        "body": "The packet doesn't say what country it is from. Does anyone know?\n\n(Yes, I know Asda is boycotted because it is minority owneed by Walmart, but it is not as bad as Tesco and Lidl and others)",
+        "keywords": {
+            "asda": 2,
+            "pineapple": 1,
+            "packet": 1,
+            "say": 1,
+            "country": 1,
+            "yes": 1,
+            "boycotted": 1,
+            "minority": 1,
+            "owneed": 1,
+            "walmart": 1,
+            "bad": 1,
+            "tesco": 1,
+            "lidl": 1,
+            "others": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Asda",
+                "label": "ORG"
+            },
+            {
+                "text": "Walmart",
+                "label": "ORG"
+            },
+            {
+                "text": "Tesco",
+                "label": "ORG"
+            },
+            {
+                "text": "Lidl",
+                "label": "PERSON"
+            }
+        ]
+    },
+    "t3_1sisjkf": {
+        "id": "t3_1sisjkf",
+        "timestamp": "2026-04-11T19:32:05.968Z",
+        "title": "Is Sacha Baron Cohen a zionist?",
+        "body": "i can't figure this out, how an actor who has played a fake idf agent to mock israel can be zionist or even have a double citizenship? pls explain ts to me",
+        "keywords": {
+            "sacha": 1,
+            "baron": 1,
+            "cohen": 1,
+            "zionist": 2,
+            "ca": 1,
+            "figure": 1,
+            "actor": 1,
+            "played": 1,
+            "fake": 1,
+            "idf": 1,
+            "agent": 1,
+            "mock": 1,
+            "israel": 1,
+            "double": 1,
+            "citizenship": 1,
+            "pls": 1,
+            "explain": 1,
+            "t": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Cohen",
+                "label": "PERSON"
+            },
+            {
+                "text": "israel",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1siznc8": {
+        "id": "t3_1siznc8",
+        "timestamp": "2026-04-12T00:29:02.554Z",
+        "title": "Is Watcha Clan safe? If not, any other 2000s bands like this?",
+        "body": "Hey, I recently found out Watcha Clan and liked some of their songs but I was unsure if I should keep hearing them. They are a band from France. I really liked Osfour but would love to know if its boycott safe or not",
+        "keywords": {
+            "watcha": 2,
+            "clan": 2,
+            "safe": 2,
+            "2000s": 1,
+            "band": 2,
+            "hey": 1,
+            "recently": 1,
+            "found": 1,
+            "liked": 2,
+            "song": 1,
+            "unsure": 1,
+            "keep": 1,
+            "hearing": 1,
+            "france": 1,
+            "osfour": 1,
+            "love": 1,
+            "boycott": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Watcha Clan",
+                "label": "PERSON"
+            },
+            {
+                "text": "France",
+                "label": "GPE"
+            },
+            {
+                "text": "Osfour",
+                "label": "PERSON"
+            }
+        ]
+    },
+    "t3_1sinieu": {
+        "id": "t3_1sinieu",
+        "timestamp": "2026-04-11T16:23:17.812Z",
+        "title": "Smh, anyone still questioning a boycott?",
+        "body": "",
+        "keywords": {
+            "smh": 1,
+            "questioning": 1,
+            "boycott": 1
+        },
+        "sentiment": "Negative",
+        "entities": []
+    },
+    "t3_1sicpfr": {
+        "id": "t3_1sicpfr",
+        "timestamp": "2026-04-11T07:44:44.896Z",
+        "title": "so how do we handle shopify?",
+        "body": "photo id: a tweet from shopify's president saying \"praying for israel and for peace \ud83d\udc99 (blue heart emoji)\"\n\nThis is their president btw saying this they also have monetary ties to israel. my question is how do we boycott when they're everywhere in online shopping? like I'll try to buy directly from somewhere and the checkout will use shopify. some of the sites ik are to support Palestinians by buying their products use it too. like I wanna support them not shopify.",
+        "keywords": {
+            "handle": 1,
+            "shopify": 4,
+            "photo": 1,
+            "id": 1,
+            "tweet": 1,
+            "president": 2,
+            "saying": 2,
+            "praying": 1,
+            "israel": 2,
+            "peace": 1,
+            "blue": 1,
+            "heart": 1,
+            "emoji": 1,
+            "btw": 1,
+            "monetary": 1,
+            "tie": 1,
+            "question": 1,
+            "boycott": 1,
+            "everywhere": 1,
+            "online": 1,
+            "shopping": 1,
+            "try": 1,
+            "buy": 1,
+            "directly": 1,
+            "somewhere": 1,
+            "checkout": 1,
+            "use": 2,
+            "site": 1,
+            "ik": 1,
+            "support": 2,
+            "palestinian": 1,
+            "buying": 1,
+            "product": 1,
+            "wan": 1,
+            "na": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "israel",
+                "label": "GPE"
+            },
+            {
+                "text": "israel",
+                "label": "GPE"
+            },
+            {
+                "text": "Palestinians",
+                "label": "NORP"
+            }
+        ]
+    },
+    "t3_1simm35": {
+        "id": "t3_1simm35",
+        "timestamp": "2026-04-11T15:49:26.876Z",
+        "title": "By Terry & Sisley",
+        "body": "Hi, I am trying to make a list of all the makeup brands that are not on the boycott list that are also available in my country. However I couldn't find anything on By Terry and Sisley on any boycott related websites including this sub. If anyone has information on these brands can you please let me know?\n\nEdit: Thank you everyone for responding!",
+        "keywords": {
+            "terry": 2,
+            "sisley": 2,
+            "hi": 1,
+            "trying": 1,
+            "list": 2,
+            "makeup": 1,
+            "brand": 2,
+            "boycott": 2,
+            "available": 1,
+            "country": 1,
+            "however": 1,
+            "find": 1,
+            "anything": 1,
+            "related": 1,
+            "website": 1,
+            "including": 1,
+            "information": 1,
+            "please": 1,
+            "let": 1,
+            "thank": 1,
+            "everyone": 1,
+            "responding": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Terry & Sisley Hi",
+                "label": "ORG"
+            },
+            {
+                "text": "Terry",
+                "label": "PERSON"
+            },
+            {
+                "text": "Sisley",
+                "label": "PERSON"
+            }
+        ]
+    },
+    "t3_1sijmcj": {
+        "id": "t3_1sijmcj",
+        "timestamp": "2026-04-11T13:49:48.261Z",
+        "title": "Streaming services",
+        "body": "Are there any streaming services that don\u2019t support Israel?? (ones with English subtitles preferably) I don\u2019t mind using a pirating website as long as it has been checked to not have viruses and no sexual ads! What do you guys use to watch films?",
+        "keywords": {
+            "streaming": 2,
+            "service": 2,
+            "support": 1,
+            "israel": 1,
+            "one": 1,
+            "english": 1,
+            "subtitle": 1,
+            "preferably": 1,
+            "mind": 1,
+            "using": 1,
+            "pirating": 1,
+            "website": 1,
+            "long": 1,
+            "checked": 1,
+            "virus": 1,
+            "sexual": 1,
+            "ad": 1,
+            "guy": 1,
+            "use": 1,
+            "watch": 1,
+            "film": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Israel",
+                "label": "GPE"
+            },
+            {
+                "text": "English",
+                "label": "LANGUAGE"
+            }
+        ]
+    },
+    "t3_1shz375": {
+        "id": "t3_1shz375",
+        "timestamp": "2026-04-10T21:00:53.197Z",
+        "title": "A possibly silly way I try to help with",
+        "body": "When I get those YT ads that ask \"which of these have you seen recently?\" And I find no safe brand in the list, I press \"none of the above\" so I skew the statistic into thinking they are missing some customers and ads are not reaching enough people so they pay more in ads to pull in people who won't pay.\n\nWould this really help? Would it not? I don't really know.",
+        "keywords": {
+            "possibly": 1,
+            "silly": 1,
+            "way": 1,
+            "try": 1,
+            "help": 2,
+            "yt": 1,
+            "ad": 3,
+            "ask": 1,
+            "seen": 1,
+            "recently": 1,
+            "find": 1,
+            "safe": 1,
+            "brand": 1,
+            "list": 1,
+            "press": 1,
+            "none": 1,
+            "skew": 1,
+            "statistic": 1,
+            "thinking": 1,
+            "missing": 1,
+            "customer": 1,
+            "reaching": 1,
+            "enough": 1,
+            "people": 2,
+            "pay": 2,
+            "pull": 1,
+            "wo": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "YT",
+                "label": "ORG"
+            }
+        ]
+    },
+    "t3_1sh6c4m": {
+        "id": "t3_1sh6c4m",
+        "timestamp": "2026-04-09T23:47:20.035Z",
+        "title": "what phone should i buy?",
+        "body": "hello, hope everyone is doing ok. i need to buy a new phone soon, as my current one isnt really working properly. what are some brands that arent on the boycott list?\n\nfairphone and nothing arent available in my country (chile). ive looked up about some brands that are available here but i havent been able to find anything related to israel. these brands are:\n\nzte, ulephone, blackview, vivo, doogee, cubot, umidigi, infinix, tcl, realme and tecno.\n\nif any of these support israel in any way, i guess i should try to buy a used phone but im not too sure about that either. please let me know in the comments",
+        "keywords": {
+            "phone": 3,
+            "buy": 3,
+            "hello": 1,
+            "hope": 1,
+            "everyone": 1,
+            "need": 1,
+            "new": 1,
+            "soon": 1,
+            "current": 1,
+            "one": 1,
+            "isnt": 1,
+            "working": 1,
+            "properly": 1,
+            "brand": 3,
+            "arent": 2,
+            "boycott": 1,
+            "list": 1,
+            "fairphone": 1,
+            "nothing": 1,
+            "available": 2,
+            "country": 1,
+            "chile": 1,
+            "ive": 1,
+            "looked": 1,
+            "havent": 1,
+            "able": 1,
+            "find": 1,
+            "anything": 1,
+            "related": 1,
+            "israel": 2,
+            "zte": 1,
+            "ulephone": 1,
+            "blackview": 1,
+            "vivo": 1,
+            "doogee": 1,
+            "cubot": 1,
+            "umidigi": 1,
+            "infinix": 1,
+            "tcl": 1,
+            "realme": 1,
+            "tecno": 1,
+            "support": 1,
+            "way": 1,
+            "guess": 1,
+            "try": 1,
+            "used": 1,
+            "im": 1,
+            "sure": 1,
+            "either": 1,
+            "please": 1,
+            "let": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "israel",
+                "label": "GPE"
+            },
+            {
+                "text": "realme",
+                "label": "ORG"
+            },
+            {
+                "text": "tecno",
+                "label": "PERSON"
+            },
+            {
+                "text": "israel",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1shj7f3": {
+        "id": "t3_1shj7f3",
+        "timestamp": "2026-04-10T10:56:39.221Z",
+        "title": "Question about specifics of BDS with regards to consumer choicesq",
+        "body": "Here in the UK, the government for some reason incentivises banks to offer switching services between current accounts that come with benefits for the consumer. For example, right now you can get \u00a3200 (~$300 or something) put into your account just for switching a current account to Barclays.\n\nBarclays are on the BDS list and are known to be pretty awful in other regards, such as financing fossil fuels. If I were to switch a current account to Barclays, it would be an account with minimal activity and thus 0 to minimal chance of making a profit out of me. However, maybe they're making a profit either way as the government might be giving them money.\n\nWhat's peoples thoughts on this please?",
+        "keywords": {
+            "question": 1,
+            "specific": 1,
+            "bd": 2,
+            "regard": 2,
+            "consumer": 2,
+            "choicesq": 1,
+            "uk": 1,
+            "government": 2,
+            "reason": 1,
+            "incentivises": 1,
+            "bank": 1,
+            "offer": 1,
+            "switching": 2,
+            "service": 1,
+            "current": 3,
+            "account": 5,
+            "come": 1,
+            "benefit": 1,
+            "example": 1,
+            "right": 1,
+            "300": 1,
+            "something": 1,
+            "put": 1,
+            "barclays": 3,
+            "list": 1,
+            "known": 1,
+            "pretty": 1,
+            "awful": 1,
+            "financing": 1,
+            "fossil": 1,
+            "fuel": 1,
+            "switch": 1,
+            "minimal": 2,
+            "activity": 1,
+            "thus": 1,
+            "0": 1,
+            "chance": 1,
+            "profit": 2,
+            "however": 1,
+            "either": 1,
+            "way": 1,
+            "giving": 1,
+            "money": 1,
+            "people": 1,
+            "thought": 1,
+            "please": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "BDS",
+                "label": "ORG"
+            },
+            {
+                "text": "UK",
+                "label": "GPE"
+            },
+            {
+                "text": "200",
+                "label": "MONEY"
+            },
+            {
+                "text": "BDS",
+                "label": "ORG"
+            }
+        ]
+    },
+    "t3_1sh5hf4": {
+        "id": "t3_1sh5hf4",
+        "timestamp": "2026-04-09T23:11:22.316Z",
+        "title": "Is nyx safe?",
+        "body": "I'm looking for affordable/drugstore makeup brands that are safe, does anyone know about nyx?",
+        "keywords": {
+            "nyx": 2,
+            "safe": 2,
+            "looking": 1,
+            "makeup": 1,
+            "brand": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "nyx",
+                "label": "ORG"
+            }
+        ]
+    },
+    "t3_1sh80r9": {
+        "id": "t3_1sh80r9",
+        "timestamp": "2026-04-10T01:02:03.630Z",
+        "title": "similar lipsticks that arent owner by a zio brand and are cruelty free",
+        "body": "as a goth i'd love to use colors like this for everyday looks, but i'm not sure what other brands have these kinds of colors, which aren't owned by Zionist brands and are cruelty free\ud83e\udd79 ive made my own lipgloss from an old Essence lipgloss and some eyeshadow, but i tend to \"eat\" my lipgloss so that might not be too safe. Also might I add, brands that are available/deliver to Europe\ud83e\udd79 x",
+        "keywords": {
+            "similar": 1,
+            "lipstick": 1,
+            "arent": 1,
+            "owner": 1,
+            "zio": 1,
+            "brand": 4,
+            "cruelty": 2,
+            "free": 1,
+            "goth": 1,
+            "love": 1,
+            "use": 1,
+            "color": 2,
+            "everyday": 1,
+            "sure": 1,
+            "kind": 1,
+            "owned": 1,
+            "zionist": 1,
+            "ive": 1,
+            "lipgloss": 3,
+            "old": 1,
+            "essence": 1,
+            "eyeshadow": 1,
+            "tend": 1,
+            "eat": 1,
+            "safe": 1,
+            "add": 1,
+            "x": 1
+        },
+        "sentiment": "Positive",
+        "entities": [
+            {
+                "text": "Zionist",
+                "label": "NORP"
+            },
+            {
+                "text": "free\ud83e\udd79",
+                "label": "NORP"
+            }
+        ]
+    },
+    "t3_1sh3udw": {
+        "id": "t3_1sh3udw",
+        "timestamp": "2026-04-09T22:04:27.982Z",
+        "title": "Captured this moment during the protest \u2014 curious how people interpret it",
+        "body": "",
+        "keywords": {
+            "captured": 1,
+            "moment": 1,
+            "protest": 1,
+            "curious": 1,
+            "people": 1,
+            "interpret": 1
+        },
+        "sentiment": "Neutral",
+        "entities": []
+    },
+    "t3_1sgng75": {
+        "id": "t3_1sgng75",
+        "timestamp": "2026-04-09T11:53:48.190Z",
+        "title": "Does boycotting make sense if you don't buy directly from the company?",
+        "body": "For example, if you buy a new iPhone from the Apple store then that money goes directly to Apple. But if you buy a new iPhone from a retailer, then that money only goes to that retailer because the retailer already paid apple for the inventory. So in that case your money isn't going to apple. With that in mind, would it be fine to buy a new iPhone for example that isn't from Apple directly?",
+        "keywords": {
+            "boycotting": 1,
+            "sense": 1,
+            "buy": 4,
+            "directly": 3,
+            "company": 1,
+            "example": 2,
+            "new": 3,
+            "iphone": 3,
+            "apple": 5,
+            "store": 1,
+            "money": 3,
+            "retailer": 3,
+            "already": 1,
+            "paid": 1,
+            "inventory": 1,
+            "case": 1,
+            "going": 1,
+            "mind": 1,
+            "fine": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Apple",
+                "label": "ORG"
+            },
+            {
+                "text": "Apple",
+                "label": "ORG"
+            },
+            {
+                "text": "Apple",
+                "label": "ORG"
+            }
+        ]
+    },
+    "t3_1sfrq54": {
+        "id": "t3_1sfrq54",
+        "timestamp": "2026-04-08T12:41:59.560Z",
+        "title": "Anthropic and Claude",
+        "body": "I know Anthropic\u2019s Claude was used in Iran air strikes by the US but not through a guided session like with Microsoft Azure who assisted with automations for Israel\u2019s air strikes in Palestine.\n\nClaude is becoming increasingly powerful and useful and I\u2019m suspicious.\n\nThere was one interview where the CEO said he was not categorically against fully autonomous weapons.\n\nThat alone for me is enough to boycott but I want to know if anyone here has more information.\n\nI think we really need ethical ai platforms especially for agentic AI.",
+        "keywords": {
+            "anthropic": 2,
+            "claude": 3,
+            "used": 1,
+            "iran": 1,
+            "air": 2,
+            "strike": 2,
+            "guided": 1,
+            "session": 1,
+            "microsoft": 1,
+            "azure": 1,
+            "assisted": 1,
+            "automation": 1,
+            "israel": 1,
+            "palestine": 1,
+            "becoming": 1,
+            "increasingly": 1,
+            "powerful": 1,
+            "useful": 1,
+            "suspicious": 1,
+            "one": 1,
+            "interview": 1,
+            "ceo": 1,
+            "said": 1,
+            "categorically": 1,
+            "fully": 1,
+            "autonomous": 1,
+            "weapon": 1,
+            "alone": 1,
+            "enough": 1,
+            "boycott": 1,
+            "information": 1,
+            "think": 1,
+            "need": 1,
+            "ethical": 1,
+            "ai": 2,
+            "platform": 1,
+            "especially": 1,
+            "agentic": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Claude",
+                "label": "PERSON"
+            },
+            {
+                "text": "Anthropic\u2019s Claude",
+                "label": "PERSON"
+            },
+            {
+                "text": "Iran",
+                "label": "GPE"
+            },
+            {
+                "text": "US",
+                "label": "GPE"
+            },
+            {
+                "text": "Microsoft Azure",
+                "label": "ORG"
+            },
+            {
+                "text": "Israel",
+                "label": "GPE"
+            },
+            {
+                "text": "Palestine",
+                "label": "GPE"
+            },
+            {
+                "text": "Claude",
+                "label": "PERSON"
+            },
+            {
+                "text": "one",
+                "label": "CARDINAL"
+            }
+        ]
+    },
+    "t3_1sfxx4d": {
+        "id": "t3_1sfxx4d",
+        "timestamp": "2026-04-08T16:32:00.904Z",
+        "title": "Speaking on Aaron Bushnell, how do you feel?\ud83c\udf49",
+        "body": "",
+        "keywords": {
+            "speaking": 1,
+            "aaron": 1,
+            "bushnell": 1,
+            "feel": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Aaron Bushnell",
+                "label": "PERSON"
+            }
+        ]
+    },
+    "t3_1sfhs1f": {
+        "id": "t3_1sfhs1f",
+        "timestamp": "2026-04-08T03:34:05.196Z",
+        "title": "accidentally bought from israe1",
+        "body": "okay i feel really bad about this, i accidentally bought from an israe1i brand called sabon, i didnt realize it was from israe1, i was literally so excited for the package to come and i was looking so forward to using the products:( i was showing a haul to my bf on ft and when it flipped it over, he noticed it said \u201cmade in israe1\u201d nd i was like excuse me??? and this was the same day as when it delivered so everything is new and unopened nd not damaged, theres a return policy within like 45 days but the thing is i dont really want to return it:( oh my gosh like i know thats so bad, i feel so selfish but i keep trying to validate myself saying i didnt know and i know not to ever buy from them next time or be careful of future products, its like i do feel bad but at the same time im upset abt returning them and that they were israe1i, it also seems so tedious to return them (ive nvr returned a product before), my bf says i shld js return them nd we can look for other brands:( and like ofc i know we can do that! its js that i dont want to focus on that rn? ig?? idk:( i feel like a horrible person but maybe i dont feel horrible enough otherwise i wld just return it without hesitation, i feel like ive fallen into temptation and that maybe im not as moralistic as i say i am?? or maybe im actually so privileged to even question abt returning it, i feel selfish",
+        "keywords": {
+            "accidentally": 2,
+            "bought": 2,
+            "israe1": 3,
+            "okay": 1,
+            "feel": 7,
+            "bad": 3,
+            "israe1i": 2,
+            "brand": 2,
+            "called": 1,
+            "sabon": 1,
+            "didnt": 2,
+            "realize": 1,
+            "excited": 1,
+            "package": 1,
+            "come": 1,
+            "looking": 1,
+            "forward": 1,
+            "using": 1,
+            "product": 3,
+            "showing": 1,
+            "haul": 1,
+            "bf": 2,
+            "ft": 1,
+            "flipped": 1,
+            "noticed": 1,
+            "said": 1,
+            "nd": 3,
+            "excuse": 1,
+            "day": 2,
+            "delivered": 1,
+            "everything": 1,
+            "new": 1,
+            "unopened": 1,
+            "damaged": 1,
+            "there": 1,
+            "return": 5,
+            "policy": 1,
+            "within": 1,
+            "45": 1,
+            "dont": 3,
+            "oh": 1,
+            "gosh": 1,
+            "thats": 1,
+            "selfish": 2,
+            "keep": 1,
+            "trying": 1,
+            "validate": 1,
+            "saying": 1,
+            "ever": 1,
+            "buy": 1,
+            "next": 1,
+            "time": 2,
+            "careful": 1,
+            "future": 1,
+            "im": 3,
+            "upset": 1,
+            "abt": 2,
+            "returning": 2,
+            "seems": 1,
+            "tedious": 1,
+            "ive": 2,
+            "nvr": 1,
+            "returned": 1,
+            "say": 2,
+            "shld": 1,
+            "j": 2,
+            "ofc": 1,
+            "focus": 1,
+            "rn": 1,
+            "ig": 1,
+            "idk": 1,
+            "horrible": 2,
+            "person": 1,
+            "enough": 1,
+            "otherwise": 1,
+            "wld": 1,
+            "without": 1,
+            "hesitation": 1,
+            "fallen": 1,
+            "temptation": 1,
+            "moralistic": 1,
+            "privileged": 1,
+            "question": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "israe1i",
+                "label": "ORG"
+            },
+            {
+                "text": "israe1",
+                "label": "ORG"
+            },
+            {
+                "text": "israe1",
+                "label": "ORG"
+            },
+            {
+                "text": "the same day",
+                "label": "DATE"
+            },
+            {
+                "text": "like 45 days",
+                "label": "DATE"
+            }
+        ]
+    },
+    "t3_1seolag": {
+        "id": "t3_1seolag",
+        "timestamp": "2026-04-07T06:56:10.999Z",
+        "title": "I feel suffocated and it\u2019s like I\u2019m in a simulation",
+        "body": "Everywhere I look people don\u2019t care about the boycott, even while I\u2019m trying to socialise and I find someone nice to have a conversation with and then poof out of nowhere they would order a coke with their meal and then they are either like that it doesn\u2019t matter or they have no clue as to why there\u2019s a boycott of these companies.\n\nI can\u2019t tell which is worse because it\u2019s impossible to be uninformed at the point of time, and to know and not care is just horrifying\n\nPeople close to me also do this, one minute they are \u2018sympathetic\u2019 to the situation and the next they are ordering something that\u2019s clearly on a boycott list.\n\nIt\u2019s been 3 years and yet I still haven\u2019t found a single person who is boycotting. The only such people I could find are online. I feel like I\u2019m going crazy.\n\nEven before all that I was an introvert who didn\u2019t have too many people in my life but know I just get grossed out and then when I try to talk to them about it they make me feel like I\u2019m in the wrong and it just makes me understand that most people are just not good human and don\u2019t care about injustice as long as that injustice doesn\u2019t impact their lives.",
+        "keywords": {
+            "feel": 3,
+            "suffocated": 1,
+            "simulation": 1,
+            "everywhere": 1,
+            "people": 5,
+            "care": 3,
+            "boycott": 3,
+            "trying": 1,
+            "socialise": 1,
+            "find": 2,
+            "nice": 1,
+            "conversation": 1,
+            "poof": 1,
+            "nowhere": 1,
+            "order": 1,
+            "coke": 1,
+            "meal": 1,
+            "either": 1,
+            "matter": 1,
+            "clue": 1,
+            "company": 1,
+            "tell": 1,
+            "worse": 1,
+            "impossible": 1,
+            "uninformed": 1,
+            "point": 1,
+            "time": 1,
+            "horrifying": 1,
+            "close": 1,
+            "one": 1,
+            "minute": 1,
+            "sympathetic": 1,
+            "situation": 1,
+            "next": 1,
+            "ordering": 1,
+            "something": 1,
+            "clearly": 1,
+            "list": 1,
+            "3": 1,
+            "year": 1,
+            "yet": 1,
+            "found": 1,
+            "single": 1,
+            "person": 1,
+            "boycotting": 1,
+            "online": 1,
+            "going": 1,
+            "crazy": 1,
+            "introvert": 1,
+            "life": 2,
+            "grossed": 1,
+            "try": 1,
+            "talk": 1,
+            "wrong": 1,
+            "make": 1,
+            "understand": 1,
+            "good": 1,
+            "human": 1,
+            "injustice": 2,
+            "long": 1,
+            "impact": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "one minute",
+                "label": "TIME"
+            },
+            {
+                "text": "3 years",
+                "label": "DATE"
+            },
+            {
+                "text": "n\u2019t",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1segcgx": {
+        "id": "t3_1segcgx",
+        "timestamp": "2026-04-07T00:15:34.285Z",
+        "title": "Antiperspirant without Israeli ties?",
+        "body": "This has been one of the most difficult things to find, as I refuse to use an aluminum-free deodorant (they can't be reliably antiperspirant without aluminum salts!) and every search engine lumps deodorant in with antiperspirant, so any search for smaller brands ends up with a heap of \"all natural\" aluminum-free stuff to sort through.\n\nI'm currently using Ban, which has ties to Unilever via joint funding of a Genomatica palm oil alternative venture. For any reason to have connections to an Israel-supporting brand, it isn't the worst on the surface, but I still don't like it. I don't know if this venture is using up land, water, etc. Resources on occupied land, for example.\n\nI've looked into Carpe, though they have connections to Clutch Inc., which has/recently had friendly business with US homeland security -- proudly, I may add. Their government connections are on the Clutch homepage, in this political climate. Not something I'm interested in supporting either, obviously.\n\nSo I'm looking for alternatives! For most things, indie/small brands have been the easiest way out, but again -- so few make actual antiperspirants! IDK if there's any hiding amingst the noise someone else had found, or if there's a bigger brand somehow avoiding ties to human rights violations. I'll take either.",
+        "keywords": {
+            "antiperspirant": 4,
+            "without": 2,
+            "israeli": 1,
+            "tie": 3,
+            "one": 1,
+            "difficult": 1,
+            "find": 1,
+            "refuse": 1,
+            "use": 1,
+            "deodorant": 2,
+            "ca": 1,
+            "reliably": 1,
+            "aluminum": 1,
+            "salt": 1,
+            "every": 1,
+            "search": 2,
+            "engine": 1,
+            "lump": 1,
+            "smaller": 1,
+            "brand": 4,
+            "end": 1,
+            "heap": 1,
+            "natural": 1,
+            "sort": 1,
+            "currently": 1,
+            "using": 2,
+            "ban": 1,
+            "unilever": 1,
+            "via": 1,
+            "joint": 1,
+            "funding": 1,
+            "genomatica": 1,
+            "palm": 1,
+            "oil": 1,
+            "alternative": 2,
+            "venture": 2,
+            "reason": 1,
+            "connection": 3,
+            "worst": 1,
+            "surface": 1,
+            "land": 2,
+            "water": 1,
+            "etc": 1,
+            "resource": 1,
+            "occupied": 1,
+            "example": 1,
+            "looked": 1,
+            "carpe": 1,
+            "though": 1,
+            "clutch": 2,
+            "friendly": 1,
+            "business": 1,
+            "homeland": 1,
+            "security": 1,
+            "proudly": 1,
+            "add": 1,
+            "government": 1,
+            "homepage": 1,
+            "political": 1,
+            "climate": 1,
+            "something": 1,
+            "interested": 1,
+            "supporting": 1,
+            "either": 2,
+            "obviously": 1,
+            "looking": 1,
+            "easiest": 1,
+            "way": 1,
+            "actual": 1,
+            "idk": 1,
+            "hiding": 1,
+            "amingst": 1,
+            "noise": 1,
+            "else": 1,
+            "found": 1,
+            "bigger": 1,
+            "somehow": 1,
+            "avoiding": 1,
+            "human": 1,
+            "right": 1,
+            "violation": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Israeli",
+                "label": "NORP"
+            },
+            {
+                "text": "Ban",
+                "label": "PERSON"
+            },
+            {
+                "text": "Unilever",
+                "label": "ORG"
+            },
+            {
+                "text": "Genomatica",
+                "label": "PRODUCT"
+            },
+            {
+                "text": "Israel",
+                "label": "GPE"
+            },
+            {
+                "text": "Carpe",
+                "label": "GPE"
+            },
+            {
+                "text": "Clutch Inc.",
+                "label": "ORG"
+            },
+            {
+                "text": "US",
+                "label": "GPE"
+            },
+            {
+                "text": "Clutch",
+                "label": "ORG"
+            },
+            {
+                "text": "IDK",
+                "label": "ORG"
+            }
+        ]
+    },
+    "t3_1sebjhl": {
+        "id": "t3_1sebjhl",
+        "timestamp": "2026-04-06T21:03:54.597Z",
+        "title": "Italians on tiktok would rather invest in war for money",
+        "body": "As an Italian is sad to see so many people trying to invest in Leonardo and other companies who are responsible for the death of thousands of people all around the world. You try to talk with them, they don't care. A man writes: thanks for my investment in this company i have bought a new bike.\n\nThis is classic italian mindset, if i can scam you, rob you or try to take ANY advantage over you, i will, no matter what, whatever it takes. I am probably a minority who has empathy for the situation. The man is enjoying his blood - stained bike, and HE KNOWS he has done it with money from dead people, helping companies to keep this war going.\n\nI have lost faith in my country, tonight",
+        "keywords": {
+            "italian": 3,
+            "tiktok": 1,
+            "rather": 1,
+            "invest": 2,
+            "war": 2,
+            "money": 2,
+            "sad": 1,
+            "see": 1,
+            "people": 3,
+            "trying": 1,
+            "leonardo": 1,
+            "company": 3,
+            "responsible": 1,
+            "death": 1,
+            "thousand": 1,
+            "around": 1,
+            "world": 1,
+            "try": 2,
+            "talk": 1,
+            "care": 1,
+            "man": 2,
+            "writes": 1,
+            "thanks": 1,
+            "investment": 1,
+            "bought": 1,
+            "new": 1,
+            "bike": 2,
+            "classic": 1,
+            "mindset": 1,
+            "scam": 1,
+            "rob": 1,
+            "advantage": 1,
+            "matter": 1,
+            "whatever": 1,
+            "take": 1,
+            "minority": 1,
+            "empathy": 1,
+            "situation": 1,
+            "enjoying": 1,
+            "blood": 1,
+            "stained": 1,
+            "done": 1,
+            "dead": 1,
+            "helping": 1,
+            "keep": 1,
+            "going": 1,
+            "lost": 1,
+            "faith": 1,
+            "country": 1,
+            "tonight": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Italians",
+                "label": "NORP"
+            },
+            {
+                "text": "Italian",
+                "label": "NORP"
+            },
+            {
+                "text": "Leonardo",
+                "label": "GPE"
+            },
+            {
+                "text": "thousands",
+                "label": "CARDINAL"
+            },
+            {
+                "text": "italian",
+                "label": "NORP"
+            },
+            {
+                "text": "tonight",
+                "label": "TIME"
+            }
+        ]
+    },
+    "t3_1sek26t": {
+        "id": "t3_1sek26t",
+        "timestamp": "2026-04-07T02:59:37.466Z",
+        "title": "Idk what to do because I'm very overwhelmed that monster is owned by coke and coke is pro Israel and I'm not sure what to do",
+        "body": "yea I am obsessed with drinking monster",
+        "keywords": {
+            "idk": 1,
+            "overwhelmed": 1,
+            "monster": 2,
+            "owned": 1,
+            "coke": 2,
+            "pro": 1,
+            "israel": 1,
+            "sure": 1,
+            "yea": 1,
+            "obsessed": 1,
+            "drinking": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Idk",
+                "label": "PERSON"
+            },
+            {
+                "text": "coke",
+                "label": "ORG"
+            },
+            {
+                "text": "Israel",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1sf3aja": {
+        "id": "t3_1sf3aja",
+        "timestamp": "2026-04-07T17:49:24.114Z",
+        "title": "Est ce que Yadan va nous obliger \u00e0 en acheter ?",
+        "body": "",
+        "keywords": {
+            "est": 1,
+            "ce": 1,
+            "que": 1,
+            "yadan": 1,
+            "va": 1,
+            "nous": 1,
+            "obliger": 1,
+            "\u00e0": 1,
+            "en": 1,
+            "acheter": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Yadan va",
+                "label": "LOC"
+            }
+        ]
+    },
+    "t3_1sdzcgn": {
+        "id": "t3_1sdzcgn",
+        "timestamp": "2026-04-06T13:47:15.945Z",
+        "title": "Apple TV Stars and Shows",
+        "body": "Is it just me or does it seem like all the biggest shows on Apple TV consist of pro-Israel celebrities? Your Friends and Neighbours has a cast that have all spoken out for Israel / Zionists.",
+        "keywords": {
+            "apple": 2,
+            "tv": 2,
+            "star": 1,
+            "show": 2,
+            "seem": 1,
+            "biggest": 1,
+            "consist": 1,
+            "celebrity": 1,
+            "friend": 1,
+            "neighbour": 1,
+            "cast": 1,
+            "spoken": 1,
+            "israel": 1,
+            "zionist": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Apple TV Stars and Shows",
+                "label": "ORG"
+            },
+            {
+                "text": "Apple TV",
+                "label": "ORG"
+            },
+            {
+                "text": "pro-Israel",
+                "label": "NORP"
+            },
+            {
+                "text": "Neighbours",
+                "label": "ORG"
+            },
+            {
+                "text": "Israel",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1scb43j": {
+        "id": "t3_1scb43j",
+        "timestamp": "2026-04-04T14:47:08.313Z",
+        "title": "Dominos Is still on the list??",
+        "body": "I just wanted to know, I\u2019m going to work there, but idk if they are still on the list (I\u2019m going to work there anyways bc i need the money but i would like to search another place maybe)",
+        "keywords": {
+            "domino": 1,
+            "list": 2,
+            "going": 2,
+            "work": 2,
+            "idk": 1,
+            "anyways": 1,
+            "bc": 1,
+            "need": 1,
+            "money": 1,
+            "search": 1,
+            "another": 1,
+            "place": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Dominos",
+                "label": "ORG"
+            }
+        ]
+    },
+    "t3_1sc9qmn": {
+        "id": "t3_1sc9qmn",
+        "timestamp": "2026-04-04T13:49:32.581Z",
+        "title": "I am replacing all Big Tech products (Google, Microsoft, Facebook) with Free and Open Source Software. I believe this is the best way to boycott these corporations. AMA!",
+        "body": "I am currently in the process of de-Googling and replacing all products from major US corporations (specifically Facebook, Microsoft, and Google) with free and open-source software alternatives.\n\nFree Software is typically developed by non-profit organizations or individuals. These projects generally have no ties to Israel, which makes them\u2014in my view\u2014the most effective way to boycott Big Tech and align your technology use with your ethical stance.\n\nHow can I help?\n\nFinding alternatives: If there is a specific program you use and can't find an alternative for, I might already be using a good alternative for it.\n\nSwitching to Linux: If you are thinking about making the switch from Windows to Linux, I can help guide you through that process.\n\nAsk Me Anything!",
+        "keywords": {
+            "replacing": 2,
+            "big": 2,
+            "tech": 2,
+            "product": 2,
+            "google": 2,
+            "microsoft": 2,
+            "facebook": 2,
+            "free": 3,
+            "open": 1,
+            "source": 1,
+            "software": 3,
+            "believe": 1,
+            "best": 1,
+            "way": 2,
+            "boycott": 2,
+            "corporation": 2,
+            "ama": 1,
+            "currently": 1,
+            "process": 2,
+            "major": 1,
+            "specifically": 1,
+            "alternative": 4,
+            "typically": 1,
+            "developed": 1,
+            "organization": 1,
+            "individual": 1,
+            "project": 1,
+            "generally": 1,
+            "tie": 1,
+            "israel": 1,
+            "make": 1,
+            "view": 1,
+            "effective": 1,
+            "align": 1,
+            "technology": 1,
+            "use": 2,
+            "ethical": 1,
+            "stance": 1,
+            "help": 2,
+            "finding": 1,
+            "specific": 1,
+            "program": 1,
+            "ca": 1,
+            "find": 1,
+            "already": 1,
+            "using": 1,
+            "good": 1,
+            "switching": 1,
+            "linux": 2,
+            "thinking": 1,
+            "switch": 1,
+            "window": 1,
+            "guide": 1,
+            "ask": 1,
+            "anything": 1
+        },
+        "sentiment": "Positive",
+        "entities": [
+            {
+                "text": "Big Tech",
+                "label": "ORG"
+            },
+            {
+                "text": "Google",
+                "label": "ORG"
+            },
+            {
+                "text": "Microsoft",
+                "label": "ORG"
+            },
+            {
+                "text": "AMA",
+                "label": "ORG"
+            },
+            {
+                "text": "US",
+                "label": "GPE"
+            },
+            {
+                "text": "Microsoft",
+                "label": "ORG"
+            },
+            {
+                "text": "Google",
+                "label": "ORG"
+            },
+            {
+                "text": "Israel",
+                "label": "GPE"
+            },
+            {
+                "text": "Big Tech",
+                "label": "ORG"
+            },
+            {
+                "text": "Linux",
+                "label": "PERSON"
+            },
+            {
+                "text": "Windows to Linux",
+                "label": "NORP"
+            }
+        ]
+    },
+    "t3_1sbsmzr": {
+        "id": "t3_1sbsmzr",
+        "timestamp": "2026-04-03T23:00:13.852Z",
+        "title": "I just almost got into an argument with someone in another subreddit, so I need to make this post to emphasise something.",
+        "body": "When anyone says anything against Israel, they are talking about the Zionists in power and the ones who actively support the actions of the Israeli government and forces.\n\nBasically, I asked in the r/qBittorrent subreddit how to block Israeli IPs, and someone thought I was being anti semitic. I clarified that I was against the Israeli government and their forces, but they still were adamant I was discriminating against the Israeli people. I couldn't be asked to have a debate, and to avoid being downvoted into Hell, I deleted the post.\n\nI know it was probably cowardly, but I knew I would go back and forth with this person, and decided not to bother.",
+        "keywords": {
+            "almost": 1,
+            "argument": 1,
+            "another": 1,
+            "need": 1,
+            "emphasise": 1,
+            "something": 1,
+            "say": 1,
+            "anything": 1,
+            "israel": 1,
+            "talking": 1,
+            "zionist": 1,
+            "power": 1,
+            "one": 1,
+            "actively": 1,
+            "support": 1,
+            "action": 1,
+            "israeli": 4,
+            "government": 2,
+            "force": 2,
+            "asked": 2,
+            "block": 1,
+            "ip": 1,
+            "thought": 1,
+            "anti": 1,
+            "semitic": 1,
+            "clarified": 1,
+            "adamant": 1,
+            "discriminating": 1,
+            "people": 1,
+            "debate": 1,
+            "avoid": 1,
+            "downvoted": 1,
+            "hell": 1,
+            "cowardly": 1,
+            "back": 1,
+            "forth": 1,
+            "person": 1,
+            "decided": 1,
+            "bother": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Israel",
+                "label": "GPE"
+            },
+            {
+                "text": "Zionists",
+                "label": "NORP"
+            },
+            {
+                "text": "Israeli",
+                "label": "NORP"
+            },
+            {
+                "text": "Israeli",
+                "label": "NORP"
+            },
+            {
+                "text": "Israeli",
+                "label": "NORP"
+            },
+            {
+                "text": "Israeli",
+                "label": "NORP"
+            }
+        ]
+    },
+    "t3_1sbsdfi": {
+        "id": "t3_1sbsdfi",
+        "timestamp": "2026-04-03T22:48:48.183Z",
+        "title": "Boycott Florence by Mills \u2013 concerns about international personal data transfers and privacy practices",
+        "body": "After reviewing the privacy policy of Florence by Mills Fashion, I found several concerning points regarding how user data is handled internationally.\n\nThe policy states that personal data collected from users in the European Economic Area (EEA) and the United Kingdom may be transferred, stored, and processed outside those regions. This includes transfers to multiple jurisdictions, notably Israel (where the company\u2019s group headquarters is located), as well as other countries where third-party service providers and subprocessors operate.\n\nAccording to the document, these transfers are justified for operational reasons such as data storage and backup, fulfilling contractual obligations, meeting legal or regulatory requirements, and supporting global business operations. However, this also means that user data may be processed in multiple countries with different privacy laws and standards.\n\nThe company claims to use \u201cappropriate safeguards\u201d for these transfers, including EU adequacy decisions, Standard Contractual Clauses (SCCs), and UK international data transfer mechanisms. While these are legal tools intended to protect data, they still allow personal information to move across borders and be handled by multiple entities worldwide.\n\nWhat stands out to me is how broadly personal data can be distributed globally, even for standard website usage. Many users may not realize how many different jurisdictions can be involved in processing their information.\n\nBecause of these concerns about transparency and international data handling practices, I believe users should reconsider supporting or engaging with this brand.\n\nI\u2019m interested to hear others\u2019 opinions on this and whether you think such data practices are acceptable or not.",
+        "keywords": {
+            "boycott": 1,
+            "florence": 2,
+            "mill": 2,
+            "concern": 2,
+            "international": 3,
+            "personal": 4,
+            "data": 10,
+            "transfer": 5,
+            "privacy": 3,
+            "practice": 3,
+            "reviewing": 1,
+            "policy": 2,
+            "fashion": 1,
+            "found": 1,
+            "several": 1,
+            "concerning": 1,
+            "point": 1,
+            "regarding": 1,
+            "user": 5,
+            "handled": 2,
+            "internationally": 1,
+            "state": 1,
+            "collected": 1,
+            "european": 1,
+            "economic": 1,
+            "area": 1,
+            "eea": 1,
+            "united": 1,
+            "kingdom": 1,
+            "transferred": 1,
+            "stored": 1,
+            "processed": 2,
+            "outside": 1,
+            "region": 1,
+            "includes": 1,
+            "multiple": 3,
+            "jurisdiction": 2,
+            "notably": 1,
+            "israel": 1,
+            "company": 2,
+            "group": 1,
+            "headquarters": 1,
+            "located": 1,
+            "well": 1,
+            "country": 2,
+            "service": 1,
+            "provider": 1,
+            "subprocessors": 1,
+            "operate": 1,
+            "according": 1,
+            "document": 1,
+            "justified": 1,
+            "operational": 1,
+            "reason": 1,
+            "storage": 1,
+            "backup": 1,
+            "fulfilling": 1,
+            "contractual": 2,
+            "obligation": 1,
+            "meeting": 1,
+            "legal": 2,
+            "regulatory": 1,
+            "requirement": 1,
+            "supporting": 2,
+            "global": 1,
+            "business": 1,
+            "operation": 1,
+            "however": 1,
+            "mean": 1,
+            "different": 2,
+            "law": 1,
+            "standard": 3,
+            "claim": 1,
+            "use": 1,
+            "appropriate": 1,
+            "safeguard": 1,
+            "including": 1,
+            "eu": 1,
+            "adequacy": 1,
+            "decision": 1,
+            "clause": 1,
+            "sccs": 1,
+            "uk": 1,
+            "mechanism": 1,
+            "tool": 1,
+            "intended": 1,
+            "protect": 1,
+            "allow": 1,
+            "information": 2,
+            "move": 1,
+            "across": 1,
+            "border": 1,
+            "entity": 1,
+            "worldwide": 1,
+            "stand": 1,
+            "broadly": 1,
+            "distributed": 1,
+            "globally": 1,
+            "website": 1,
+            "usage": 1,
+            "realize": 1,
+            "involved": 1,
+            "processing": 1,
+            "transparency": 1,
+            "handling": 1,
+            "believe": 1,
+            "reconsider": 1,
+            "engaging": 1,
+            "brand": 1,
+            "interested": 1,
+            "hear": 1,
+            "others": 1,
+            "opinion": 1,
+            "whether": 1,
+            "think": 1,
+            "acceptable": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Boycott Florence",
+                "label": "PERSON"
+            },
+            {
+                "text": "Florence by Mills Fashion",
+                "label": "ORG"
+            },
+            {
+                "text": "the European Economic Area",
+                "label": "ORG"
+            },
+            {
+                "text": "the United Kingdom",
+                "label": "GPE"
+            },
+            {
+                "text": "Israel",
+                "label": "GPE"
+            },
+            {
+                "text": "third",
+                "label": "ORDINAL"
+            },
+            {
+                "text": "EU",
+                "label": "ORG"
+            },
+            {
+                "text": "Standard Contractual Clauses (SCCs",
+                "label": "ORG"
+            },
+            {
+                "text": "UK",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1sajqyq": {
+        "id": "t3_1sajqyq",
+        "timestamp": "2026-04-02T14:59:16.067Z",
+        "title": "Does Marlboro support Israel",
+        "body": "Is Marlboro in the boycott list?",
+        "keywords": {
+            "marlboro": 2,
+            "support": 1,
+            "israel": 1,
+            "boycott": 1,
+            "list": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Marlboro",
+                "label": "ORG"
+            },
+            {
+                "text": "Israel",
+                "label": "GPE"
+            },
+            {
+                "text": "Marlboro",
+                "label": "ORG"
+            }
+        ]
+    },
+    "t3_1s9fzxh": {
+        "id": "t3_1s9fzxh",
+        "timestamp": "2026-04-01T09:50:38.852Z",
+        "title": "This is the best local alternative to Pepsi and coca-cola",
+        "body": "unfortunately it's just available in Egypt (not worldwide) what is your local alternative?\n\n( Gaza cola) is very expressive here",
+        "keywords": {
+            "best": 1,
+            "local": 2,
+            "alternative": 2,
+            "pepsi": 1,
+            "unfortunately": 1,
+            "available": 1,
+            "egypt": 1,
+            "worldwide": 1,
+            "gaza": 1,
+            "cola": 1,
+            "expressive": 1
+        },
+        "sentiment": "Positive",
+        "entities": [
+            {
+                "text": "Pepsi",
+                "label": "ORG"
+            },
+            {
+                "text": "Egypt",
+                "label": "GPE"
+            },
+            {
+                "text": "Gaza",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1sbq1fw": {
+        "id": "t3_1sbq1fw",
+        "timestamp": "2026-04-03T21:14:05.245Z",
+        "title": "Long island restaurants?",
+        "body": "Hi, so I went to a 'mediterranean' mostly greek restaurant, but when they told the menu they mentioned 'israeli' food ._.\n\nI got immediate ick and didn't order. I'm scared about other places now because I didn't realize israel involvement in mediterranean or greek food too bruh,\n\nI wish there was a list of safe restaurants or restaurants to avoid. I'm so disappointed.\n\nI hope the tag is correct for this lol (throwaway account because anonymity)\n\nedit: New York, long island",
+        "keywords": {
+            "long": 2,
+            "island": 2,
+            "restaurant": 4,
+            "hi": 1,
+            "mostly": 1,
+            "greek": 2,
+            "told": 1,
+            "menu": 1,
+            "mentioned": 1,
+            "food": 2,
+            "immediate": 1,
+            "ick": 1,
+            "order": 1,
+            "scared": 1,
+            "place": 1,
+            "realize": 1,
+            "israel": 1,
+            "involvement": 1,
+            "mediterranean": 1,
+            "bruh": 1,
+            "wish": 1,
+            "list": 1,
+            "safe": 1,
+            "avoid": 1,
+            "disappointed": 1,
+            "hope": 1,
+            "tag": 1,
+            "correct": 1,
+            "lol": 1,
+            "throwaway": 1,
+            "account": 1,
+            "anonymity": 1,
+            "new": 1,
+            "york": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "greek",
+                "label": "NORP"
+            },
+            {
+                "text": "israeli",
+                "label": "NORP"
+            },
+            {
+                "text": "israel",
+                "label": "GPE"
+            },
+            {
+                "text": "mediterranean",
+                "label": "LOC"
+            },
+            {
+                "text": "greek",
+                "label": "NORP"
+            },
+            {
+                "text": "New York",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1s95mbv": {
+        "id": "t3_1s95mbv",
+        "timestamp": "2026-04-01T00:48:00.961Z",
+        "title": "I accidentally bought an Israeli product I feel terrible",
+        "body": "i was at one of those markets where there are like foods imported from all over the world and i saw these wafer treat things because i thought they looked delicious and I bought them but when i got home I saw there was Hebrew writing all over the back of the packaging and I feel terrible what the hell do I do.",
+        "keywords": {
+            "accidentally": 1,
+            "bought": 2,
+            "israeli": 1,
+            "product": 1,
+            "feel": 2,
+            "terrible": 2,
+            "one": 1,
+            "market": 1,
+            "food": 1,
+            "imported": 1,
+            "world": 1,
+            "saw": 2,
+            "wafer": 1,
+            "treat": 1,
+            "thought": 1,
+            "looked": 1,
+            "delicious": 1,
+            "home": 1,
+            "hebrew": 1,
+            "writing": 1,
+            "back": 1,
+            "packaging": 1,
+            "hell": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Israeli",
+                "label": "NORP"
+            },
+            {
+                "text": "Hebrew",
+                "label": "LANGUAGE"
+            }
+        ]
+    },
+    "t3_1s8vii6": {
+        "id": "t3_1s8vii6",
+        "timestamp": "2026-03-31T18:21:01.000Z",
+        "title": "BDS friendly stock list?",
+        "body": "There is a post on a subreddit about ethical US and non-US stocks, but turns out many stocks (especially US) were already on the boycott list like Adobe. Are there any BDS friendly stock lists?",
+        "keywords": {
+            "bd": 2,
+            "friendly": 2,
+            "stock": 4,
+            "list": 3,
+            "ethical": 1,
+            "turn": 1,
+            "especially": 1,
+            "already": 1,
+            "boycott": 1,
+            "adobe": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "BDS",
+                "label": "ORG"
+            },
+            {
+                "text": "US",
+                "label": "GPE"
+            },
+            {
+                "text": "non-US",
+                "label": "NORP"
+            },
+            {
+                "text": "US",
+                "label": "GPE"
+            },
+            {
+                "text": "Adobe",
+                "label": "ORG"
+            },
+            {
+                "text": "BDS",
+                "label": "ORG"
+            }
+        ]
+    },
+    "t3_1s8kf8e": {
+        "id": "t3_1s8kf8e",
+        "timestamp": "2026-03-31T11:10:34.698Z",
+        "title": "She spoke out about Gaza. Now she can\u2019t use a credit card.",
+        "body": "https://www.politico.com/news/magazine/2026/03/30/gaza-israel-un-criticize-us-sanction-00850477?referrer=https://reddit.com\n\nFreedom of speech only when it's good for their side otherwise it's \"sanctions\".\n\nThey are a bunch of hypocrites.",
+        "keywords": {
+            "spoke": 1,
+            "gaza": 1,
+            "use": 1,
+            "credit": 1,
+            "card": 1,
+            "freedom": 1,
+            "speech": 1,
+            "good": 1,
+            "side": 1,
+            "otherwise": 1,
+            "sanction": 1,
+            "bunch": 1,
+            "hypocrite": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Gaza",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1s87hm8": {
+        "id": "t3_1s87hm8",
+        "timestamp": "2026-03-30T23:52:16.460Z",
+        "title": "General question?",
+        "body": "How is everyone dealing with banks checking the no thanks app most banks are on the boycott list including the big banks like chase and Bank of America? Like I\u2019m currently using Bank of America and not sure what to do ?",
+        "keywords": {
+            "general": 1,
+            "question": 1,
+            "everyone": 1,
+            "dealing": 1,
+            "bank": 5,
+            "checking": 1,
+            "thanks": 1,
+            "app": 1,
+            "boycott": 1,
+            "list": 1,
+            "including": 1,
+            "big": 1,
+            "chase": 1,
+            "america": 2,
+            "currently": 1,
+            "using": 1,
+            "sure": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Bank of America",
+                "label": "ORG"
+            },
+            {
+                "text": "Bank of America",
+                "label": "ORG"
+            }
+        ]
+    },
+    "t3_1s7yegc": {
+        "id": "t3_1s7yegc",
+        "timestamp": "2026-03-30T18:08:57.033Z",
+        "title": "Good alternatives for music streaming apps?",
+        "body": "Hello! So, since last year I've been trying to do my part, however small, to help in what I've been able to. I cut most beef/diary from my diet, grew some plants (some died sadly), less shopping, etc, but my problem is music.\n\nI have over 6000 songs on Spotify and when I saw where the money was going to I ditched it immediately. I tried getting onto Tidal since I saw it pays artists much better, but there was a problem with subscribing so it didn't go through. I also saw Qobuz but the whole catalog wasn't there and it's a bit expensive for me (wages where I live are around 500 dollars a month so, US-European services are expensive in relation). Same with Deezer. I've seen some comment bandcamp but i don't think the 6000+ songs are feasable that way.\n\nI'm still interested in trying Tidal, but would you recommend (hope this doesn't get me in trouble) instead going with ReVanced/the Spotify cracked version or another option ? Or should I try Tidal? I saw Jack Dorsey is behind it now so that also has me doubting.\n\nThanks in advance!",
+        "keywords": {
+            "good": 1,
+            "alternative": 1,
+            "music": 2,
+            "streaming": 1,
+            "apps": 1,
+            "hello": 1,
+            "since": 2,
+            "last": 1,
+            "year": 1,
+            "trying": 2,
+            "part": 1,
+            "however": 1,
+            "small": 1,
+            "help": 1,
+            "able": 1,
+            "cut": 1,
+            "diet": 1,
+            "grew": 1,
+            "plant": 1,
+            "died": 1,
+            "sadly": 1,
+            "less": 1,
+            "shopping": 1,
+            "etc": 1,
+            "problem": 2,
+            "6000": 1,
+            "song": 2,
+            "spotify": 2,
+            "saw": 4,
+            "money": 1,
+            "going": 2,
+            "ditched": 1,
+            "immediately": 1,
+            "tried": 1,
+            "onto": 1,
+            "tidal": 3,
+            "pay": 1,
+            "artist": 1,
+            "better": 1,
+            "subscribing": 1,
+            "qobuz": 1,
+            "whole": 1,
+            "catalog": 1,
+            "bit": 1,
+            "expensive": 2,
+            "wage": 1,
+            "live": 1,
+            "around": 1,
+            "500": 1,
+            "dollar": 1,
+            "month": 1,
+            "service": 1,
+            "relation": 1,
+            "deezer": 1,
+            "seen": 1,
+            "bandcamp": 1,
+            "think": 1,
+            "feasable": 1,
+            "way": 1,
+            "interested": 1,
+            "recommend": 1,
+            "hope": 1,
+            "trouble": 1,
+            "instead": 1,
+            "cracked": 1,
+            "version": 1,
+            "another": 1,
+            "option": 1,
+            "try": 1,
+            "jack": 1,
+            "dorsey": 1,
+            "behind": 1,
+            "doubting": 1,
+            "thanks": 1,
+            "advance": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "last year",
+                "label": "DATE"
+            },
+            {
+                "text": "6000",
+                "label": "CARDINAL"
+            },
+            {
+                "text": "Spotify",
+                "label": "GPE"
+            },
+            {
+                "text": "Qobuz",
+                "label": "GPE"
+            },
+            {
+                "text": "around 500 dollars",
+                "label": "MONEY"
+            },
+            {
+                "text": "US",
+                "label": "GPE"
+            },
+            {
+                "text": "European",
+                "label": "NORP"
+            },
+            {
+                "text": "Deezer",
+                "label": "PERSON"
+            },
+            {
+                "text": "6000",
+                "label": "CARDINAL"
+            },
+            {
+                "text": "ReVanced/the Spotify",
+                "label": "ORG"
+            },
+            {
+                "text": "Jack Dorsey",
+                "label": "PERSON"
+            }
+        ]
+    },
+    "t3_1s7oil3": {
+        "id": "t3_1s7oil3",
+        "timestamp": "2026-03-30T11:59:30.174Z",
+        "title": "BDS friendly stock broker apps?",
+        "body": "Etoro is israeli, interactive brokers\u2019s majority is owned by Vanguard, BlackRock and the whole other major companies we boycott because of. There are many alternatives, but most don\u2019t work where I live (Jordan). So any suggestions?\n\nPreferably having non-US stock options because most US companies are also on the BDS list, or boycotted for other reasons.",
+        "keywords": {
+            "bd": 2,
+            "friendly": 1,
+            "stock": 2,
+            "broker": 2,
+            "apps": 1,
+            "etoro": 1,
+            "israeli": 1,
+            "interactive": 1,
+            "majority": 1,
+            "owned": 1,
+            "vanguard": 1,
+            "blackrock": 1,
+            "whole": 1,
+            "major": 1,
+            "company": 2,
+            "boycott": 1,
+            "alternative": 1,
+            "work": 1,
+            "live": 1,
+            "jordan": 1,
+            "suggestion": 1,
+            "preferably": 1,
+            "option": 1,
+            "list": 1,
+            "boycotted": 1,
+            "reason": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "BDS",
+                "label": "ORG"
+            },
+            {
+                "text": "israeli",
+                "label": "NORP"
+            },
+            {
+                "text": "Vanguard",
+                "label": "ORG"
+            },
+            {
+                "text": "BlackRock",
+                "label": "ORG"
+            },
+            {
+                "text": "Jordan",
+                "label": "GPE"
+            },
+            {
+                "text": "non-US",
+                "label": "NORP"
+            },
+            {
+                "text": "US",
+                "label": "GPE"
+            },
+            {
+                "text": "BDS",
+                "label": "ORG"
+            }
+        ]
+    },
+    "t3_1s7l2ao": {
+        "id": "t3_1s7l2ao",
+        "timestamp": "2026-03-30T08:45:56.679Z",
+        "title": "Worth Boycotting Stores that use Shopify?",
+        "body": "I am aware that the Shopify CEO is a massive pos, but I like to buy stuff from small businesses and most of the individual stores online use Shopify. Not all of the stuff that I want to buy is essential but some of them do include personal care and household products. I\u2019m also not sure if it\u2019s even worth it due to the fact it\u2019ll do more harm to the business than Shopify itself.",
+        "keywords": {
+            "worth": 2,
+            "boycotting": 1,
+            "store": 2,
+            "use": 2,
+            "shopify": 4,
+            "aware": 1,
+            "ceo": 1,
+            "massive": 1,
+            "po": 1,
+            "buy": 2,
+            "small": 1,
+            "business": 2,
+            "individual": 1,
+            "online": 1,
+            "essential": 1,
+            "include": 1,
+            "personal": 1,
+            "care": 1,
+            "household": 1,
+            "product": 1,
+            "sure": 1,
+            "due": 1,
+            "fact": 1,
+            "harm": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Worth Boycotting Stores",
+                "label": "ORG"
+            },
+            {
+                "text": "Shopify",
+                "label": "GPE"
+            },
+            {
+                "text": "Shopify",
+                "label": "ORG"
+            },
+            {
+                "text": "Shopify",
+                "label": "GPE"
+            },
+            {
+                "text": "Shopify",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1s74b9u": {
+        "id": "t3_1s74b9u",
+        "timestamp": "2026-03-29T19:23:11.169Z",
+        "title": "We can\u2019t say \u201cfrom the river to the sea\u201d but Israeli politicians can publicly demand for Israel to murder more babies\u2026",
+        "body": "",
+        "keywords": {
+            "say": 1,
+            "river": 1,
+            "sea": 1,
+            "israeli": 1,
+            "politician": 1,
+            "publicly": 1,
+            "demand": 1,
+            "israel": 1,
+            "murder": 1
+        },
+        "sentiment": "Negative",
+        "entities": [
+            {
+                "text": "Israeli",
+                "label": "NORP"
+            },
+            {
+                "text": "Israel",
+                "label": "GPE"
+            }
+        ]
+    },
+    "t3_1s7capd": {
+        "id": "t3_1s7capd",
+        "timestamp": "2026-03-30T00:50:50.505Z",
+        "title": "Is shoplifting boycotting or breaking the boycott?",
+        "body": "For legal reasons this is all hypothetical and in minecraft. I re-discovered that video from Mohammed Alnaas about how money flows for boycotting and it occured to me: they're stocked based on demand for certain products. Hypothetically and in minecraft, if I shoplifted a coca cola product or a candy bar under Mars from my grocery store, would it still count as adding to the demand? Does it count as boycotting?",
+        "keywords": {
+            "shoplifting": 1,
+            "boycotting": 3,
+            "breaking": 1,
+            "boycott": 1,
+            "legal": 1,
+            "reason": 1,
+            "hypothetical": 1,
+            "minecraft": 2,
+            "video": 1,
+            "mohammed": 1,
+            "alnaas": 1,
+            "money": 1,
+            "flow": 1,
+            "occured": 1,
+            "stocked": 1,
+            "based": 1,
+            "demand": 2,
+            "certain": 1,
+            "product": 2,
+            "hypothetically": 1,
+            "shoplifted": 1,
+            "coca": 1,
+            "cola": 1,
+            "candy": 1,
+            "bar": 1,
+            "mar": 1,
+            "grocery": 1,
+            "store": 1,
+            "count": 2,
+            "adding": 1
+        },
+        "sentiment": "Neutral",
+        "entities": [
+            {
+                "text": "Mohammed Alnaas",
+                "label": "PERSON"
+            },
+            {
+                "text": "Mars",
+                "label": "LOC"
+            }
+        ]
+    },
+    "t3_1s6rqcp": {
+        "id": "t3_1s6rqcp",
+        "timestamp": "2026-03-29T10:38:57.591Z",
+        "title": "Clothing, shoe and accessory brands that support Palestine?",
+        "body": "i am attending a writer's event in the coming weeks and i would to wear a complete outfit of brands that NOT only do not do business with Israel but also COMPLETELY support Palestine. i need clothing, shoes and accessories so any help would be greatly appreciated. thank you in advance and free Palestine.",
+        "keywords": {
+            "clothing": 2,
+            "shoe": 2,
+            "accessory": 2,
+            "brand": 2,
+            "support": 2,
+            "palestine": 3,
+            "attending": 1,
+            "writer": 1,
+            "event": 1,
+            "coming": 1,
+            "week": 1,
+            "wear": 1,
+            "complete": 1,
+            "outfit": 1,
+            "business": 1,
+            "israel": 1,
+            "completely": 1,
+            "need": 1,
+            "help": 1,
+            "greatly": 1,
+            "appreciated": 1,
+            "thank": 1,
+            "advance": 1,
+            "free": 1
+        },
+        "sentiment": "Positive",
+        "entities": [
+            {
+                "text": "Palestine",
+                "label": "GPE"
+            },
+            {
+                "text": "the coming weeks",
+                "label": "DATE"
+            },
+            {
+                "text": "Israel",
+                "label": "GPE"
+            },
+            {
+                "text": "COMPLETELY",
+                "label": "ORG"
+            },
+            {
+                "text": "Palestine",
+                "label": "GPE"
+            },
+            {
+                "text": "Palestine",
+                "label": "GPE"
+            }
+        ]
+    }
+}

@@ -31,7 +31,7 @@ export default function DataTabs({ postsData }) {
 
   return (
     <Tabs.Root
-      defaultValue="Pie Chart"
+      defaultValue="Posts Table"
       variant="plain"
       // lazyMount
       // unmountOnExit

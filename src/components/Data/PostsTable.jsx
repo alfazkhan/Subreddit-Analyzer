@@ -1,8 +1,7 @@
 import {
   HStack,
   Table,
-  Field,
-  NumberInput,
+  Badge,
   Flex,
   Pagination,
   ButtonGroup,
@@ -77,7 +76,10 @@ export default function KeywordTable({ data: postsData }) {
               emotion.label === sentiment ? "orange.600" : "gray.800"
             }
             _hover={{ bg: "whiteAlpha.100" }}
-            onClick={() => setSentiment(emotion.label)}
+            onClick={() => {
+              setSentiment(emotion.label)
+              setCurrentPage(1)
+            }}
           >
             <Text>{emotion.emoji}</Text>
             <Text fontWeight="bold" color="white">
@@ -96,9 +98,6 @@ export default function KeywordTable({ data: postsData }) {
           <Table.Header>
             <Table.Row>
               <Table.ColumnHeader color="orange.600" fontWeight="extrabold">
-                ID
-              </Table.ColumnHeader>
-              <Table.ColumnHeader color="orange.600" fontWeight="extrabold">
                 Title
               </Table.ColumnHeader>
               <Table.ColumnHeader color="orange.600" fontWeight="extrabold">
@@ -110,18 +109,14 @@ export default function KeywordTable({ data: postsData }) {
               <Table.ColumnHeader color="orange.600" fontWeight="extrabold">
                 Sentiment
               </Table.ColumnHeader>
+              <Table.ColumnHeader color="orange.600" fontWeight="extrabold">
+                Entities
+              </Table.ColumnHeader>
             </Table.Row>
           </Table.Header>
           <Table.Body>
             {paginatedData.map((post) => (
               <Table.Row key={post.id} color="gray.100">
-                <Table.Cell
-                  maxW="100px"
-                  whiteSpace="normal"
-                  verticalAlign="top"
-                >
-                  {post.id}
-                </Table.Cell>
                 <Table.Cell
                   maxW="200px"
                   whiteSpace="normal"
@@ -136,7 +131,15 @@ export default function KeywordTable({ data: postsData }) {
                 >
                   <Collapsible.Root collapsedHeight="80px">
                     <Collapsible.Content>
-                      <Stack>{post.body? post.body : <Text color="red.400" textAlign="center">No body content</Text>}</Stack>
+                      <Stack>
+                        {post.body ? (
+                          post.body
+                        ) : (
+                          <Text color="red.400" textAlign="center">
+                            No body content
+                          </Text>
+                        )}
+                      </Stack>
                     </Collapsible.Content>
                     {post.body.length >= 300 && (
                       <Collapsible.Trigger asChild mt="3">
@@ -170,6 +173,28 @@ export default function KeywordTable({ data: postsData }) {
                   }
                 >
                   {post.sentiment}
+                </Table.Cell>
+                <Table.Cell>
+                  <Stack direction="column">
+                    {post.entities
+                      .filter(
+                        (item, index, self) =>
+                          index ===
+                          self.findIndex((t) => t.label === item.label),
+                      )
+                      .map((e) => {
+                        if (labelConfig[e.label] !== undefined) {
+                          return (
+                            <Badge
+                              id={labelConfig[e.label]?.type}
+                              colorPalette={labelConfig[e.label]?.color}
+                            >
+                              {labelConfig[e.label]?.type}
+                            </Badge>
+                          );
+                        }
+                      })}
+                  </Stack>
                 </Table.Cell>
               </Table.Row>
             ))}
@@ -211,3 +236,97 @@ export default function KeywordTable({ data: postsData }) {
     </Flex>
   );
 }
+
+const labelConfig = {
+  PERSON: {
+    type: "Person",
+    description:
+      "Real and fictional people (e.g., politicians, celebrities, users).",
+    color: "blue",
+  },
+  NORP: {
+    type: "Group",
+    description: "Nationalities, religious, or political groups.",
+    color: "purple",
+  },
+  FAC: {
+    type: "Facility",
+    description: "Buildings, airports, highways, bridges, and infrastructure.",
+    color: "gray",
+  },
+  ORG: {
+    type: "Organization",
+    description: "Companies, agencies, institutions, and corporate brands.",
+    color: "cyan",
+  },
+  GPE: {
+    type: "Location (GPE)",
+    description: "Countries, cities, and states.",
+    color: "green",
+  },
+  LOC: {
+    type: "Location",
+    description: "Non-GPE locations like mountain ranges or bodies of water.",
+    color: "teal",
+  },
+  PRODUCT: {
+    type: "Product",
+    description: "Objects, vehicles, foods, etc. (excludes services).",
+    color: "orange",
+  },
+  EVENT: {
+    type: "Event",
+    description: "Named hurricanes, battles, wars, or sports events.",
+    color: "pink",
+  },
+  WORK_OF_ART: {
+    type: "Work of Art",
+    description: "Titles of books, songs, movies, and TV shows.",
+    color: "red",
+  },
+  LAW: {
+    type: "Law",
+    description: "Named documents made into laws (e.g., Section 144, GDPR).",
+    color: "yellow",
+  },
+  LANGUAGE: {
+    type: "Language",
+    description: "Any specifically named language.",
+    color: "blue",
+  },
+  DATE: {
+    type: "Date",
+    description: "Absolute or relative dates or time periods.",
+    color: "facebook",
+  },
+  TIME: {
+    type: "Time",
+    description: "Times smaller than a day.",
+    color: "messenger",
+  },
+  // PERCENT: {
+  //   type: "Percentage",
+  //   description: "Percentage values, including the '%' sign.",
+  //   color: "whatsapp",
+  // },
+  MONEY: {
+    type: "Money",
+    description: "Monetary values, including units (e.g., INR, Euros).",
+    color: "green",
+  },
+  QUANTITY: {
+    type: "Quantity",
+    description: "Measurements, such as weight or distance.",
+    color: "yellow",
+  },
+  // ORDINAL: {
+  //   type: "Ordinal",
+  //   description: "Words describing order like 'first' or 'second'.",
+  //   color: "gray",
+  // },
+  // CARDINAL: {
+  //   type: "Number",
+  //   description: "Numerals that do not fall under another category.",
+  //   color: "gray",
+  // },
+};

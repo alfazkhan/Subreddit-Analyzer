@@ -8,6 +8,7 @@ const Suggestions = [
   { name: "r/Munich", link: "Munich" },
   { name: "r/AskIndianWomen", link: "AskIndianWomen" },
   { name: "r/BoycottIsrael", link: "BoycottIsrael" },
+  { name: "r/LegalAdviceIndia", link: "LegalAdviceIndia" },
 ];
 
 export default function SubredditsSuggestions() {
