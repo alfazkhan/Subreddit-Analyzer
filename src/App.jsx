@@ -8,7 +8,7 @@ import SubredditsSuggestions from "./components/ui/SubredditsSuggestion";
 import ProgressBar from "./components/ui/ProgressBar";
 import DataTabs from "./components/ui/DataTabs";
 import { SubredditContext } from "./store/SubredditContext";
-import UpcomingFeatures from "./components/ui/UpcomingFeatures";
+import UpcomingFeatures from "./components/Feature Tracker/UpcomingFeatures";
 
 function App() {
   const [progress, setProgress] = useState(0);
@@ -95,7 +95,7 @@ function App() {
         </Flex>
       )}
 
-      {!posts.length !== 0 && ( //Remove ! in the end
+      {posts.length !== 0 && ( //Remove ! in the end
         <Flex justifyContent="center" gap="4" margin="5" flexDirection="column">
           <DataTabs postsData={posts} />
         </Flex>
