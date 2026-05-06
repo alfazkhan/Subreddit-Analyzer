@@ -77,8 +77,8 @@ export default function KeywordTable({ data: postsData }) {
             }
             _hover={{ bg: "whiteAlpha.100" }}
             onClick={() => {
-              setSentiment(emotion.label)
-              setCurrentPage(1)
+              setSentiment(emotion.label);
+              setCurrentPage(1);
             }}
           >
             <Text>{emotion.emoji}</Text>
@@ -165,7 +165,24 @@ export default function KeywordTable({ data: postsData }) {
                     )}
                   </Collapsible.Root>
                 </Table.Cell>
-                <Table.Cell>{timeStampFormatter(post.timestamp)}</Table.Cell>
+                <Table.Cell>
+                  <Text>
+                  {Intl.DateTimeFormat("en-DE", {
+                    year: "numeric",
+                    month: "numeric",
+                    day: "numeric",
+                  }).format(new Date(post.timestamp))}
+                  </Text>
+                  <Text>
+                  {Intl.DateTimeFormat("en-DE", {
+                    hour: "numeric",
+                    minute: "numeric",
+                    second: "numeric",
+                    hour12: true,
+                    timeZone: "Europe/Berlin",
+                  }).format(new Date(post.timestamp))}
+                  </Text>
+                </Table.Cell>
                 <Table.Cell
                   color={
                     config.find((element) => post.sentiment === element.label)

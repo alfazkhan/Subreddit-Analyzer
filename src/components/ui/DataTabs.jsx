@@ -4,6 +4,7 @@ import KeywordTable from "../Data/KeywordTable";
 import Sentiment from "../Data/Sentiment";
 import KeywordsPieChart from "../Data/KeywordsPieChart";
 import PostsTable from "../Data/PostsTable";
+import PostsFrequency from "../Data/PostsFrequency";
 
 export default function DataTabs({ postsData }) {
   const TabsListData = [
@@ -27,11 +28,16 @@ export default function DataTabs({ postsData }) {
       icon: LuUser,
       content: <KeywordTable data={postsData} />,
     },
+    {
+      value: "Posts Frequency",
+      icon: LuUser,
+      content: <PostsFrequency data={postsData} />,
+    },
   ];
 
   return (
     <Tabs.Root
-      defaultValue="Posts Table"
+      defaultValue="Posts Frequency"
       variant="plain"
       // lazyMount
       // unmountOnExit

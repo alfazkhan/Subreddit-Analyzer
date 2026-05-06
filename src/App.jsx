@@ -50,6 +50,14 @@ function App() {
         setProgress(message.progress);
       }
 
+      if (message.type === "partial_data") {
+        console.log(message)
+
+        setProcessingStatus("Partial Data received");
+        setProgress(Math.floor((message.posts.length / targetPostCount)*100));
+        setPosts(message.posts);
+      }
+
       if (message.type === "final_data") {
         console.log(message)
         setProcessingStatus("Process Completed");
@@ -58,7 +66,7 @@ function App() {
       }
     };
     return () => socket.close();
-  }, []);
+  }, [targetPostCount]);
 
   function StartScraping() {
     setProcessingStatus("Sending Request...");
@@ -95,7 +103,7 @@ function App() {
         </Flex>
       )}
 
-      {posts.length !== 0 && ( //Remove ! in the end
+      {!posts.length !== 0 && ( //Remove ! in the end
         <Flex justifyContent="center" gap="4" margin="5" flexDirection="column">
           <DataTabs postsData={posts} />
         </Flex>
