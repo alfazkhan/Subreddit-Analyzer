@@ -10,6 +10,7 @@ import {
   Collapsible,
   Stack,
   Button,
+  Link
 } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
@@ -111,7 +112,9 @@ export default function KeywordTable({ data: postsData }) {
                   whiteSpace="normal"
                   verticalAlign="top"
                 >
+                  <Link color="blue.400" href={`https://www.reddit.com/r/${post.subreddit}/comments/${post.id.substring(3)}`}>
                   {post.title}
+                  </Link>
                 </Table.Cell>
                 <Table.Cell
                   maxW="300px"
