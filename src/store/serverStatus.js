@@ -9,7 +9,6 @@ const serverStatusSlice = createSlice({
   initialState: initialServerStatusState,
   reducers: {
     serverStatusChange(state, action) {
-      console.log("SERVER status change", action);
       state.serverStatus = action.payload;
     },
   },

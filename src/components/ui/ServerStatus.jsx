@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 
 function ServerStatus() {
   const status = useSelector((state) => state.serverStatusState.serverStatus);
-  console.log(status)
 
   return (
     <>

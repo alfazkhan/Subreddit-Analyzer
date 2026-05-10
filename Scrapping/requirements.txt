@@ -1,0 +1,15 @@
+# Core Dependencies
+asyncpg
+websockets
+playwright
+transformers
+torch
+
+# NLP & Text Processing
+nltk
+spacy
+collections-extended
+
+# Testing
+pytest
+pytest-asyncio

@@ -8,12 +8,21 @@ import PostsFrequency from "../Data/PostsFrequency";
 import { useEffect } from "react";
 
 export default function DataTabs({ postsData }) {
+  useEffect(() => {
+    var currentdate = new Date();
+    var datetime =
+      "Last Sync: " +
+      " @ " +
+      currentdate.getHours() +
+      ":" +
+      currentdate.getMinutes() +
+      ":" +
+      currentdate.getSeconds() +
+      ":" +
+      currentdate.getMilliseconds();
 
-useEffect(() => {
-  console.log("Data Tabs Rendered at", Date.now())
-
-}, [])
-
+    console.log("App.jsx rendered at:", datetime);
+  }, []);
 
   const TabsListData = [
     {
@@ -29,7 +38,7 @@ useEffect(() => {
     {
       value: "Posts Table",
       icon: LuUser,
-      content: <PostsTable data={postsData}/>,
+      content: <PostsTable data={postsData} />,
     },
     {
       value: "Keyword Table",

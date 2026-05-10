@@ -27,19 +27,6 @@ function App() {
   const statusTimerRef = useRef(null);
 
   useEffect(() => {
-    // var currentdate = new Date();
-    // var datetime =
-    //   "Last Sync: " +
-    //   " @ " +
-    //   currentdate.getHours() +
-    //   ":" +
-    //   currentdate.getMinutes() +
-    //   ":" +
-    //   currentdate.getSeconds() +
-    //   ":" +
-    //   currentdate.getMilliseconds();
-
-    // console.log("App.jsx rendered at:", datetime);
     const socket = new WebSocket("ws://192.168.0.246:8765");
     socketRef.current = socket;
     socket.onopen = () =>
