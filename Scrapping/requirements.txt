@@ -4,6 +4,8 @@ websockets
 playwright
 transformers
 torch
+uvicorn
+fastapi
 
 # NLP & Text Processing
 nltk
