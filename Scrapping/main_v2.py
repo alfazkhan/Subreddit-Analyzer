@@ -3,15 +3,17 @@ import asyncio
 import logging
 import sys
 import uvicorn
-from fastapi import FastAPI, Query
+from fastapi import FastAPI
 from datetime import datetime
 from config import SCRAPE_INTERVAL
 from database import (
-    get_cache_summary, get_db_pool, load_posts_from_db, 
-    load_all_posts_from_db, get_last_post_timestamp, is_subreddit_bootstrapped,
+    get_db_pool, get_last_post_timestamp, is_subreddit_bootstrapped,
     get_active_subreddits
 )
 from scraper_v2 import run_discovery_cycle, process_queue_batch
+
+# Import decouple routing modules from the Routes package folder
+from Routes import routes_posts, routes_subreddits
 
 # Determine execution environment context
 IS_PRODUCTION = os.getenv("APP_ENV") == "production"
@@ -22,29 +24,16 @@ API_HOST = "0.0.0.0" if IS_PRODUCTION else "192.168.0.246"
 
 app = FastAPI(title="Reddit BI REST API", version="2.1.0")
 
+# Mount endpoints from the package folder
+app.include_router(routes_posts.router)
+app.include_router(routes_subreddits.router)
+
 logging.basicConfig(
     level=logging.INFO, format='[%(asctime)s] %(levelname)s: %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S', handlers=[logging.StreamHandler(sys.stdout)], force=True
 )
 
 is_scraping = asyncio.Lock()
-
-@app.get("/summary")
-async def api_get_summary():
-    return await get_cache_summary()
-
-@app.get("/posts/{subreddit}")
-async def api_get_posts(subreddit: str, limit: int = Query(10, ge=1, le=100)):
-    posts_dict = await load_posts_from_db(subreddit, limit)
-    if not posts_dict: return []
-    return sorted(posts_dict.values(), key=lambda x: x.get('timestamp') or '', reverse=True)[:limit]
-
-@app.get("/posts/{subreddit}/all")
-async def api_get_all_posts(subreddit: str):
-    posts_dict = await load_all_posts_from_db(subreddit)
-    if not posts_dict:
-        return []
-    return sorted(posts_dict.values(), key=lambda x: x.get('timestamp') or '', reverse=True)
 
 async def background_worker():
     while True:
