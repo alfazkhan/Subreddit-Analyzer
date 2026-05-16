@@ -23,8 +23,7 @@ async def get_post_metadata(post):
 async def scrape_post_by_id(context, post_id: str, subreddit: str):
     """
     Performs a deep scrape of a single post URL.
-    Optimized with content-rendering guards to ensure no null data is saved.
-   
+    Optimized with native shadow-piercing locators and structural fallbacks.
     """
     async with semaphore:
         page = await context.new_page()
@@ -33,30 +32,43 @@ async def scrape_post_by_id(context, post_id: str, subreddit: str):
         
         try:
             logging.info(f"Scraper: Opening post {clean_id}...")
-            # Use 'load' state for stability across varying network conditions
             await page.goto(url, wait_until="load", timeout=45000)
             
-            # Optimization: Wait for actual title text to hydrate before reading
-            await page.wait_for_function(
-                "() => document.querySelector('h1') && document.querySelector('h1').innerText.trim().length > 0",
-                timeout=20000
-            )
+            # Use native shadow-piercing selector wait boundaries instead of raw JS injection
+            try:
+                await page.wait_for_selector('h1', timeout=10000, state="attached")
+            except Exception:
+                logging.warning(f"Scraper: Top-tier h1 selector missing for post {clean_id}. Trying fallbacks.")
 
-            title = await page.locator('h1').first.inner_text()
-            
-            # Validation: Filter out deleted/not-found landing pages
+            # Attempt multi-selector extraction arrays to handle layout variations
+            title = ""
+            for selector in ['h1', '[post-title]', 'shreddit-title', 'title']:
+                loc = page.locator(selector).first
+                if await loc.count() > 0:
+                    raw_text = await loc.inner_text() or await loc.get_attribute('title') or ""
+                    if raw_text.strip():
+                        title = raw_text.strip()
+                        break
+
+            # Fallback Validation Check: Prevent blank database inserts
+            if not title:
+                logging.error(f"Scraper: Unable to resolve title headers for post {clean_id}. Aborting task.")
+                await update_queue_status(post_id, 'failed')
+                return None
+
             if "reddit" in title.lower() and len(title) < 15:
                 await update_queue_status(post_id, 'failed')
                 return None
 
-            # Ensure the timestamp attribute is available
-            await page.wait_for_selector("time[datetime]", timeout=10000)
-
+            # Safe extraction of post content blocks
             body_loc = page.locator('shreddit-post-text-body').first
             content = await body_loc.inner_text() if await body_loc.count() > 0 else ""
             
+            # Safe extraction of temporal variables without hard stalling
             time_loc = page.locator('time').first
-            ts = await time_loc.get_attribute('datetime') if await time_loc.count() > 0 else ""
+            ts = ""
+            if await time_loc.count() > 0:
+                ts = await time_loc.get_attribute('datetime') or ""
 
             # Standardized Post Data Object
             post_entry = {
@@ -87,18 +99,24 @@ async def run_discovery_cycle(subreddit: str, stop_mode: str = 'routine', headle
     Scans the New feed. 
     'routine' stops at the first archived ID. 
     'bootstrap' stops at the oldest archived post.
-   
     """
     archived_ids = await get_archived_ids(subreddit)
     queued_ids = await get_queued_ids(subreddit)
     oldest_id = await get_oldest_post_id(subreddit)
     
-    # Boundary set includes archived and currently queued items
     boundary_ids = archived_ids | queued_ids
 
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=headless)
-        context = await browser.new_context(storage_state=AUTH_FILE if os.path.exists(AUTH_FILE) else None)
+        
+        # Production Stealth Context Override
+        context = await browser.new_context(
+            storage_state=AUTH_FILE if os.path.exists(AUTH_FILE) else None,
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            viewport={"width": 1920, "height": 1080},
+            locale="en-US",
+            timezone_id="America/New_York"
+        )
         page = await context.new_page()
         
         try:
@@ -113,7 +131,6 @@ async def run_discovery_cycle(subreddit: str, stop_mode: str = 'routine', headle
                     pid, _ = await get_post_metadata(p_el)
                     if not pid: continue
                     
-                    # STOP logic: Terminate scan if we reach known data boundaries
                     if stop_mode == 'routine' and pid in archived_ids:
                         logging.info(f"Discovery: Hit archive boundary {pid}. Stopping.")
                         stop_scrolling = True
@@ -135,7 +152,6 @@ async def run_discovery_cycle(subreddit: str, stop_mode: str = 'routine', headle
 
                 if stop_scrolling: break
                 
-                # Defensive scroll check to prevent scrollHeight null errors
                 js_scroll_logic = "(document.scrollingElement || document.documentElement || document.body || {scrollHeight: 0})"
                 prev_h = await page.evaluate(f"{js_scroll_logic}.scrollHeight")
                 await page.evaluate(f"window.scrollTo(0, {js_scroll_logic}.scrollHeight)")
@@ -153,7 +169,15 @@ async def process_queue_batch(subreddit: str, limit: int = 15, status: str = 'pe
 
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=headless)
-        context = await browser.new_context(storage_state=AUTH_FILE if os.path.exists(AUTH_FILE) else None)
+        
+        # Production Stealth Context Override
+        context = await browser.new_context(
+            storage_state=AUTH_FILE if os.path.exists(AUTH_FILE) else None,
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            viewport={"width": 1920, "height": 1080},
+            locale="en-US",
+            timezone_id="America/New_York"
+        )
         try:
             for t in tasks:
                 await scrape_post_by_id(context, t['post_id'], subreddit)

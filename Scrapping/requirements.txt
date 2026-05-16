@@ -1,6 +1,6 @@
 # Core Dependencies
 asyncpg
-websockets
+# websockets
 playwright
 transformers
 torch

@@ -1,3 +1,4 @@
+import os
 import asyncio
 import logging
 import sys
@@ -11,7 +12,12 @@ from database import (
 )
 from scraper_v2 import run_discovery_cycle, process_queue_batch
 
-headlessMode = True
+# Determine execution environment context
+IS_PRODUCTION = os.getenv("APP_ENV") == "production"
+
+# Assign environmental runtime variables
+headlessMode = True if IS_PRODUCTION else False
+API_HOST = "0.0.0.0" if IS_PRODUCTION else "192.168.0.246"
 
 app = FastAPI(title="Reddit BI REST API", version="2.1.0")
 
@@ -77,9 +83,9 @@ async def background_worker():
         await asyncio.sleep(SCRAPE_INTERVAL)
 
 async def main():
-    api_config = uvicorn.Config(app, host="0.0.0.0", port=8000, log_level="info")
+    api_config = uvicorn.Config(app, host=API_HOST, port=8000, log_level="info")
     api_server = uvicorn.Server(api_config)
-    logging.info("System Launch: REST API running on http://0.0.0.0:8000")
+    logging.info(f"System Launch: REST API running on http://{API_HOST}:8000")
     await asyncio.gather(api_server.serve(), background_worker())
 
 if __name__ == "__main__":
