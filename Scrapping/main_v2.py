@@ -4,6 +4,7 @@ import logging
 import sys
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 from config import SCRAPE_INTERVAL
 from database import (
@@ -32,10 +33,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Mount endpoints from the package folder
-app.include_router(routes_posts.router)
-app.include_router(routes_subreddits.router)
 
 # Mount endpoints from the package folder
 app.include_router(routes_posts.router)
