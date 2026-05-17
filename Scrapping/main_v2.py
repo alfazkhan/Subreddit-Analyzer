@@ -24,6 +24,19 @@ API_HOST = "0.0.0.0" if IS_PRODUCTION else "192.168.0.246"
 
 app = FastAPI(title="Reddit BI REST API", version="2.1.0")
 
+# Configure Cross-Origin Resource Sharing (CORS) Middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Mount endpoints from the package folder
+app.include_router(routes_posts.router)
+app.include_router(routes_subreddits.router)
+
 # Mount endpoints from the package folder
 app.include_router(routes_posts.router)
 app.include_router(routes_subreddits.router)

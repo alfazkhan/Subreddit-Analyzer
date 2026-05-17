@@ -26,75 +26,86 @@ function App() {
   const socketRef = useRef(null);
   const statusTimerRef = useRef(null);
 
-  useEffect(() => {
-    const socket = new WebSocket("ws://192.168.0.246:8765");
-    socketRef.current = socket;
-    socket.onopen = () =>
-      dispatch(serverStatusActions.serverStatusChange("online"));
-    socket.onclose = () =>
-      dispatch(serverStatusActions.serverStatusChange("offline"));
+useEffect(() => {
+  async function fetchPostData() {
+    const response = await fetch("http://142.93.104.173:8000/summary")
+    console.log(response)
+  }
 
-    socket.onmessage = (event) => {
-      const message = JSON.parse(event.data);
+  fetchPostData();
+}, [])
 
-      if (message.type === "cache_summary") {
-        console.log(message);
-        setCacheSummary(message.message);
-      }
 
-      if (message.type === "progress") {
-        console.log(message);
-        setProgress(message.value);
-      }
 
-      if (message.type === "status") {
-        setProcessingStatus(message.message);
-        console.log(message);
-      }
+  // useEffect(() => {
+  //   const socket = new WebSocket("ws://192.168.0.246:8765");
+  //   socketRef.current = socket;
+  //   socket.onopen = () =>
+  //     dispatch(serverStatusActions.serverStatusChange("online"));
+  //   socket.onclose = () =>
+  //     dispatch(serverStatusActions.serverStatusChange("offline"));
 
-      if (message.type === "delta_update") {
-        console.log(message);
+  //   socket.onmessage = (event) => {
+  //     const message = JSON.parse(event.data);
 
-        if (statusTimerRef.current) {
-          clearTimeout(statusTimerRef.current);
-        }
-        setProcessingStatus("Receiving deltas...");
+  //     if (message.type === "cache_summary") {
+  //       console.log(message);
+  //       setCacheSummary(message.message);
+  //     }
 
-        statusTimerRef.current = setTimeout(() => {
-          setProcessingStatus("Scrolling further down...");
-        }, 2000);
-        setPosts((posts) => {
-          const newPosts = [...posts];
-          newPosts.push(message.post);
-          return newPosts;
-        });
-        setProgress(message.progress);
-      }
+  //     if (message.type === "progress") {
+  //       console.log(message);
+  //       setProgress(message.value);
+  //     }
 
-      if (message.type === "partial_data") {
-        console.log(message);
+  //     if (message.type === "status") {
+  //       setProcessingStatus(message.message);
+  //       console.log(message);
+  //     }
 
-        setProcessingStatus("Partial Data received");
-        setProgress(Math.floor((message.posts.length / targetPostCount) * 100));
-        setPosts(message.posts);
-      }
+  //     if (message.type === "delta_update") {
+  //       console.log(message);
 
-      if (message.type === "final_data") {
-        console.log(message);
-        setProcessingStatus("Process Completed");
-        setProgress(100);
-        setPosts(message.posts);
-      }
-    };
-    return () => {
-      if (
-        socket.readyState === WebSocket.OPEN ||
-        socket.readyState === WebSocket.CONNECTING
-      ) {
-        socket.close();
-      }
-    };
-  }, []);
+  //       if (statusTimerRef.current) {
+  //         clearTimeout(statusTimerRef.current);
+  //       }
+  //       setProcessingStatus("Receiving deltas...");
+
+  //       statusTimerRef.current = setTimeout(() => {
+  //         setProcessingStatus("Scrolling further down...");
+  //       }, 2000);
+  //       setPosts((posts) => {
+  //         const newPosts = [...posts];
+  //         newPosts.push(message.post);
+  //         return newPosts;
+  //       });
+  //       setProgress(message.progress);
+  //     }
+
+  //     if (message.type === "partial_data") {
+  //       console.log(message);
+
+  //       setProcessingStatus("Partial Data received");
+  //       setProgress(Math.floor((message.posts.length / targetPostCount) * 100));
+  //       setPosts(message.posts);
+  //     }
+
+  //     if (message.type === "final_data") {
+  //       console.log(message);
+  //       setProcessingStatus("Process Completed");
+  //       setProgress(100);
+  //       setPosts(message.posts);
+  //     }
+  //   };
+  //   return () => {
+  //     if (
+  //       socket.readyState === WebSocket.OPEN ||
+  //       socket.readyState === WebSocket.CONNECTING
+  //     ) {
+  //       socket.close();
+  //     }
+  //   };
+  // }, []);
 
   function StartScraping(subredditName, currentCount) {
     const socket = socketRef.current;
