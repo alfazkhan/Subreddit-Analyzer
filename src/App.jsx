@@ -13,29 +13,43 @@ import { useSelector, useDispatch } from "react-redux";
 import { serverStatusActions } from "./store/serverStatus";
 
 function App() {
-  const [progress, setProgress] = useState(0);
+  //New States
+  const [cacheSummary, setCacheSummary] = useState([]);
   const [posts, setPosts] = useState([]);
   const [processingStatus, setProcessingStatus] = useState(false);
-  const [cacheSummary, setCacheSummary] = useState([]);
 
+  //Old States
+  const [progress, setProgress] = useState(0);
 
-  const targetPostCount = useSelector((state) => state.userInputState.targetPostCount);
-  const useOnlyCache = useSelector((state) => state.userInputState.useOnlyCache);
+  //Redux Variables
+  const targetPostCount = useSelector(
+    (state) => state.userInputState.targetPostCount,
+  );
+  const useOnlyCache = useSelector(
+    (state) => state.userInputState.useOnlyCache,
+  );
   const dispatch = useDispatch();
 
   const socketRef = useRef(null);
   const statusTimerRef = useRef(null);
 
-useEffect(() => {
-  async function fetchPostData() {
-    const response = await fetch("http://142.93.104.173:8000/summary")
-    console.log(response)
-  }
+  useEffect(() => {
+    async function fetchPostData() {
+      const response = await fetch("https://api.theonlyalfaz.com/summary");
+      const resData = await response.json();
+      console.log(resData);
+      if (!response.ok) {
+        dispatch(serverStatusActions.serverStatusChange("offline"));
+        throw new Error(resData.message || "Server is Offline!");
+      } else {
+        dispatch(serverStatusActions.serverStatusChange("online"));
+      }
 
-  fetchPostData();
-}, [])
+      setCacheSummary(resData);
+    }
 
-
+    fetchPostData();
+  }, []);
 
   // useEffect(() => {
   //   const socket = new WebSocket("ws://192.168.0.246:8765");
@@ -107,17 +121,17 @@ useEffect(() => {
   //   };
   // }, []);
 
-  function StartScraping(subredditName, currentCount) {
-    const socket = socketRef.current;
-    if (socket?.readyState === WebSocket.OPEN) {
-      socket.send(
-        JSON.stringify({
-          type: "start_scrape",
-          subreddit: subredditName,
-          count: currentCount,
-          useOnlyCache: useOnlyCache,
-        }),
-      );
+  async function fetchSubredditData(subredditName, currentCount) {
+    setProcessingStatus(true)
+    const response = await fetch(`https://api.theonlyalfaz.com/posts/${subredditName}?limit=${currentCount}`) 
+    const resData = await response.json()
+    // console.log(resData)
+
+    if(!response.ok){
+      throw new Error(resData.message || "Something went wrong!")
+    }else{
+      setProcessingStatus(false)
+      setPosts(resData)
     }
   }
 
@@ -129,25 +143,25 @@ useEffect(() => {
       </Flex>
 
       <Flex justifyContent="center" gap="2" margin="5" flexDirection="column">
-        <UserInput onStart={StartScraping} />
+        <UserInput onFetchData={fetchSubredditData} cacheSummary={cacheSummary} processingStatus={processingStatus}/>
         <SubredditsSuggestions cacheSummary={cacheSummary} />
       </Flex>
 
-      {processingStatus && (
+      {/* {processingStatus && (
         <Flex justifyContent="center" gap="4" margin="5" flexDirection="column">
           <ProgressBar value={progress} processingStatus={processingStatus} />
         </Flex>
-      )}
+      )} */}
 
-      {posts.length !== 0 && ( //Remove ! in the end
+      {(posts.length !== 0 || processingStatus) && ( //Remove ! in the end
         <Flex justifyContent="center" gap="4" margin="5" flexDirection="column">
-          <DataTabs postsData={posts} />
+          <DataTabs postsData={posts} processingStatus={processingStatus}/>
         </Flex>
       )}
-
+{/* 
       <Flex justifyContent="center" gap="4" margin="5" flexDirection="column">
         <UpcomingFeatures />
-      </Flex>
+      </Flex> */}
     </Flex>
   );
 }

@@ -1,4 +1,4 @@
-import { Tabs } from "@chakra-ui/react";
+import { Tabs, Box, Center, Heading, Spinner, Text } from "@chakra-ui/react";
 import { LuFolder, LuSquareCheck, LuUser } from "react-icons/lu";
 import KeywordTable from "../Data/KeywordTable";
 import Sentiment from "../Data/Sentiment";
@@ -7,7 +7,7 @@ import PostsTable from "../Data/PostsTable";
 import PostsFrequency from "../Data/PostsFrequency";
 import { useEffect } from "react";
 
-export default function DataTabs({ postsData }) {
+export default function DataTabs({ postsData, processingStatus }) {
   useEffect(() => {
     var currentdate = new Date();
     var datetime =
@@ -53,39 +53,57 @@ export default function DataTabs({ postsData }) {
   ];
 
   return (
-    <Tabs.Root
-      defaultValue="Posts Frequency"
-      variant="plain"
-      lazyMount
-      // unmountOnExit
-      width="auto"
-      fitted
-      css={{
-        "--tabs-indicator-bg": "colors.orange.600",
-        "--tabs-indicator-color": "colors.orange.600",
-      }}
-    >
-      <Tabs.List rounded="l3" p="1">
-        {TabsListData.map((tab) => (
-          <Tabs.Trigger
-            key={tab.value} // Always add a key
-            value={tab.value}
-            color="white"
-            fontWeight="bold"
-            _selected={{ bgColor: "orange.600" }}
-          >
-            <tab.icon />
-            {tab.value}
-          </Tabs.Trigger>
-        ))}
-        <Tabs.Indicator rounded="l2" />
-      </Tabs.List>
+    <Box position="relative" aria-busy="true" userSelect="none">
+      <Tabs.Root
+        defaultValue="Posts Frequency"
+        variant="plain"
+        lazyMount
+        // unmountOnExit
+        width="auto"
+        fitted
+        css={{
+          "--tabs-indicator-bg": "colors.orange.600",
+          "--tabs-indicator-color": "colors.orange.600",
+        }}
+        data-state={postsData.length !== 0 ? "open" : "closed"}
+        _open={{
+          animation: "fade-in 800ms ease-out",
+        }}
+      >
+        <Tabs.List rounded="l3" p="1">
+          {TabsListData.map((tab) => (
+            <Tabs.Trigger
+              key={tab.value} // Always add a key
+              value={tab.value}
+              color="white"
+              fontWeight="bold"
+              _selected={{ bgColor: "orange.600" }}
+            >
+              <tab.icon />
+              {tab.value}
+            </Tabs.Trigger>
+          ))}
+          <Tabs.Indicator rounded="l2" />
+        </Tabs.List>
 
-      {TabsListData.map((tab) => (
-        <Tabs.Content key={tab.value} value={tab.value}>
-          {tab.content}
-        </Tabs.Content>
-      ))}
-    </Tabs.Root>
+        {TabsListData.map((tab) => (
+          <Tabs.Content key={tab.value} value={tab.value}>
+            {tab.content}
+          </Tabs.Content>
+        ))}
+      </Tabs.Root>
+      {(postsData.length === 0 || processingStatus) && (
+        <Box pos="absolute" inset="0" bg="gray.700/80">
+          <Center h="full">
+            <Spinner
+              borderWidth="4px"
+              size="xl"
+              color="orange.600"
+              animationDuration="0.6s"
+            />
+          </Center>
+        </Box>
+      )}
+    </Box>
   );
 }

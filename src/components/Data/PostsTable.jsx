@@ -185,18 +185,19 @@ export default function KeywordTable({ data: postsData }) {
                 </Table.Cell>
                 <Table.Cell>
                   <Stack direction="column">
-                    {post.entities
+                    {JSON.parse(post.entities)
                       .filter(
                         (item, index, self) =>
                           index ===
                           self.findIndex((t) => t.label === item.label),
                       )
-                      .map((e) => {
+                      .map((e,idx) => {
                         if (labelConfig[e.label] !== undefined) {
                           return (
                             <Badge
                               id={labelConfig[e.label]?.type}
                               colorPalette={labelConfig[e.label]?.color}
+                              key={idx}
                             >
                               {labelConfig[e.label]?.type}
                             </Badge>

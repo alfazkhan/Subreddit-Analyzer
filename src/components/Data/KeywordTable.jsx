@@ -8,7 +8,7 @@ export default function KeywordTable({ data }) {
   const keywordsCount = useMemo(() => {
     const counts = {};
     data.forEach((post) => {
-      const keywords = post.keywords;
+      const keywords = JSON.parse(post.keywords);
       if (!keywords) return;
 
       Object.keys(keywords).forEach((keyword) => {
@@ -17,7 +17,6 @@ export default function KeywordTable({ data }) {
           : counts[keyword]++;
       });
     });
-
     return counts;
   }, [data]);
 
@@ -78,15 +77,19 @@ export default function KeywordTable({ data }) {
         </Field.Root>
       </HStack>
 
-
-      <Table.ScrollArea h="500px" borderWidth="1px" rounded="md" css={{
-            "&::-webkit-scrollbar": {
-              display: "none",
-            },
-            msOverflowStyle: "none",
-            scrollbarWidth: "none",
-          }}>
-        <Table.Root colorScheme="orange" variant="outline" >
+      <Table.ScrollArea
+        h="500px"
+        borderWidth="1px"
+        rounded="md"
+        css={{
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+          msOverflowStyle: "none",
+          scrollbarWidth: "none",
+        }}
+      >
+        <Table.Root colorScheme="orange" variant="outline">
           <Table.Header>
             <Table.Row>
               <Table.ColumnHeader color="orange.600" fontWeight="extrabold">
@@ -98,8 +101,8 @@ export default function KeywordTable({ data }) {
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {chartData.map((item,idx) => (
-              <Table.Row key={idx} color="orange.600">
+            {chartData.map((item, idx) => (
+              <Table.Row key={idx + item} color="orange.600">
                 <Table.Cell>{item.name}</Table.Cell>
                 <Table.Cell>{item.value}</Table.Cell>
               </Table.Row>

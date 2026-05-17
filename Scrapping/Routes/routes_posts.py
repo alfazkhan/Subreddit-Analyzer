@@ -8,7 +8,7 @@ async def api_get_summary():
     return await get_cache_summary()
 
 @router.get("/posts/{subreddit}")
-async def api_get_posts(subreddit: str, limit: int = Query(10, ge=1, le=100)):
+async def api_get_posts(subreddit: str, limit: int = Query(10, ge=1, le=10000)):
     posts_dict = await load_posts_from_db(subreddit, limit)
     if not posts_dict: 
         return []
