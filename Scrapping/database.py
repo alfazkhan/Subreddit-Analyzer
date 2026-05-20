@@ -94,15 +94,24 @@ async def get_queue_tasks_by_status(subreddit_name: str, status: str, limit: int
             WHERE s.name = $1 AND q.status = $2 LIMIT $3
         ''', subreddit_name, status, limit)
 
+        
 async def save_post_to_db(post_entry: dict, subreddit_name: str):
     pool = await get_db_pool()
     async with pool.acquire() as conn:
         row = await conn.fetchrow("SELECT id FROM subreddits WHERE name = $1", subreddit_name)
         sub_id = row['id'] if row else await conn.fetchval("INSERT INTO subreddits (name) VALUES ($1) RETURNING id", subreddit_name)
         ts_obj = safe_parse_timestamp(post_entry.get('timestamp'))
+        
+        # Updated to DO UPDATE SET so reanalyzed data actually overwrites old NLP data
         await conn.execute('''
             INSERT INTO reddit_posts (id, subreddit_id, timestamp, title, body, sentiment, keywords, entities)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (id) DO NOTHING
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
+            ON CONFLICT (id) DO UPDATE SET
+                title = EXCLUDED.title,
+                body = EXCLUDED.body,
+                sentiment = EXCLUDED.sentiment,
+                keywords = EXCLUDED.keywords,
+                entities = EXCLUDED.entities
         ''', post_entry['id'], sub_id, ts_obj, post_entry['title'], 
            post_entry['body'], post_entry['sentiment'], 
            json.dumps(post_entry['keywords']), json.dumps(post_entry['entities']))
@@ -201,3 +210,38 @@ async def db_delete_subreddit(name: str):
     async with pool.acquire() as conn:
         status = await conn.execute("DELETE FROM subreddits WHERE name = $1", name)
         return status == "DELETE 1"
+    
+    
+# --- ADD THESE TO THE BOTTOM OF database.py ---
+
+async def get_post_content_for_reanalysis(subreddit_name: str):
+    """Fetches the title and body of all archived posts locally for CPU processing."""
+    pool = await get_db_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch('''
+            SELECT p.id, p.title, p.body FROM reddit_posts p
+            JOIN subreddits s ON p.subreddit_id = s.id
+            WHERE s.name = $1
+        ''', subreddit_name)
+        return [dict(row) for row in rows]
+
+async def update_post_nlp_data(post_id: str, sentiment: str, keywords: list, entities: dict):
+    """Updates only the intelligence columns of a post without touching metadata."""
+    pool = await get_db_pool()
+    async with pool.acquire() as conn:
+        await conn.execute('''
+            UPDATE reddit_posts
+            SET sentiment = $1, keywords = $2, entities = $3
+            WHERE id = $4
+        ''', sentiment, json.dumps(keywords), json.dumps(entities), post_id)
+
+async def force_requeue_posts(post_ids: list, subreddit_name: str):
+    """Pushes known IDs back into the queue and forces status to 'pending'."""
+    if not post_ids: return
+    pool = await get_db_pool()
+    async with pool.acquire() as conn:
+        await conn.executemany('''
+            INSERT INTO scraping_queue (post_id, subreddit_id, status) 
+            VALUES ($1, (SELECT id FROM subreddits WHERE name = $2), 'pending')
+            ON CONFLICT (post_id) DO UPDATE SET status = 'pending'
+        ''', [(pid, subreddit_name) for pid in post_ids])

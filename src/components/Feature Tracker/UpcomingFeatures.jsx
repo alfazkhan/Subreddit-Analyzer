@@ -83,8 +83,7 @@ export default function UpcomingFeatures() {
           src="https://tundra-monitor-40c.notion.site/ebd//8d0b8016801b4327bc1f61da619c353f?v=b668abc7fa5644feb0e94997b554d8a1"
           width="100%"
           height="600"
-          frameborder="0"
-          allowfullscreen
+          allowFullScreen
           style={{
             marginTop: "-50px"
           }}

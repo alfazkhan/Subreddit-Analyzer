@@ -12,6 +12,10 @@ import UpcomingFeatures from "./components/Feature Tracker/UpcomingFeatures";
 import { useSelector, useDispatch } from "react-redux";
 import { serverStatusActions } from "./store/serverStatus";
 
+const BASE_URL = import.meta.env.PROD
+  ? "https://api.theonlyalfaz.com"
+  : "http://192.168.0.246:8000";
+
 function App() {
   //New States
   const [cacheSummary, setCacheSummary] = useState([]);
@@ -35,7 +39,7 @@ function App() {
 
   useEffect(() => {
     async function fetchPostData() {
-      const response = await fetch("https://api.theonlyalfaz.com/summary");
+      const response = await fetch(BASE_URL + "/summary");
       const resData = await response.json();
       console.log(resData);
       if (!response.ok) {
@@ -122,16 +126,18 @@ function App() {
   // }, []);
 
   async function fetchSubredditData(subredditName, currentCount) {
-    setProcessingStatus(true)
-    const response = await fetch(`https://api.theonlyalfaz.com/posts/${subredditName}?limit=${currentCount}`) 
-    const resData = await response.json()
+    setProcessingStatus(true);
+    const response = await fetch(
+      `${BASE_URL}/posts/${subredditName}?limit=${currentCount}`,
+    );
+    const resData = await response.json();
     // console.log(resData)
 
-    if(!response.ok){
-      throw new Error(resData.message || "Something went wrong!")
-    }else{
-      setProcessingStatus(false)
-      setPosts(resData)
+    if (!response.ok) {
+      throw new Error(resData.message || "Something went wrong!");
+    } else {
+      setProcessingStatus(false);
+      setPosts(resData);
     }
   }
 
@@ -143,7 +149,11 @@ function App() {
       </Flex>
 
       <Flex justifyContent="center" gap="2" margin="5" flexDirection="column">
-        <UserInput onFetchData={fetchSubredditData} cacheSummary={cacheSummary} processingStatus={processingStatus}/>
+        <UserInput
+          onFetchData={fetchSubredditData}
+          cacheSummary={cacheSummary}
+          processingStatus={processingStatus}
+        />
         <SubredditsSuggestions cacheSummary={cacheSummary} />
       </Flex>
 
@@ -155,13 +165,14 @@ function App() {
 
       {(posts.length !== 0 || processingStatus) && ( //Remove ! in the end
         <Flex justifyContent="center" gap="4" margin="5" flexDirection="column">
-          <DataTabs postsData={posts} processingStatus={processingStatus}/>
+          <DataTabs postsData={posts} processingStatus={processingStatus} />
         </Flex>
       )}
-
-      <Flex justifyContent="center" gap="4" margin="5" flexDirection="column">
-        <UpcomingFeatures />
-      </Flex>
+      {import.meta.env.PROD && (
+        <Flex justifyContent="center" gap="4" margin="5" flexDirection="column">
+          <UpcomingFeatures />
+        </Flex>
+      )}
     </Flex>
   );
 }

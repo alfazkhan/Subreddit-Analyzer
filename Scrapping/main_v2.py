@@ -11,7 +11,8 @@ from database import (
     get_db_pool, get_last_post_timestamp, is_subreddit_bootstrapped,
     get_active_subreddits
 )
-from scraper_v2 import run_discovery_cycle, process_queue_batch
+# Updated import to match the unified scrapper function
+from scraper_v2 import run_discovery_scan, process_queue_batch
 
 # Import decouple routing modules from the Routes package folder
 from Routes import routes_posts, routes_subreddits
@@ -72,10 +73,10 @@ async def background_worker():
                     
                     if not is_booted:
                         logging.info(f"Worker: Subreddit r/{sub} not found in cache. Starting initial bootstrap discovery.")
-                        await run_discovery_cycle(sub, stop_mode='bootstrap', headless=headlessMode)
+                        await run_discovery_scan(sub, mode='bootstrap', headless=headlessMode)
                     elif gap > 3600:
                         logging.info(f"Worker: Data gap of {int(gap/60)} minutes detected for r/{sub}. Triggering routine update.")
-                        await run_discovery_cycle(sub, stop_mode='routine', headless=headlessMode)
+                        await run_discovery_scan(sub, mode='routine', headless=headlessMode)
                     else:
                         logging.info(f"Worker: Subreddit r/{sub} data is fresh ({int(gap/60)}m gap). Skipping discovery phase.")
                     
