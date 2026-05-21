@@ -33,7 +33,6 @@ function App() {
     async function fetchPostData() {
       const response = await fetch(BASE_URL + "/summary");
       const resData = await response.json();
-      console.log(resData);
       if (!response.ok) {
         dispatch(serverStatusActions.serverStatusChange("offline"));
         throw new Error(resData.message || "Server is Offline!");
@@ -54,7 +53,6 @@ function App() {
       `${BASE_URL}/posts/${subredditName}?limit=${currentCount}`,
     );
     const resData = await response.json();
-    // console.log(resData)
 
     if (!response.ok) {
       throw new Error(resData.message || "Something went wrong!");

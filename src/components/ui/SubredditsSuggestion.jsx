@@ -2,14 +2,14 @@ import { Button, HStack, VStack, Text } from "@chakra-ui/react";
 import {useDispatch} from "react-redux";
 import {userInputAction} from "../../store/userInput.js"
 
-const Suggestions = [
-  { name: "r/India", link: "India" },
-  { name: "r/Mumbai", link: "Mumbai" },
-  { name: "r/Munich", link: "Munich" },
-  { name: "r/AskIndianWomen", link: "AskIndianWomen" },
-  { name: "r/BoycottIsrael", link: "BoycottIsrael" },
-  { name: "r/LegalAdviceIndia", link: "LegalAdviceIndia" },
-];
+// const Suggestions = [
+//   { name: "r/India", link: "India" },
+//   { name: "r/Mumbai", link: "Mumbai" },
+//   { name: "r/Munich", link: "Munich" },
+//   { name: "r/AskIndianWomen", link: "AskIndianWomen" },
+//   { name: "r/BoycottIsrael", link: "BoycottIsrael" },
+//   { name: "r/LegalAdviceIndia", link: "LegalAdviceIndia" },
+// ];
 
 function dateTimeFormatter(rawTimestamp) {
   const date = new Date(rawTimestamp);
@@ -31,47 +31,48 @@ function dateTimeFormatter(rawTimestamp) {
 export default function SubredditsSuggestions({ cacheSummary }) {
 
   const dispatch = useDispatch()
+  
 
   return (
     <HStack>
-      {Suggestions.map((sub) => (
-        <VStack key={sub.name + "stack"} gap="-1.5">
+      {Object.keys(cacheSummary).map((sub) => (
+        <VStack key={sub + "stack"} gap="-1.5">
           <Button
-            key={sub.name}
+            key={sub}
             size="xs"
             color="white"
             fontWeight="black"
             bg="orange.600"
             onClick={() => {
               dispatch(userInputAction.handleNameChange(sub.link));
-              dispatch(userInputAction.handleCountChange(cacheSummary[sub.link]?.count))
+              dispatch(userInputAction.handleCountChange(cacheSummary[sub]?.count))
             }}
             marginBottom={2}
           >
-            {sub.name}
+            {sub}
           </Button>
           <Text
-            key={`${sub.name}-count`}
+            key={`${sub}-count`}
             color="green.400"
             fontSize="xx-small"
             textAlign="left"
           >
-            Cached Posts: {cacheSummary[sub.link]?.count}
+            Cached Posts: {cacheSummary[sub]?.count}
           </Text>
           <Text
-            key={`${sub.name}-last-updated`}
+            key={`${sub}-last-updated`}
             fontSize="xx-small"
             textAlign="left"
           >
             Last Scrapped post:
           </Text>
           <Text
-            key={`${sub.name}-datetime`}
+            key={`${sub}-datetime`}
             color="green.400"
             fontSize="xx-small"
             textAlign="left"
           >
-            {dateTimeFormatter(cacheSummary[sub.link]?.last_updated)}
+            {dateTimeFormatter(cacheSummary[sub]?.last_updated)}
           </Text>
         </VStack>
       ))}
