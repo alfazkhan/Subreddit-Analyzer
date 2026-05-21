@@ -1,22 +1,33 @@
 import asyncio
 import logging
 import os
-import json
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from database import (
-    get_active_subreddits, get_archived_ids,
-    get_post_content_for_reanalysis, update_post_nlp_data, force_requeue_posts,
-    get_all_ignored_words
-)
 from scraper_v2 import process_queue_batch
 from nlp_processor import get_sentiment, extract_keywords, extract_entities
+
+# New explicit database module imports
+from database.subreddits import get_active_subreddits
+from database.posts import (
+    get_archived_ids, get_post_content_for_reanalysis, 
+    update_post_nlp_data, update_post_keywords_only
+)
+from database.queue_manager import force_requeue_posts
+from database.ignored_words import get_all_ignored_words
 
 router = APIRouter()
 
 IS_PRODUCTION = os.getenv("APP_ENV") == "production"
 headless_mode = True if IS_PRODUCTION else True
 
-async def run_local_reanalysis(subreddit: str, websocket: WebSocket, ignored_words: set):
+class ReanalysisSession:
+    """Manages the state of a running reanalysis job for a specific WebSocket connection."""
+    def __init__(self):
+        self.active_task = None
+        self.stop_event = asyncio.Event()
+        self.pause_event = asyncio.Event()
+        self.pause_event.set()
+
+async def run_local_reanalysis(subreddit: str, websocket: WebSocket, ignored_words: set, session: ReanalysisSession, keywords_only: bool = False):
     posts = await get_post_content_for_reanalysis(subreddit)
     
     total_posts = len(posts)
@@ -25,18 +36,28 @@ async def run_local_reanalysis(subreddit: str, websocket: WebSocket, ignored_wor
         return
 
     log_interval = max(1, total_posts // 10)
-    await websocket.send_json({"type": "start", "subreddit": subreddit, "total": total_posts})
+    mode_str = "Keywords Only Fast-Lane" if keywords_only else "Full NLP Suite"
+    await websocket.send_json({"type": "start", "subreddit": subreddit, "total": total_posts, "message": f"Starting {mode_str}"})
 
     for count, row in enumerate(posts, 1):
+        if session.stop_event.is_set():
+            await websocket.send_json({"type": "warning", "message": f"r/{subreddit} | Local Reanalysis forcefully stopped."})
+            break
+        
+        await session.pause_event.wait()
+
         pid = row['id']
         combined_text = f"{row['title'] or ''} {row['body'] or ''}"
         
-        sentiment = get_sentiment(combined_text)
         raw_keywords = extract_keywords(combined_text, ignored_words)
         keywords = list(raw_keywords) if isinstance(raw_keywords, set) else raw_keywords
-        entities = extract_entities(combined_text)
         
-        await update_post_nlp_data(pid, sentiment, keywords, entities)
+        if keywords_only:
+            await update_post_keywords_only(pid, keywords)
+        else:
+            sentiment = get_sentiment(combined_text)
+            entities = extract_entities(combined_text)
+            await update_post_nlp_data(pid, sentiment, keywords, entities)
         
         if count % log_interval == 0 or count == total_posts:
             percent = round((count / total_posts) * 100, 1)
@@ -47,8 +68,11 @@ async def run_local_reanalysis(subreddit: str, websocket: WebSocket, ignored_wor
                 "total": total_posts, 
                 "percent": percent
             })
+        
+        if count % 25 == 0:
+            await asyncio.sleep(0)
 
-async def run_network_reanalysis(subreddit: str, websocket: WebSocket):
+async def run_network_reanalysis(subreddit: str, websocket: WebSocket, session: ReanalysisSession):
     archived_ids = await get_archived_ids(subreddit)
     
     if not archived_ids:
@@ -66,6 +90,12 @@ async def run_network_reanalysis(subreddit: str, websocket: WebSocket):
     })
     
     for i in range(total_batches):
+        if session.stop_event.is_set():
+            await websocket.send_json({"type": "warning", "message": f"r/{subreddit} | Network Reanalysis forcefully stopped."})
+            break
+        
+        await session.pause_event.wait()
+
         await process_queue_batch(subreddit, limit=batch_size, status='pending', headless=headless_mode)
         await websocket.send_json({
             "type": "progress", 
@@ -75,38 +105,75 @@ async def run_network_reanalysis(subreddit: str, websocket: WebSocket):
         })
         await asyncio.sleep(2)
 
+async def pipeline_worker(websocket: WebSocket, open_page: bool, keywords_only: bool, session: ReanalysisSession):
+    try:
+        subreddits = await get_active_subreddits()
+        if not subreddits:
+            await websocket.send_json({"type": "error", "message": "No active subreddits found."})
+            return
+
+        ignored_words = await get_all_ignored_words()
+
+        for sub in subreddits:
+            if session.stop_event.is_set():
+                break
+            
+            if open_page:
+                await run_network_reanalysis(sub, websocket, session)
+            else:
+                await run_local_reanalysis(sub, websocket, ignored_words, session, keywords_only)
+
+        if not session.stop_event.is_set():
+            await websocket.send_json({"type": "complete", "message": "Reanalysis pipeline finished successfully."})
+            
+    except Exception as e:
+        logging.error(f"Pipeline worker error: {e}")
+        await websocket.send_json({"type": "error", "message": f"Server Error: {str(e)}"})
+
 @router.websocket("/ws/reanalyze")
 async def reanalyze_endpoint(websocket: WebSocket):
     await websocket.accept()
     logging.info("Frontend Client Connected to Native FastAPI Reanalysis Socket.")
     
+    session = ReanalysisSession()
+    
     try:
         while True:
-            # FastAPI natively parses the incoming JSON text
             data = await websocket.receive_json()
+            action = data.get("action")
             
-            if data.get("action") == "start":
-                open_page = data.get("open_page", False)
-                mode = "NETWORK SCRAPE" if open_page else "LOCAL CPU"
-                
-                await websocket.send_json({"type": "status", "message": f"Trigger received. Mode: {mode}"})
-
-                subreddits = await get_active_subreddits()
-                if not subreddits:
-                    await websocket.send_json({"type": "error", "message": "No active subreddits found."})
+            if action == "start":
+                if session.active_task and not session.active_task.done():
+                    await websocket.send_json({"type": "error", "message": "A reanalysis job is already running. Stop it first."})
                     continue
-
-                ignored_words = await get_all_ignored_words()
-
-                for sub in subreddits:
-                    if open_page:
-                        await run_network_reanalysis(sub, websocket)
-                    else:
-                        await run_local_reanalysis(sub, websocket, ignored_words)
-
-                await websocket.send_json({"type": "complete", "message": "Reanalysis pipeline finished successfully."})
+                    
+                open_page = data.get("open_page", False)
+                keywords_only = data.get("keywords_only", False)
+                
+                mode = "NETWORK SCRAPE" if open_page else ("LOCAL CPU (Keywords Only)" if keywords_only else "LOCAL CPU (Full NLP)")
+                await websocket.send_json({"type": "status", "message": f"Trigger received. Mode: {mode}"})
+                
+                session.stop_event.clear()
+                session.pause_event.set()
+                
+                session.active_task = asyncio.create_task(pipeline_worker(websocket, open_page, keywords_only, session))
+                
+            elif action == "pause":
+                session.pause_event.clear()
+                await websocket.send_json({"type": "status", "message": "Job paused. Waiting for resume..."})
+                
+            elif action == "resume":
+                session.pause_event.set()
+                await websocket.send_json({"type": "status", "message": "Job resumed."})
+                
+            elif action == "stop":
+                session.stop_event.set()
+                session.pause_event.set() 
+                await websocket.send_json({"type": "status", "message": "Termination signal sent. Shutting down worker..."})
                 
     except WebSocketDisconnect:
         logging.info("Frontend Client Disconnected from Reanalysis Socket.")
+        session.stop_event.set()
+        session.pause_event.set()
     except Exception as e:
         logging.error(f"Native WebSocket Error: {e}")

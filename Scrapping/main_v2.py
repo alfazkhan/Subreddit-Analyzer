@@ -7,10 +7,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 from config import SCRAPE_INTERVAL
-from database import (
-    get_db_pool, get_last_post_timestamp, is_subreddit_bootstrapped,
-    get_active_subreddits
-)
+from database.core import get_db_pool
+from database.posts import get_last_post_timestamp
+from database.subreddits import is_subreddit_bootstrapped, get_active_subreddits
 
 # Updated import to match the unified scrapper function
 from scraper_v2 import run_discovery_scan, process_queue_batch

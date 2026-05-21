@@ -3,11 +3,10 @@ import asyncio
 import logging
 from playwright.async_api import async_playwright
 from config import AUTH_FILE, semaphore
-from database import (
-    save_post_to_db, get_archived_ids, get_queued_ids, add_to_queue, 
-    update_queue_status, get_queue_tasks_by_status, get_db_pool,
-    get_oldest_post_id, get_all_ignored_words
-)
+from database.core import get_db_pool
+from database.posts import save_post_to_db, get_archived_ids, get_oldest_post_id
+from database.queue_manager import get_queued_ids, add_to_queue, update_queue_status, get_queue_tasks_by_status
+from database.ignored_words import get_all_ignored_words
 from nlp_processor import get_sentiment, extract_keywords, extract_entities
 
 async def get_post_metadata(post):

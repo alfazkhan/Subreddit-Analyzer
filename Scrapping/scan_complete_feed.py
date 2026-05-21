@@ -2,7 +2,7 @@ import asyncio
 import logging
 import sys
 import os
-from database import get_active_subreddits
+from database.subreddits import get_active_subreddits
 from scraper_v2 import run_discovery_scan
 
 # Configure standalone logging

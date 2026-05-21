@@ -2,12 +2,9 @@ import asyncio
 import logging
 import sys
 import os
-from database import (
-    get_active_subreddits, 
-    get_post_content_for_reanalysis, 
-    get_all_ignored_words, 
-    update_post_keywords_only
-)
+from database.subreddits import get_active_subreddits
+from database.posts import get_post_content_for_reanalysis, update_post_keywords_only
+from database.ignored_words import get_all_ignored_words
 from nlp_processor import extract_keywords
 
 # Configure standalone logging suitable for background tracking

@@ -1,7 +1,12 @@
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 from typing import Optional, List
-import database
+
+# New explicit database module imports
+from database.subreddits import (
+    db_create_subreddit, db_get_all_subreddits, db_get_subreddit,
+    db_update_subreddit, db_delete_subreddit
+)
 
 router = APIRouter(prefix="/subreddits", tags=["Subreddits Control Layer"])
 
@@ -20,7 +25,7 @@ class SubredditUpdate(BaseModel):
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 async def create_new_target(payload: SubredditBase):
-    sub_id = await database.db_create_subreddit(
+    sub_id = await db_create_subreddit(
         name=payload.name,
         description=payload.description,
         total_users=payload.total_users,
@@ -31,22 +36,22 @@ async def create_new_target(payload: SubredditBase):
 
 @router.get("", response_model=List[dict])
 async def list_tracked_targets():
-    return await database.db_get_all_subreddits()
+    return await db_get_all_subreddits()
 
 @router.get("/{name}", response_model=dict)
 async def fetch_target_details(name: str):
-    sub = await database.db_get_subreddit(name)
+    sub = await db_get_subreddit(name)
     if not sub:
         raise HTTPException(status_code=404, detail="Subreddit targeting configuration not found")
     return sub
 
 @router.put("/{name}")
 async def modify_target_configuration(name: str, payload: SubredditUpdate):
-    existing = await database.db_get_subreddit(name)
+    existing = await db_get_subreddit(name)
     if not existing:
         raise HTTPException(status_code=404, detail="Subreddit target entry not found")
     
-    success = await database.db_update_subreddit(
+    success = await db_update_subreddit(
         name=name,
         description=payload.description if payload.description is not None else existing.get('description'),
         total_users=payload.total_users if payload.total_users is not None else existing.get('total_users'),
@@ -59,7 +64,7 @@ async def modify_target_configuration(name: str, payload: SubredditUpdate):
 
 @router.delete("/{name}")
 async def untrack_and_purge_target(name: str):
-    success = await database.db_delete_subreddit(name)
+    success = await db_delete_subreddit(name)
     if not success:
         raise HTTPException(status_code=404, detail="Subreddit target record not found or already deleted")
     return {"message": "Subreddit dropped out of active indexing tables successfully"}

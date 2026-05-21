@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Query
-from database import get_cache_summary, load_posts_from_db, load_all_posts_from_db
+
+from database.posts import get_cache_summary, load_posts_from_db, load_all_posts_from_db
 
 router = APIRouter(tags=["Posts Endpoint Layer"])
 
