@@ -82,9 +82,13 @@ async def load_all_posts_from_db(subreddit_name: str):
 async def get_cache_summary():
     pool = await get_db_pool()
     async with pool.acquire() as conn:
+        # Added WHERE s.is_active = TRUE to filter out inactive subreddits
         rows = await conn.fetch('''
-            SELECT s.name, COUNT(p.id) as count, MAX(p.timestamp) as last_updated FROM subreddits s 
-            LEFT JOIN reddit_posts p ON s.id = p.subreddit_id GROUP BY s.name
+            SELECT s.name, COUNT(p.id) as count, MAX(p.timestamp) as last_updated 
+            FROM subreddits s 
+            LEFT JOIN reddit_posts p ON s.id = p.subreddit_id 
+            WHERE s.is_active = TRUE
+            GROUP BY s.name
         ''')
         return {r['name']: {"count": r['count'], "last_updated": r['last_updated'].isoformat() if r['last_updated'] else None} for r in rows}
 
