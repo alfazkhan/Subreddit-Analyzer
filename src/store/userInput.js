@@ -1,7 +1,7 @@
 import {createSlice} from "@reduxjs/toolkit"
 
 const initialUserInputState = {
-  subredditName: "AskIndianWomen",
+  subredditName: "Nothing to Select...",
   targetPostCount: 100,
   useOnlyCache: true,
 }

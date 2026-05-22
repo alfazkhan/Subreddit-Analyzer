@@ -10,7 +10,7 @@ import {
   Collapsible,
   Stack,
   Button,
-  Link
+  Link,
 } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
@@ -22,7 +22,6 @@ const config = [
   { emoji: "😐", color: "#52719c", label: "Neutral" },
   { emoji: "😠", color: "#aa0505", label: "Negative" },
 ];
-
 
 export default function KeywordTable({ data: postsData }) {
   const [sentiment, setSentiment] = useState("All");
@@ -40,6 +39,17 @@ export default function KeywordTable({ data: postsData }) {
     const end = start + pageSize;
     return data.slice(start, end);
   }, [data, currentPage]);
+
+  function parseTopics(topicData) {
+    console.log(JSON.parse(topicData));
+    return (
+      <>
+        <Badge colorPalette="green" variant="solid">
+          {JSON.parse(topicData)?.primary_topic}
+        </Badge>
+      </>
+    );
+  }
 
   return (
     <Flex direction="column">
@@ -100,6 +110,9 @@ export default function KeywordTable({ data: postsData }) {
                 Sentiment
               </Table.ColumnHeader>
               <Table.ColumnHeader color="orange.600" fontWeight="extrabold">
+                Topics
+              </Table.ColumnHeader>
+              <Table.ColumnHeader color="orange.600" fontWeight="extrabold">
                 Entities
               </Table.ColumnHeader>
             </Table.Row>
@@ -112,8 +125,11 @@ export default function KeywordTable({ data: postsData }) {
                   whiteSpace="normal"
                   verticalAlign="top"
                 >
-                  <Link color="blue.400" href={`https://www.reddit.com/r/${post.subreddit}/comments/${post.id.substring(3)}`}>
-                  {post.title}
+                  <Link
+                    color="blue.400"
+                    href={`https://www.reddit.com/r/${post.subreddit}/comments/${post.id.substring(3)}`}
+                  >
+                    {post.title}
                   </Link>
                 </Table.Cell>
                 <Table.Cell
@@ -159,20 +175,20 @@ export default function KeywordTable({ data: postsData }) {
                 </Table.Cell>
                 <Table.Cell>
                   <Text>
-                  {Intl.DateTimeFormat("en-DE", {
-                    year: "numeric",
-                    month: "numeric",
-                    day: "numeric",
-                  }).format(new Date(post.timestamp))}
+                    {Intl.DateTimeFormat("en-DE", {
+                      year: "numeric",
+                      month: "numeric",
+                      day: "numeric",
+                    }).format(new Date(post.timestamp))}
                   </Text>
                   <Text>
-                  {Intl.DateTimeFormat("en-DE", {
-                    hour: "numeric",
-                    minute: "numeric",
-                    second: "numeric",
-                    hour12: true,
-                    timeZone: "Europe/Berlin",
-                  }).format(new Date(post.timestamp))}
+                    {Intl.DateTimeFormat("en-DE", {
+                      hour: "numeric",
+                      minute: "numeric",
+                      second: "numeric",
+                      hour12: true,
+                      timeZone: "Europe/Berlin",
+                    }).format(new Date(post.timestamp))}
                   </Text>
                 </Table.Cell>
                 <Table.Cell
@@ -185,13 +201,38 @@ export default function KeywordTable({ data: postsData }) {
                 </Table.Cell>
                 <Table.Cell>
                   <Stack direction="column">
-                    {JSON.parse(post.entities)
+                    {/* {JSON.parse(post.entities)
                       .filter(
                         (item, index, self) =>
                           index ===
                           self.findIndex((t) => t.label === item.label),
                       )
                       .map((e,idx) => {
+                        if (labelConfig[e.label] !== undefined) {
+                          return (
+                            <Badge
+                              id={labelConfig[e.label]?.type}
+                              colorPalette={labelConfig[e.label]?.color}
+                              key={idx}
+                            >
+                              {labelConfig[e.label]?.type}
+                            </Badge>
+                          );
+                        }
+                      })} */}
+                    {post.topics && parseTopics(post.topics)}
+                    {!post.topics && "No Data Right now..."}
+                  </Stack>
+                </Table.Cell>
+                <Table.Cell>
+                  <Stack direction="column">
+                    {JSON.parse(post.entities)
+                      .filter(
+                        (item, index, self) =>
+                          index ===
+                          self.findIndex((t) => t.label === item.label),
+                      )
+                      .map((e, idx) => {
                         if (labelConfig[e.label] !== undefined) {
                           return (
                             <Badge

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import "./App.css";
 import ServerStatus from "./components/ui/ServerStatus";
 import Header from "./components/ui/Header";
-import { Flex } from "@chakra-ui/react";
+import { Flex, Box, Collapsible } from "@chakra-ui/react";
 import UserInput from "./components/ui/UserInput.jsx";
 import SubredditsSuggestions from "./components/ui/SubredditsSuggestion";
 import DataTabs from "./components/ui/DataTabs";
@@ -18,15 +18,11 @@ const BASE_URL = import.meta.env.PROD
 
 function App() {
   //New States
-  const [cacheSummary, setCacheSummary] = useState([]);
+  const [cacheSummary, setCacheSummary] = useState({});
   const [posts, setPosts] = useState([]);
   const [processingStatus, setProcessingStatus] = useState(false);
 
-
-
   const dispatch = useDispatch();
-
-
 
   useEffect(() => {
     async function fetchPostData() {
@@ -45,7 +41,6 @@ function App() {
     fetchPostData();
   }, []);
 
-
   async function fetchSubredditData(subredditName, currentCount) {
     setProcessingStatus(true);
     const response = await fetch(
@@ -58,7 +53,7 @@ function App() {
     } else {
       setProcessingStatus(false);
       setPosts(resData);
-      console.log(resData)
+      console.log(resData);
     }
   }
 
@@ -96,8 +91,17 @@ function App() {
       )}
 
       <Flex justifyContent="center" gap="4" margin="5" flexDirection="column">
-          <ReanalyzeButton/>
-        </Flex>
+        <Collapsible.Root>
+          <Collapsible.Trigger paddingY="3" backgroundColor="red.500" fontWeight="bolder" px={10}>
+            DO NOT TOUCH!
+          </Collapsible.Trigger>
+          <Collapsible.Content>
+            <Box padding="4" borderWidth="1px">
+              <ReanalyzeButton />
+            </Box>
+          </Collapsible.Content>
+        </Collapsible.Root>
+      </Flex>
     </Flex>
   );
 }

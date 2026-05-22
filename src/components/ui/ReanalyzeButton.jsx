@@ -9,7 +9,8 @@ const BASE_URL = import.meta.env.PROD
 export default function ReanalyzeButton() {
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState("Idle");
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState("");
 
   const socketRef = useRef(null);
 
@@ -31,6 +32,7 @@ export default function ReanalyzeButton() {
       if (data.type === "progress" && data.percent !== undefined) {
         setProgress(data.percent);
         setStatus(data.message);
+        setCurrentStatus(data.current_status);
       } else if (
         data.type === "status" ||
         data.type === "info" ||
@@ -39,14 +41,17 @@ export default function ReanalyzeButton() {
       ) {
         setStatus(data.message);
         console.log(data.message);
-        setLoading(false)
+        setLoading(false);
+        setCurrentStatus(data.current_status);
       } else if (data.type === "complete") {
         setProgress(100);
         setStatus(data.message);
         console.log(data.message);
+        setCurrentStatus(data.current_status);
       } else {
         console.log(data);
         setStatus(data.message);
+        setCurrentStatus(data.current_status);
       }
     };
 
@@ -63,9 +68,9 @@ export default function ReanalyzeButton() {
   }, []);
 
   // Helper function to fire actions safely
-  const sendAction = (actionName,keywordOnly) => {
-    if(actionName === "pause" || actionName === "stop" ){
-      setLoading(true)
+  const sendAction = (actionName, keywordOnly) => {
+    if (actionName === "pause" || actionName === "stop") {
+      setLoading(true);
     }
 
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
@@ -99,7 +104,7 @@ export default function ReanalyzeButton() {
           bg="green.600"
           marginBottom={2}
           disabled={loading}
-          onClick={() => sendAction("start",true)}
+          onClick={() => sendAction("start", true)}
         >
           Keyword-Only Reanalysis
         </Button>
@@ -110,7 +115,7 @@ export default function ReanalyzeButton() {
           bg="red.700"
           marginBottom={2}
           disabled={loading}
-          onClick={() => sendAction("start",false)}
+          onClick={() => sendAction("start", false)}
         >
           Complete Re-Analysis
         </Button>
@@ -151,6 +156,12 @@ export default function ReanalyzeButton() {
       <HStack mt={5}>
         <Blockquote.Root>
           <Blockquote.Content fontSize="2xl">{status}</Blockquote.Content>
+          <Blockquote.Content
+            fontSize="xl"
+            color={currentStatus === "running" ? "green.500" : "yellow.400"}
+          >
+            {currentStatus.toUpperCase()}
+          </Blockquote.Content>
         </Blockquote.Root>
       </HStack>
     </VStack>
