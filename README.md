@@ -1,4 +1,4 @@
-# Subreddit Scrapper: Real-Time Business Intelligence Dashboard
+# Subreddit Analyzer: Real-Time Business Intelligence Dashboard
 
 A full-stack Business Intelligence (BI) tool designed to scrape, analyze, and visualize Reddit data in real-time. This project uses a Python-based backend for advanced Natural Language Processing (NLP) and a React-powered frontend for a seamless data visualization experience.
 

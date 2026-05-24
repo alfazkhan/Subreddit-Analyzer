@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+*.pyc
+
+.\Scrapping\config.py
+.\Scrapping\auth.json
+__pycache__
+/__pycache__/
+

@@ -132,3 +132,36 @@ async def update_post_keywords_only(post_id: str, keywords: dict):
             SET keywords = $1
             WHERE id = $2
         ''', json.dumps(keywords), post_id)
+        
+async def get_all_posts_for_dynamic_reanalysis(subreddit: str, target_pipelines: list, only_null: bool):
+    """
+    Dynamically loads text records from PostgreSQL based on the requested features 
+    and whether we should only target entries with missing values.
+    """
+    pool = await get_db_pool()
+    
+    # Base extraction query mapping
+    query = "SELECT id, title, body, sentiment, keywords, entities, topics FROM public.reddit_posts WHERE subreddit_id = (SELECT id FROM public.subreddits WHERE name = $1)"
+    
+    # Conditional logic array appending
+    if only_null and target_pipelines:
+        null_clauses = []
+        for feature in target_pipelines:
+            if feature == "sentiment":
+                null_clauses.append("sentiment IS NULL")
+            elif feature == "keywords":
+                null_clauses.append("keywords IS NULL")
+            elif feature == "entities":
+                null_clauses.append("entities IS NULL")
+            elif feature == "topic":
+                # Handles both traditional database NULLs and JSON array '[null]' string values
+                null_clauses.append("(topics IS NULL OR topics::text = '[null]')")
+        
+        if null_clauses:
+            query += " AND (" + " OR ".join(null_clauses) + ")"
+            
+    query += " ORDER BY timestamp DESC;"
+    
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(query, subreddit)
+        return [dict(row) for row in rows]

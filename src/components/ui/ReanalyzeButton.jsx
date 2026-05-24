@@ -1,4 +1,11 @@
-import { Button, HStack, VStack, Blockquote } from "@chakra-ui/react";
+import {
+  Button,
+  HStack,
+  VStack,
+  Blockquote,
+  Text,
+  Checkbox,
+} from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import ProgressBar from "./ProgressBar.jsx";
 
@@ -6,13 +13,25 @@ const BASE_URL = import.meta.env.PROD
   ? "api.theonlyalfaz.com"
   : "192.168.0.246:8000";
 
+const analysisTypesValues = ["Keywords", "Sentiment", "Entities", "Topic"];
+
 export default function ReanalyzeButton() {
   const [progress, setProgress] = useState(0);
-  const [status, setStatus] = useState("Idle");
+  const [status, setStatus] = useState("Connecting...");
   const [loading, setLoading] = useState(false);
   const [currentStatus, setCurrentStatus] = useState("");
+  const [analysisTypes, setAnalysisTypes] = useState([]);
+  const [onlyNull, setOnlyNull] = useState(false);
+
+  const [processed, setProcessed] = useState(0);
+  const [totalPost, setTotalPosts] = useState(0);
+  const [timeRemaining, setTimeRemaining] = useState("");
 
   const socketRef = useRef(null);
+
+  // Track structural timing metrics using mutable references to avoid closure stale snapshots
+  const lastTimeRef = useRef(null);
+  const avgTimePerPostRef = useRef(null);
 
   useEffect(() => {
     const wsUrl = import.meta.env.PROD
@@ -30,12 +49,47 @@ export default function ReanalyzeButton() {
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log("Live Progress Data:", data);
-      // Dynamically update UI state based on the payload type
+      // console.log("Live Progress Data:", data);
+
       if (data.type === "progress" && data.percent !== undefined) {
+        const currentTime = Date.now();
+        const currentTotal = data.total;
+        const currentProcessed = data.processed;
+
+        setTotalPosts(currentTotal);
+        setProcessed(currentProcessed);
         setProgress(data.percent);
         setStatus(data.message);
         setCurrentStatus(data.current_status);
+
+        // --- TIME REMAINING CALCULATION LOGIC ---
+        if (lastTimeRef.current !== null && data.current_status === "running") {
+          // Calculate exact duration to process this individual item (in seconds)
+          const duration = (currentTime - lastTimeRef.current) / 1000;
+
+          // Prevent statistical anomalies if the browser was suspended or disconnected
+          if (duration > 0 && duration < 60) {
+            if (avgTimePerPostRef.current === null) {
+              avgTimePerPostRef.current = duration;
+            } else {
+              // Apply a 10% smoothing factor (Exponential Moving Average) for stable ETA numbers
+              avgTimePerPostRef.current =
+                avgTimePerPostRef.current * 0.9 + duration * 0.1;
+            }
+
+            const remainingPosts = currentTotal - currentProcessed;
+            if (remainingPosts > 0 && avgTimePerPostRef.current > 0) {
+              const totalSecondsLeft =
+                remainingPosts * avgTimePerPostRef.current;
+              setTimeRemaining(formatTime(totalSecondsLeft));
+            } else {
+              setTimeRemaining("0s");
+            }
+          }
+        }
+
+        // Lock in timestamps for the next incoming iteration frame
+        lastTimeRef.current = currentTime;
       } else if (
         data.type === "status" ||
         data.type === "info" ||
@@ -43,18 +97,23 @@ export default function ReanalyzeButton() {
         data.type === "error"
       ) {
         setStatus(data.message);
-        console.log(data.message);
         setLoading(false);
-        setCurrentStatus(data.current_status);
+        setCurrentStatus(data.current_status || "");
+
+        // Reset timing arrays if the stream is paused or stopped
+        if (data.current_status !== "running") {
+          lastTimeRef.current = null;
+        }
       } else if (data.type === "complete") {
         setProgress(100);
         setStatus(data.message);
-        console.log(data.message);
-        setCurrentStatus(data.current_status);
+        setCurrentStatus(data.current_status || "stopped");
+        setTimeRemaining("");
+        lastTimeRef.current = null;
+        avgTimePerPostRef.current = null;
       } else {
-        console.log(data);
         setStatus(data.message);
-        setCurrentStatus(data.current_status);
+        setCurrentStatus(data.current_status || "");
       }
     };
 
@@ -70,18 +129,61 @@ export default function ReanalyzeButton() {
     };
   }, []);
 
-  // Helper function to fire actions safely
-  const sendAction = (actionName, keywordOnly) => {
+  function handleAnalysisTypes(type,checked) {
+    console.log(type.toLowerCase());
+    const currentTypes = [...analysisTypes];
+    // console.log(currentTypes);
+    const index = currentTypes.findIndex((e) => e === type.toLowerCase())
+    if (index === -1 && checked) {
+      currentTypes.push(type.toLowerCase());
+      setAnalysisTypes(currentTypes);
+    }else{
+      currentTypes.splice(index,1)
+      setAnalysisTypes(currentTypes)
+    }
+  }
+
+  const formatTime = (seconds) => {
+    if (seconds < 1) return "Calculating...";
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+
+    const parts = [];
+    if (h > 0) parts.push(`${h}h`);
+    if (m > 0 || h > 0) parts.push(`${m}m`);
+    parts.push(`${s}s`);
+
+    return parts.join(" ");
+  };
+
+  const sendAction = (actionName) => {
     if (actionName === "pause" || actionName === "stop") {
       setLoading(true);
     }
 
-    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+    if (actionName === "stop" || actionName === "pause") {
+      lastTimeRef.current = null;
+      setTimeRemaining("");
+    }
+
+    console.log(
+      JSON.stringify({
+        action: actionName,
+        pipelines: analysisTypes,
+        only_null: onlyNull,
+      }),
+    );
+
+    const confirmStart = confirm(`Do you want to start analysis on ${analysisTypes} with Only Null as ${onlyNull}`)
+    console.log(confirmStart)
+
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN && confirmStart) {
       socketRef.current.send(
         JSON.stringify({
           action: actionName,
-          open_page: false,
-          keywords_only: keywordOnly,
+          pipelines: analysisTypes,
+          only_null: onlyNull,
         }),
       );
     } else {
@@ -89,8 +191,19 @@ export default function ReanalyzeButton() {
     }
   };
 
+  const sendControlAction = (actionName) => {
+    if (["pause", "stop"].includes(actionName)) setLoading(true);
+    if (["stop", "pause"].includes(actionName)) {
+      lastTimeRef.current = null;
+      setTimeRemaining("");
+    }
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      socketRef.current.send(JSON.stringify({ action: actionName }));
+    }
+  };
+
   return (
-    <VStack>
+    <VStack width="full" gap={4}>
       <HStack
         width="full"
         gap="1"
@@ -99,37 +212,64 @@ export default function ReanalyzeButton() {
       >
         <ProgressBar value={progress} processingStatus={"Reanalyze Progress"} />
       </HStack>
+
+      {/* Real-time Meta Metrics Indicators Display */}
+      {currentStatus === "running" && totalPost > 0 && (
+        <HStack gap={6} fontSize="sm" color="gray.400" fontWeight="bold">
+          <Text>
+            Processed: {processed} / {totalPost}
+          </Text>
+          {timeRemaining && (
+            <Text color="green.400">
+              Estimated Time Remaining: {timeRemaining}
+            </Text>
+          )}
+        </HStack>
+      )}
+
+      <HStack>
+        {analysisTypesValues.map((type) => (
+          <Checkbox.Root
+            checked={analysisTypes.findIndex((e) => e === type.toLowerCase()) !== -1}
+            onCheckedChange={(e) => handleAnalysisTypes(type,e.checked)}
+            key={type}
+          >
+            <Checkbox.HiddenInput />
+            <Checkbox.Control />
+            <Checkbox.Label>{type}</Checkbox.Label>
+          </Checkbox.Root>
+        ))}
+      </HStack>
+
+      <HStack>
+        <Checkbox.Root
+          checked={onlyNull}
+          onCheckedChange={(e) => setOnlyNull(!!e.checked)}
+        >
+          <Checkbox.HiddenInput />
+          <Checkbox.Control />
+          <Checkbox.Label>Only Null Fields</Checkbox.Label>
+        </Checkbox.Root>
+      </HStack>
+
       <HStack>
         <Button
           size="xs"
           color="white"
           fontWeight="black"
-          bg="green.600"
-          marginBottom={2}
-          disabled={loading}
-          onClick={() => sendAction("start", true)}
-        >
-          Keyword-Only Reanalysis
-        </Button>
-        <Button
-          size="xs"
-          color="white"
-          fontWeight="black"
           bg="red.700"
-          marginBottom={2}
           disabled={loading}
-          onClick={() => sendAction("start", false)}
+          onClick={() => sendAction("start")}
         >
-          Complete Re-Analysis
+          Start Analysis
         </Button>
         <Button
           size="xs"
           color="white"
           fontWeight="black"
           bg="orange.600"
-          marginBottom={2}
           disabled={loading}
-          onClick={() => sendAction("pause")}
+          onClick={() => sendControlAction("pause")}
         >
           Pause
         </Button>
@@ -138,9 +278,8 @@ export default function ReanalyzeButton() {
           color="white"
           fontWeight="black"
           bg="orange.600"
-          marginBottom={2}
           disabled={loading}
-          onClick={() => sendAction("resume")}
+          onClick={() => sendControlAction("resume")}
         >
           Resume
         </Button>
@@ -149,13 +288,13 @@ export default function ReanalyzeButton() {
           color="white"
           fontWeight="black"
           bg="orange.600"
-          marginBottom={2}
           disabled={loading}
-          onClick={() => sendAction("stop")}
+          onClick={() => sendControlAction("stop")}
         >
           Stop
         </Button>
       </HStack>
+
       <HStack mt={5}>
         <Blockquote.Root>
           <Blockquote.Content fontSize="2xl">{status}</Blockquote.Content>
@@ -163,7 +302,15 @@ export default function ReanalyzeButton() {
             fontSize="xl"
             color={currentStatus === "running" ? "green.500" : "yellow.400"}
           >
-            {currentStatus.toUpperCase()}
+            <p>{currentStatus.toUpperCase()}</p>
+            {avgTimePerPostRef.current && (
+              <Text color="green.500">
+                Avg Time Per Post:{" "}
+                <span style={{ fontWeight: "bolder" }}>
+                  {avgTimePerPostRef.current.toFixed(2)} seconds
+                </span>
+              </Text>
+            )}
           </Blockquote.Content>
         </Blockquote.Root>
       </HStack>
