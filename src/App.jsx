@@ -90,7 +90,7 @@ function App() {
         </Flex>
       )}
 
-      {import.meta.env.PROD && (
+      {!import.meta.env.PROD && (
         <Flex justifyContent="center" gap="4" margin="5" flexDirection="column">
           <Collapsible.Root>
             <Collapsible.Trigger
