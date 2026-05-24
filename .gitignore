@@ -24,9 +24,8 @@ dist-ssr
 *.sw?
 *.pyc
 
-.\Scrapping\config.py
-.\Scrapping\auth.json
 __pycache__
 /__pycache__/
 
 Scrapping/auth.json
+Scrapping/config.py
