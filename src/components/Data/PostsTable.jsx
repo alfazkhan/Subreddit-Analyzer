@@ -24,16 +24,47 @@ const config = [
 ];
 
 const topicsConfig = [
-  "Housing, Accommodations & Living Logistics",
-  "Public Transit, Traffic & Urban Mobility",
-  "Local Administration, Law & Politics",
-  "Jobs, Career & Local Economy",
-  "Education, Students & Schools",
-  "Food, Dining & Local Cuisines",
-  "Nightlife, Festivals & Social Events",
-  "Tourism, Sightseeing & Local Travel",
-  "Sports, Hobbies & Recreation",
-  "Public Safety, Weather & Emergency Alerts",
+    // # Housing & Living Accommodations
+    "Rent Prices & Affordability",
+    "Apartment Viewings & Contracts",
+    "Flatmates & Shared Housing",
+    "Landlord Disputes & Evictions",
+    "Utility Bills & Energy Costs",
+    "Home Maintenance & Damage Repairs",
+
+    // # Public Transit & Urban Mobility
+    "Subway, Tram & Train Schedules",
+    "Bus Routes & Reliability",
+    "Transit Passes & Ticket Pricing",
+    "Bicycle Lanes & Cycling Safety",
+    "Traffic Congestion & Roadwork",
+    "City Parking & Driving Permits",
+
+    // # Local Administration, Law & Politics
+    "City Registration & Paperwork",
+    "Visas & Residence Permits",
+    "Local Elections & Candidates",
+    "City Council Policies & Budgets",
+    "Protests, Strikes & Demonstrations",
+
+    // # Jobs & Daily Economy
+    "Job Postings & Career Advice",
+    "Student Shifts & Part-Time Work",
+    "Supermarket Prices & Groceries",
+    "Salaries & Cost of Living Rants",
+
+    // # Social Life, Culture & Recreation
+    "Restaurant & Cafe Reviews",
+    "Bars, Nightclubs & Nightlife",
+    "Street Food & Local Cuisines",
+    "Festivals, Concerts & Public Events",
+    "Museums, Art & Theater",
+    "Amateur Sports & Fitness Groups",
+
+    // # Public Safety & Travel
+    "Tourist Attractions & Sightseeing",
+    "Neighborhood Safety & Crime Alerts",
+    "Lost Items & Found Belongings"
 ];
 
 export default function KeywordTable({ data: postsData }) {

@@ -2,38 +2,54 @@ import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  BarElement,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
   Legend,
 } from "chart.js";
-import { useEffect } from "react";
-import { Bar } from "react-chartjs-2";
+import { useEffect, useMemo } from "react";
+import { Bar, Line } from "react-chartjs-2";
 // import faker from 'faker';
 
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  BarElement,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
   Legend,
 );
-
 export const options = {
+  responsive: true,
   plugins: {
+    legend: {
+      position: "top",
+    },
     title: {
       display: true,
-      text: "Chart.js Bar Chart - Stacked",
+      text: "Sentiments Throughout the day",
     },
   },
-  responsive: true,
   scales: {
     x: {
-      stacked: true,
+      border: {
+        display: true,
+      },
+      grid: {
+        display: true,
+        drawOnChartArea: true,
+        drawTicks: true,
+      },
     },
     y: {
-      stacked: true,
+      border: {
+        display: false,
+      },
+      grid: {
+        color: "#fff"
+      },
     },
   },
 };
@@ -52,29 +68,57 @@ export default function EmotionsThroughoutDay({ data: postsData }) {
       }
     });
   }
-  console.log(sentimentCounts);
+  // console.log(sentimentCounts);
+
+  const hourlySentimentData = useMemo(() => {
+    const counts = {
+      Positive: Array(24).fill(0),
+      Neutral: Array(24).fill(0),
+      Negative: Array(24).fill(0),
+    };
+
+    postsData.forEach((post) => {
+      if (!post.timestamp) return;
+      const dateObj = new Date(post.timestamp);
+      const localHour = dateObj.getHours();
+
+      counts[post.sentiment][localHour]++;
+    });
+    console.log(counts);
+
+    return counts;
+  }, [postsData]);
 
   const labels = Array.from({ length: 24 }, (_, i) => `${i}:00`);
-  const labelsData = Object.values(sentimentCounts);
   const data = {
     labels,
     datasets: [
       {
         label: "Positive",
-        data: labelsData,
-        backgroundColor: "rgb(255, 99, 132)",
+        data: hourlySentimentData.Positive,
+        borderColor: "rgb(40, 175, 28)",
+        // borderWidth: 1,
+        backgroundColor: "rgb(40, 175, 28)",
+        tension: 0.4,
+      pointRadius: 4,
       },
-      {
-        label: "Neutral",
-        data: labelsData,
-        backgroundColor: "rgb(75, 192, 192)",
-      },
+      // {
+      //   label: "Neutral",
+      //   data: hourlySentimentData.Neutral,
+      //   backgroundColor: "rgb(224, 206, 206)",
+      //   borderColor: "rgb(224, 206, 206)",
+      //   borderWidth: 1,
+      // },
       {
         label: "Negative",
-        data: labelsData,
-        backgroundColor: "rgb(53, 162, 235)",
+        data: hourlySentimentData.Negative,
+        backgroundColor: "rgb(194, 36, 36)",
+        borderColor: "rgb(194, 36, 36)",
+        tension: 0.4,
+      pointRadius: 4,
+        // borderWidth: 1,
       },
     ],
   };
-  return <Bar options={options} data={data} />;
+  return <Line options={options} data={data} />;
 }

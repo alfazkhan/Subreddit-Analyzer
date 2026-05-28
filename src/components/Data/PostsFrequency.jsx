@@ -72,7 +72,7 @@ export default function PostTime({ data }) {
         counts[localHour]++;
       }
     });
-
+console.log(counts)
     return counts;
   }, [data, startDate, endDate, timezone]);
 

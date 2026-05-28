@@ -51,17 +51,17 @@ export default function DataTabs({ postsData, processingStatus }) {
       icon: LuUser,
       content: <PostsFrequency data={postsData} />,
     },
-    // {
-    //   value: "Emotions Throughout Day",
-    //   icon: LuUser,
-    //   content: <EmotionsThroughoutDay data={postsData} />,
-    // },
+    {
+      value: "Sentiments Frequency",
+      icon: LuUser,
+      content: <EmotionsThroughoutDay data={postsData} />,
+    },
   ];
 
   return (
     <Box position="relative" aria-busy="true" userSelect="none">
       <Tabs.Root
-        defaultValue="Sentiments"
+        defaultValue="Emotions Throughout Day"
         variant="plain"
         lazyMount
         unmountOnExit

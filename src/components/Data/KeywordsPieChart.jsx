@@ -10,6 +10,8 @@ import {
   Button,
 } from "@chakra-ui/react";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+import keywordCount from "../../util/keywordCount.js";
+import getTopKeywords from "../../util/getTopKeywords.js";
 
 const legendMarginPlugin = {
   id: "legendMargin",
@@ -42,31 +44,10 @@ function getRandomColor() {
 
 export default function KeywordsPieChart({ data }) {
   const [minValue, setMinValue] = useState(50);
-  const [maxValue, setMaxValue] = useState(100);
+  const [maxValue, setMaxValue] = useState(100); 
 
-  const keywordsCount = useMemo(() => {
-    const counts = {};
-    data.forEach((post) => {
-      const keywords = JSON.parse(post.keywords);
-      if (!keywords) return;
-      Object.keys(keywords).forEach((keyword) => {
-        counts[keyword] === undefined
-          ? (counts[keyword] = 1)
-          : counts[keyword]++;
-      });
-    });
+  const keywordsCount = keywordCount(data);
 
-    return counts;
-  }, [data]);
-
-  function getTopTen() {
-    const valuesSet = new Set(Object.values(keywordsCount));
-    const sortedValues = Array.from(valuesSet).sort((a, b) => a - b);
-    const minValue = Math.min(...sortedValues.slice(-10));
-    const maxValue = Math.max(...sortedValues.slice(-10));
-    setMinValue(minValue);
-    setMaxValue(maxValue);
-  }
 
   const chartData = useMemo(() => {
     const filteredCount = Object.entries(keywordsCount).reduce(
@@ -169,17 +150,41 @@ export default function KeywordsPieChart({ data }) {
       </HStack>
       <HStack>
         <Button
-          key="top10"
-          size="xs"
-          color="white"
-          fontWeight="black"
-          bg="orange.600"
-          onClick={getTopTen}
-          marginBottom={2}
-          minW={"100px"}
-        >
-          Get top 10
-        </Button>
+                        key="top10"
+                        size="xs"
+                        color="white"
+                        fontWeight="black"
+                        bg="orange.600"
+                        onClick={()=>getTopKeywords(keywordsCount, 10, setMinValue, setMaxValue)}
+                        marginBottom={2}
+                        minW={"100px"}
+                      >
+                        Get Top 10
+                      </Button>
+                      <Button
+                        key="top10"
+                        size="xs"
+                        color="white"
+                        fontWeight="black"
+                        bg="orange.600"
+                        onClick={()=>getTopKeywords(keywordsCount, 50, setMinValue, setMaxValue)}
+                        marginBottom={2}
+                        minW={"100px"}
+                      >
+                        Get Top 50
+                      </Button>
+                      <Button
+                        key="top10"
+                        size="xs"
+                        color="white"
+                        fontWeight="black"
+                        bg="orange.600"
+                        onClick={()=>getTopKeywords(keywordsCount, 100, setMinValue, setMaxValue)}
+                        marginBottom={2}
+                        minW={"100px"}
+                      >
+                        Get Top 100
+                      </Button>
       </HStack>
       <Box width="full" height="500px" mt="-20px">
         <Pie options={options} data={chartData} />

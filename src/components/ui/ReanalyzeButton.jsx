@@ -5,9 +5,11 @@ import {
   Blockquote,
   Text,
   Checkbox,
+  Flex
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import ProgressBar from "./ProgressBar.jsx";
+import formatTime from "../../util/formatTime.js";
 
 const BASE_URL = import.meta.env.PROD
   ? "api.theonlyalfaz.com"
@@ -160,20 +162,6 @@ export default function ReanalyzeButton({cacheSummary}) {
   }
 
 
-  const formatTime = (seconds) => {
-    if (seconds < 1) return "Calculating...";
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = Math.floor(seconds % 60);
-
-    const parts = [];
-    if (h > 0) parts.push(`${h}h`);
-    if (m > 0 || h > 0) parts.push(`${m}m`);
-    parts.push(`${s}s`);
-
-    return parts.join(" ");
-  };
-
   const sendAction = (actionName) => {
     if (actionName === "pause" || actionName === "stop") {
       setLoading(true);
@@ -262,7 +250,7 @@ export default function ReanalyzeButton({cacheSummary}) {
         ))}
       </HStack>
 
-      <HStack gap={4} borderWidth={0.5} p={5} borderColor="orange.400">
+      <Flex borderWidth={0.5} p={5} borderColor="orange.400" overflow="scroll" flexWrap="wrap" gap={4}>
         {Object.keys(cacheSummary).map((sub) => (
           <Checkbox.Root
             checked={subredditIDS.findIndex((e) => e === cacheSummary[sub].id) !== -1}
@@ -274,7 +262,7 @@ export default function ReanalyzeButton({cacheSummary}) {
             <Checkbox.Label>{sub}</Checkbox.Label>
           </Checkbox.Root>
         ))}
-      </HStack>
+      </Flex>
 
       <HStack>
         <Checkbox.Root
