@@ -15,7 +15,7 @@ from database.subreddits import is_subreddit_bootstrapped, get_active_subreddits
 from scraper_v2 import run_discovery_scan, process_queue_batch
 
 # Import decouple routing modules from the Routes package folder
-from Routes import routes_posts, routes_subreddits, routes_reanalyze
+from Routes import routes_posts, routes_subreddits, routes_reanalyze, routes_ignored_words
 
 # Determine execution environment context
 IS_PRODUCTION = os.getenv("APP_ENV") == "production"
@@ -39,6 +39,7 @@ app.add_middleware(
 app.include_router(routes_posts.router)
 app.include_router(routes_subreddits.router)
 app.include_router(routes_reanalyze.router)
+app.include_router(routes_ignored_words.router)
 
 logging.basicConfig(
     level=logging.INFO, format='[%(asctime)s] %(levelname)s: %(message)s',

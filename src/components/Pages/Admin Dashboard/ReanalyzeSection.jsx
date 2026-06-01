@@ -11,14 +11,12 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
-import ProgressBar from "./ProgressBar.jsx";
-import formatTime from "../../util/formatTime.js";
+import ProgressBar from "../../ui/ProgressBar.jsx";
+import formatTime from "../../../util/formatTime.js";
 import { useSelector } from "react-redux";
-import DateSelector from "./DateSelector.jsx";
+import DateSelector from "../../ui/DateSelector.jsx";
+import { BASE_URL } from "../../../Constants.js";
 
-const BASE_URL = import.meta.env.PROD
-  ? "api.theonlyalfaz.com"
-  : "192.168.0.246:8000";
 
 const analysisTypesValues = ["Keywords", "Sentiment", "Entities", "Topic"];
 
@@ -55,13 +53,12 @@ export default function ReanalyzeSection() {
       ? "wss://api.theonlyalfaz.com/ws/reanalyze"
       : "ws://192.168.0.246:8000/ws/reanalyze";
 
-    console.log(`Connecting to WebSocket channel via: ${wsUrl}`);
+    // console.log(`Connecting to WebSocket channel via: ${wsUrl}`);
     const socket = new WebSocket(wsUrl);
     socketRef.current = socket;
 
     socket.onopen = () => {
       setStatus("Connected");
-      console.log("WebSocket connection established.");
     };
 
     socket.onmessage = (event) => {

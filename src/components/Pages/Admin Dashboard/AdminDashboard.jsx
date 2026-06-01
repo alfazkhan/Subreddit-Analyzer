@@ -1,5 +1,6 @@
-import Header from "../ui/Header";
-import ReanalyzeSection from "../ui/ReanalyzeSection";
+import Header from "../../ui/Header";
+import IgnoredWordsSection from "./IgnoredWordsSection";
+import ReanalyzeSection from "./ReanalyzeSection";
 import { Flex, Tabs } from "@chakra-ui/react";
 
 export default function AdminDashboard() {
@@ -8,7 +9,7 @@ export default function AdminDashboard() {
       <Header text="Admin Dashboard" highlight="Dashboard" />
       <Tabs.Root
         variant="subtle"
-        defaultValue="members"
+        defaultValue="ignored_words"
         orientation="vertical"
         css={{
           "--tabs-indicator-bg": "colors.gray.subtle",
@@ -19,18 +20,18 @@ export default function AdminDashboard() {
       >
         <Tabs.List >
           <Tabs.Trigger value="tasks">Subreddits</Tabs.Trigger>
-          <Tabs.Trigger value="projects">Ignored Words</Tabs.Trigger>
-          <Tabs.Trigger value="members">Reanalyze Data</Tabs.Trigger>
+          <Tabs.Trigger value="ignored_words">Ignored Words</Tabs.Trigger>
+          <Tabs.Trigger value="reanalyze">Reanalyze Data</Tabs.Trigger>
         </Tabs.List>
 
         <Tabs.Content value="tasks">
           Manage your tasks and their progress here.
         </Tabs.Content>
-        <Tabs.Content value="projects">
-          Manage your projects and their status here.
+        <Tabs.Content value="ignored_words">
+          <IgnoredWordsSection/>
         </Tabs.Content>
 
-        <Tabs.Content value="members">
+        <Tabs.Content value="reanalyze">
           <ReanalyzeSection />;
         </Tabs.Content>
       </Tabs.Root>

@@ -8,7 +8,7 @@ from nlp_processor import get_sentiment, extract_keywords, extract_entities, cla
 # Database modules
 from database.subreddits import db_get_all_subreddits
 from database.posts import get_all_posts_for_dynamic_reanalysis, update_post_nlp_data
-from database.ignored_words import get_all_ignored_words
+from database.ignored_words import get_all_ignored_words, mark_ignored_words_as_processed
 
 router = APIRouter()
 
@@ -188,6 +188,10 @@ async def dynamic_pipeline_orchestrator(target_pipelines: list, only_null: bool,
             await run_dynamic_text_reanalysis(sub, target_pipelines, only_null, ignored_words, start_date, end_date)
 
         if not global_manager.stop_event.is_set():
+            # Post-processing flag update for keyword pipelines
+            if "keywords" in target_pipelines:
+                await mark_ignored_words_as_processed()
+                
             global_manager.current_status = "stopped"
             msg_fin = "Dynamic Engine Sequence complete. Operations parsed successfully."
             logging.info(msg_fin)

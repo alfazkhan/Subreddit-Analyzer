@@ -1,5 +1,5 @@
 import "./App.css";
-import AdminDashboard from "./components/Pages/AdminDashboard";
+import AdminDashboard from "./components/Pages/Admin Dashboard/AdminDashboard";
 import Homepage from "./components/Pages/Homepage";
 import {createBrowserRouter, RouterProvider} from "react-router-dom"
 import { useDispatch } from "react-redux";
