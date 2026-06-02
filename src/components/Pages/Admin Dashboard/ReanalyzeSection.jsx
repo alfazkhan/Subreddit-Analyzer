@@ -6,17 +6,15 @@ import {
   Text,
   Checkbox,
   Flex,
-  Box,
   Center,
   Spinner,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
-import ProgressBar from "../../ui/ProgressBar.jsx";
+import ProgressBar from "../../ui-components/ProgressBar.jsx";
 import formatTime from "../../../util/formatTime.js";
 import { useSelector } from "react-redux";
-import DateSelector from "../../ui/DateSelector.jsx";
-import { BASE_URL } from "../../../Constants.js";
-
+import DateSelector from "../../ui-components/DateSelector.jsx";
+import { wsUrl } from "../../../Constants.js";
 
 const analysisTypesValues = ["Keywords", "Sentiment", "Entities", "Topic"];
 
@@ -28,14 +26,20 @@ export default function ReanalyzeSection() {
   const cacheSummary = useSelector(
     (state) => state.serverStatusState.cacheSummary,
   );
-  // console.log(cacheSummary);
+
   const loadingData = Object.keys(cacheSummary).length === 0;
 
   //Data to be sent
   const [subredditIDS, setSubredditIDS] = useState([]);
   const [analysisTypes, setAnalysisTypes] = useState([]);
   const [onlyNull, setOnlyNull] = useState(false);
-  const [dateRange, setDateRange] = useState();
+  const date = new Date();
+
+  let day = parseInt(date.getDate()) < 10 ? "0" + date.getDate() : date.getDate();
+  let month = parseInt(date.getMonth()) < 10 ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1);
+  let year = date.getFullYear();
+  let currentDate = `${year}/${month}/${day}`;
+  const [dateRange, setDateRange] = useState(["2026/01/01", currentDate]);
 
   //Processing
   const [processed, setProcessed] = useState(0);
@@ -49,10 +53,6 @@ export default function ReanalyzeSection() {
   const avgTimePerPostRef = useRef(null);
 
   useEffect(() => {
-    const wsUrl = import.meta.env.PROD
-      ? "wss://api.theonlyalfaz.com/ws/reanalyze"
-      : "ws://192.168.0.246:8000/ws/reanalyze";
-
     // console.log(`Connecting to WebSocket channel via: ${wsUrl}`);
     const socket = new WebSocket(wsUrl);
     socketRef.current = socket;
@@ -190,7 +190,7 @@ export default function ReanalyzeSection() {
     };
 
     const confirmStart = confirm(
-      `Do you want to start analysis on ${analysisTypes} from ${dateRange[0].split("-").reverse().join("-")} to ${dateRange[1].split("-").reverse().join("-")} with Only Null as ${onlyNull}`,
+      `Do you want to start analysis on ${analysisTypes} from ${dateRange[0]} to ${dateRange[1]} with Only Null as ${onlyNull}`,
     );
     if (!confirmStart) {
       console.log(JSON.stringify(data));

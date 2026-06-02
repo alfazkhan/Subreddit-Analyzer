@@ -1,6 +1,6 @@
 import { Button, HStack, VStack, Text, Flex } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
-import { userInputAction } from "../../store/userInput.js";
+import { userInputAction } from "../../../store/userInput.js";
 
 // const Suggestions = [
 //   { name: "r/India", link: "India" },

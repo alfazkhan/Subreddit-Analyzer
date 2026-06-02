@@ -1,5 +1,5 @@
-import keywordCount from "../../util/keywordCount.js";
-import getTopKeywords from "../../util/getTopKeywords.js";
+import keywordCount from "../../../../util/keywordCount.js";
+import getTopKeywords from "../../../../util/getTopKeywords.js";
 import {
   HStack,
   Table,

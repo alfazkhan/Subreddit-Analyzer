@@ -12,7 +12,7 @@ import {
   Spinner
 } from "@chakra-ui/react";
 import { useEffect, useState, useMemo } from "react";
-import { userInputAction } from "../../store/userInput";
+import { userInputAction } from "../../../store/userInput.js";
 
 import { useSelector, useDispatch } from "react-redux";
 

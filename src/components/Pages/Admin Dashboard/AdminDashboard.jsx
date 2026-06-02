@@ -1,4 +1,4 @@
-import Header from "../../ui/Header";
+import Header from "../../ui-components/Header";
 import IgnoredWordsSection from "./IgnoredWordsSection";
 import ReanalyzeSection from "./ReanalyzeSection";
 import { Flex, Tabs } from "@chakra-ui/react";

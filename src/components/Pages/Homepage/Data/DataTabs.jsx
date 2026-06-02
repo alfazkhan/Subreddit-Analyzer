@@ -22,7 +22,7 @@ export default function DataTabs({ postsData, processingStatus }) {
       ":" +
       currentdate.getMilliseconds();
 
-    console.log("App.jsx rendered at:", datetime);
+    // console.log("App.jsx rendered at:", datetime);
   }, []);
 
   const TabsListData = [
@@ -61,7 +61,7 @@ export default function DataTabs({ postsData, processingStatus }) {
   return (
     <Box position="relative" aria-busy="true" userSelect="none">
       <Tabs.Root
-        defaultValue="Emotions Throughout Day"
+        defaultValue="Posts Table"
         variant="plain"
         lazyMount
         unmountOnExit

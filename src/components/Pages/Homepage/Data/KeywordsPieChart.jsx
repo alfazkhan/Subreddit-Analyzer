@@ -10,8 +10,8 @@ import {
   Button,
 } from "@chakra-ui/react";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-import keywordCount from "../../util/keywordCount.js";
-import getTopKeywords from "../../util/getTopKeywords.js";
+import keywordCount from "../../../../util/keywordCount";
+import getTopKeywords from "../../../../util/getTopKeywords.js";
 
 const legendMarginPlugin = {
   id: "legendMargin",

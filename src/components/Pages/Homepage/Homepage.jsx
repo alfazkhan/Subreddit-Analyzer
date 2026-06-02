@@ -1,22 +1,38 @@
 import { useState, useEffect } from "react";
-import ServerStatus from "../ui/ServerStatus.jsx";
-import Header from "../ui/Header";
+import ServerStatus from "../../ui-components/ServerStatus.jsx";
+import Header from "../../ui-components/Header.jsx";
 import { Flex } from "@chakra-ui/react";
-import UserInput from "../ui/UserInput.jsx";
-import SubredditsSuggestions from "../ui/SubredditsSuggestion";
-import DataTabs from "../ui/DataTabs";
-import UpcomingFeatures from "../Feature Tracker/UpcomingFeatures";
+import UserInput from "./UserInput.jsx";
+import SubredditsSuggestions from "./SubredditsSuggestion.jsx";
+import DataTabs from "./Data/DataTabs.jsx";
+import UpcomingFeatures from "../../Feature Tracker/UpcomingFeatures.jsx";
 import { Link } from "react-router-dom";
-
-const BASE_URL = import.meta.env.PROD
-  ? "https://api.theonlyalfaz.com"
-  : "http://192.168.0.246:8000";
+import { useDispatch } from "react-redux";
+import { serverStatusActions } from "../../../store/serverStatus.js";
+import { BASE_URL } from "../../../Constants.js";
 
 export default function Homepage() {
   const [posts, setPosts] = useState([]);
   const [processingStatus, setProcessingStatus] = useState(false);
 
+  const dispatch = useDispatch();
 
+  useEffect(() => {
+    async function fetchPostData() {
+      const response = await fetch(BASE_URL + "/summary");
+      const resData = await response.json();
+      if (!response.ok) {
+        dispatch(serverStatusActions.serverStatusChange("offline"));
+        throw new Error(resData.message || "Server is Offline!");
+      } else {
+        dispatch(serverStatusActions.serverStatusChange("online"));
+      }
+
+      dispatch(serverStatusActions.updateCacheSummary(resData));
+    }
+
+    fetchPostData();
+  }, [dispatch]);
 
   async function fetchSubredditData(subredditName, currentCount) {
     setProcessingStatus(true);
@@ -30,14 +46,13 @@ export default function Homepage() {
     } else {
       setProcessingStatus(false);
       setPosts(resData);
-      console.log(resData);
     }
   }
 
   return (
     <Flex direction="column" justifyContent="center" width="80%" margin="auto">
       <Flex gap="4" align="anchor-center" justify="space-between" margin="5">
-        <Header text={"Subreddit Analyzer"} highlight="Analyzer"/>
+        <Header text={"Subreddit Analyzer"} highlight="Analyzer" />
         <Link to="/dashboard">
           <ServerStatus />
         </Link>
