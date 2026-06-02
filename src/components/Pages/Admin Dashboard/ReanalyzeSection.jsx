@@ -8,6 +8,7 @@ import {
   Flex,
   Center,
   Spinner,
+  Highlight
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import ProgressBar from "../../ui-components/ProgressBar.jsx";
@@ -358,7 +359,7 @@ export default function ReanalyzeSection() {
 
       <HStack mt={5}>
         <Blockquote.Root>
-          <Blockquote.Content fontSize="2xl">{status}</Blockquote.Content>
+          <Blockquote.Content fontSize="2xl"><Highlight query={"Connected"} styles={{ color: "gray.100", backgroundColor: "green.600", padding: 1, borderRadius: 3 }}>{status}</Highlight></Blockquote.Content>
           <Blockquote.Content
             fontSize="xl"
             color={currentStatus === "running" ? "green.500" : "yellow.400"}

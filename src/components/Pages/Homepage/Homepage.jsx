@@ -7,32 +7,12 @@ import SubredditsSuggestions from "./SubredditsSuggestion.jsx";
 import DataTabs from "./Data/DataTabs.jsx";
 import UpcomingFeatures from "../../Feature Tracker/UpcomingFeatures.jsx";
 import { Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { serverStatusActions } from "../../../store/serverStatus.js";
+
 import { BASE_URL } from "../../../Constants.js";
 
 export default function Homepage() {
   const [posts, setPosts] = useState([]);
   const [processingStatus, setProcessingStatus] = useState(false);
-
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    async function fetchPostData() {
-      const response = await fetch(BASE_URL + "/summary");
-      const resData = await response.json();
-      if (!response.ok) {
-        dispatch(serverStatusActions.serverStatusChange("offline"));
-        throw new Error(resData.message || "Server is Offline!");
-      } else {
-        dispatch(serverStatusActions.serverStatusChange("online"));
-      }
-
-      dispatch(serverStatusActions.updateCacheSummary(resData));
-    }
-
-    fetchPostData();
-  }, [dispatch]);
 
   async function fetchSubredditData(subredditName, currentCount) {
     setProcessingStatus(true);
@@ -53,7 +33,7 @@ export default function Homepage() {
     <Flex direction="column" justifyContent="center" width="80%" margin="auto">
       <Flex gap="4" align="anchor-center" justify="space-between" margin="5">
         <Header text={"Subreddit Analyzer"} highlight="Analyzer" />
-        <Link to="/dashboard">
+        <Link to={"/dashboard"}>
           <ServerStatus />
         </Link>
       </Flex>

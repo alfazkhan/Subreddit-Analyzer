@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Header from "../../ui-components/Header";
 import IgnoredWordsSection from "./IgnoredWordsSection";
 import ReanalyzeSection from "./ReanalyzeSection";
@@ -6,7 +7,9 @@ import { Flex, Tabs } from "@chakra-ui/react";
 export default function AdminDashboard() {
   return (
     <Flex direction="column" justifyContent="center" width="80%" margin="auto">
-      <Header text="Admin Dashboard" highlight="Dashboard" />
+      <Link to="/">
+        <Header text="Admin Dashboard" highlight="Dashboard" />
+      </Link>
       <Tabs.Root
         variant="subtle"
         defaultValue="ignored_words"
@@ -15,10 +18,9 @@ export default function AdminDashboard() {
           "--tabs-indicator-bg": "colors.gray.subtle",
           "--tabs-indicator-shadow": "shadows.xs",
           "--tabs-trigger-radius": "radii.full",
-          
         }}
       >
-        <Tabs.List >
+        <Tabs.List>
           <Tabs.Trigger value="tasks">Subreddits</Tabs.Trigger>
           <Tabs.Trigger value="ignored_words">Ignored Words</Tabs.Trigger>
           <Tabs.Trigger value="reanalyze">Reanalyze Data</Tabs.Trigger>
@@ -28,7 +30,7 @@ export default function AdminDashboard() {
           Manage your tasks and their progress here.
         </Tabs.Content>
         <Tabs.Content value="ignored_words">
-          <IgnoredWordsSection/>
+          <IgnoredWordsSection />
         </Tabs.Content>
 
         <Tabs.Content value="reanalyze">

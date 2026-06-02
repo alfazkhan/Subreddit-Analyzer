@@ -3,9 +3,10 @@ import logging
 import os
 import json
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
+from typing import Optional
 from nlp_processor import get_sentiment, extract_keywords, extract_entities, classify_topics
 
-from auth_guard import verify_client_identity_ws
+from auth_guard import get_optional_client_identity_ws
 # Database modules
 from database.subreddits import db_get_all_subreddits
 from database.posts import get_all_posts_for_dynamic_reanalysis, update_post_nlp_data
@@ -206,7 +207,7 @@ async def dynamic_pipeline_orchestrator(target_pipelines: list, only_null: bool,
 
 
 @router.websocket("/ws/reanalyze")
-async def reanalyze_endpoint(websocket: WebSocket, client: dict = Depends(verify_client_identity_ws)):
+async def reanalyze_endpoint(websocket: WebSocket, client: Optional[dict] = Depends(get_optional_client_identity_ws)):
     await websocket.accept()
     await global_manager.register_client(websocket)
     
@@ -215,13 +216,14 @@ async def reanalyze_endpoint(websocket: WebSocket, client: dict = Depends(verify
             data = await websocket.receive_json()
             action = data.get("action")
 
-            if action in {"start", "pause", "resume", "stop"} and client["role"] != "Super Admin":
-                await websocket.send_json({
-                    "type": "error",
-                    "current_status": global_manager.current_status,
-                    "message": "Unauthorized. Only Super Admin may control reanalysis."
-                })
-                continue
+            if action in {"start", "pause", "resume", "stop"}:
+                if not client or client.get("role") != "Super Admin":
+                    await websocket.send_json({
+                        "type": "error",
+                        "current_status": global_manager.current_status,
+                        "message": "Unauthorized. Only Super Admin may control reanalysis."
+                    })
+                    continue
 
             if action == "status":
                 await websocket.send_json({
