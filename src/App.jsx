@@ -54,7 +54,7 @@ function App() {
       if (firebaseUser) {
         try {
           const token = await firebaseUser.getIdToken();
-          console.log("Token:", token);
+          // console.log("Token:", token);
           const response = await fetch(`${BASE_URL}/users/me`, {
             headers: { Authorization: `Bearer ${token}` },
           });
