@@ -15,7 +15,7 @@ import ProgressBar from "../../ui-components/ProgressBar.jsx";
 import formatTime from "../../../util/formatTime.js";
 import { useSelector } from "react-redux";
 import DateSelector from "../../ui-components/DateSelector.jsx";
-import { wsUrl } from "../../../Constants.js";
+import { BASE_URL, wsUrl } from "../../../Constants.js";
 
 const analysisTypesValues = ["Keywords", "Sentiment", "Entities", "Topic"];
 
@@ -27,11 +27,11 @@ export default function ReanalyzeSection() {
   const cacheSummary = useSelector(
     (state) => state.serverStatusState.cacheSummary,
   );
-  const token = useSelector(state=> state.authState.token)
+  const token = useSelector((state) => state.authState.token);
 
   const loadingData = Object.keys(cacheSummary).length === 0;
 
-  //Data to be sent
+  // Data to be sent
   const [subredditIDS, setSubredditIDS] = useState([]);
   const [analysisTypes, setAnalysisTypes] = useState([]);
   const [onlyNull, setOnlyNull] = useState(false);
@@ -43,7 +43,7 @@ export default function ReanalyzeSection() {
   let currentDate = `${year}-${month}-${day}`;
   const [dateRange, setDateRange] = useState(["2026-01-01", currentDate]);
 
-  //Processing
+  // Processing
   const [processed, setProcessed] = useState(0);
   const [totalPost, setTotalPosts] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState("");
@@ -55,114 +55,137 @@ export default function ReanalyzeSection() {
   const avgTimePerPostRef = useRef(null);
 
   useEffect(() => {
-    // console.log(`Connecting to WebSocket channel via: ${wsUrl}`);
-    const socket = new WebSocket(`${wsUrl}?token=${token}`);
-    socketRef.current = socket;
+    let isCurrent = true;
+    let socket = null;
 
-    socket.onopen = () => {
-      setStatus("Connected");
-    };
+    const establishSecureConnection = async () => {
+      try {
+        if (!token) {
+          if (isCurrent) setStatus("Authentication Missing");
+          return;
+        }
 
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      // console.log("Live Progress Data:", data);
+        // 1. Request short-lived transaction authorization validation ticket profile
+        const response = await fetch(`${BASE_URL}/ws/ticket`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-      if (data.type === "progress" && data.percent !== undefined) {
-        const currentTime = Date.now();
-        const currentTotal = data.total;
-        const currentProcessed = data.processed;
+        if (!response.ok) {
+          throw new Error("Failed to claim high-security pipeline ticket validation profile.");
+        }
 
-        setTotalPosts(currentTotal);
-        setProcessed(currentProcessed);
-        setProgress(data.percent);
-        setStatus(data.message);
-        setCurrentStatus(data.current_status);
+        const { ticket } = await response.json();
+        
 
-        // --- TIME REMAINING CALCULATION LOGIC ---
-        if (lastTimeRef.current !== null && data.current_status === "running") {
-          // Calculate exact duration to process this individual item (in seconds)
-          const duration = (currentTime - lastTimeRef.current) / 1000;
+        // Safe unmount abort branch guard checkpoint 
+        if (!isCurrent) return;
 
-          // Prevent statistical anomalies if the browser was suspended or disconnected
-          if (duration > 0 && duration < 60) {
-            if (avgTimePerPostRef.current === null) {
-              avgTimePerPostRef.current = duration;
-            } else {
-              // Apply a 10% smoothing factor (Exponential Moving Average) for stable ETA numbers
-              avgTimePerPostRef.current =
-                avgTimePerPostRef.current * 0.9 + duration * 0.1;
+        // 2. Open channels using safe verification keys
+        socket = new WebSocket(`${wsUrl}?ticket=${ticket}`);
+        socketRef.current = socket;
+
+        socket.onopen = () => {
+          if (isCurrent) setStatus("Connected");
+        };
+
+        socket.onmessage = (event) => {
+          if (!isCurrent) return;
+          const data = JSON.parse(event.data);
+
+          if (data.type === "progress" && data.percent !== undefined) {
+            const currentTime = Date.now();
+            const currentTotal = data.total;
+            const currentProcessed = data.processed;
+
+            setTotalPosts(currentTotal);
+            setProcessed(currentProcessed);
+            setProgress(data.percent);
+            setStatus(data.message);
+            setCurrentStatus(data.current_status);
+
+            // --- TIME REMAINING CALCULATION LOGIC ---
+            if (lastTimeRef.current !== null && data.current_status === "running") {
+              const duration = (currentTime - lastTimeRef.current) / 1000;
+
+              if (duration > 0 && duration < 60) {
+                if (avgTimePerPostRef.current === null) {
+                  avgTimePerPostRef.current = duration;
+                } else {
+                  avgTimePerPostRef.current =
+                    avgTimePerPostRef.current * 0.9 + duration * 0.1;
+                }
+
+                const remainingPosts = currentTotal - currentProcessed;
+                if (remainingPosts > 0 && avgTimePerPostRef.current > 0) {
+                  const totalSecondsLeft = remainingPosts * avgTimePerPostRef.current;
+                  setTimeRemaining(formatTime(totalSecondsLeft));
+                } else {
+                  setTimeRemaining("0s");
+                }
+              }
             }
+            lastTimeRef.current = currentTime;
+          } else if (
+            ["status", "info", "warning", "error"].includes(data.type)
+          ) {
+            setStatus(data.message);
+            setLoading(false);
+            setCurrentStatus(data.current_status || "");
 
-            const remainingPosts = currentTotal - currentProcessed;
-            if (remainingPosts > 0 && avgTimePerPostRef.current > 0) {
-              const totalSecondsLeft =
-                remainingPosts * avgTimePerPostRef.current;
-              setTimeRemaining(formatTime(totalSecondsLeft));
-            } else {
-              setTimeRemaining("0s");
+            if (data.current_status !== "running") {
+              lastTimeRef.current = null;
             }
+          } else if (data.type === "complete") {
+            setProgress(100);
+            setStatus(data.message);
+            setCurrentStatus(data.current_status || "stopped");
+            setTimeRemaining("");
+            lastTimeRef.current = null;
+            avgTimePerPostRef.current = null;
+          } else {
+            setStatus(data.message);
+            setCurrentStatus(data.current_status || "");
           }
-        }
+        };
 
-        // Lock in timestamps for the next incoming iteration frame
-        lastTimeRef.current = currentTime;
-      } else if (
-        data.type === "status" ||
-        data.type === "info" ||
-        data.type === "warning" ||
-        data.type === "error"
-      ) {
-        setStatus(data.message);
-        setLoading(false);
-        setCurrentStatus(data.current_status || "");
+        socket.onerror = (error) => {
+          console.error("WebSocket Error Encountered:", error);
+          if (isCurrent) setStatus("Connection Error");
+        };
 
-        // Reset timing arrays if the stream is paused or stopped
-        if (data.current_status !== "running") {
-          lastTimeRef.current = null;
-        }
-      } else if (data.type === "complete") {
-        setProgress(100);
-        setStatus(data.message);
-        setCurrentStatus(data.current_status || "stopped");
-        setTimeRemaining("");
-        lastTimeRef.current = null;
-        avgTimePerPostRef.current = null;
-      } else {
-        setStatus(data.message);
-        setCurrentStatus(data.current_status || "");
+      } catch (err) {
+        console.error("Initialization pipeline connection failure:", err);
+        if (isCurrent) setStatus("Authentication Error");
       }
     };
 
-    socket.onerror = (error) => {
-      console.error("WebSocket Error:", error);
-      setStatus("Connection Error");
-    };
+    establishSecureConnection();
 
     return () => {
-      if (socket.readyState === WebSocket.OPEN) {
+      isCurrent = false;
+      if (socket && socket.readyState === WebSocket.OPEN) {
         socket.close();
       }
     };
-  }, []);
+  }, [token]);
 
-
-  function selectAllSubreddits(){
-      const allSubreddits = []
-      Object.values(cacheSummary).map((e)=>{
-        allSubreddits.push(e.id)
-      })
-      setSubredditIDS(allSubreddits)
+  function selectAllSubreddits() {
+    const allSubreddits = [];
+    Object.values(cacheSummary).map((e) => {
+      allSubreddits.push(e.id);
+    });
+    setSubredditIDS(allSubreddits);
   }
 
   function handleAnalysisTypes(type, checked) {
-
-    if(type === "Keywords"){
-      selectAllSubreddits()
+    if (type === "Keywords") {
+      selectAllSubreddits();
     }
 
-    // console.log(type.toLowerCase());
     const currentTypes = [...analysisTypes];
-    // console.log(currentTypes);
     const index = currentTypes.findIndex((e) => e === type.toLowerCase());
     if (index === -1 && checked) {
       currentTypes.push(type.toLowerCase());
@@ -175,7 +198,6 @@ export default function ReanalyzeSection() {
 
   function handleSubredditIDS(id, checked) {
     const currentIDS = [...subredditIDS];
-    console.log(id);
     const index = currentIDS.findIndex((e) => e === id);
     if (index === -1 && checked) {
       currentIDS.push(id);
@@ -196,8 +218,8 @@ export default function ReanalyzeSection() {
       setTimeRemaining("");
     }
 
-    if(analysisTypes.findIndex((e)=> e === "keywords") !== -1){
-      selectAllSubreddits()
+    if (analysisTypes.findIndex((e) => e === "keywords") !== -1) {
+      selectAllSubreddits();
     }
 
     const data = {
@@ -213,7 +235,6 @@ export default function ReanalyzeSection() {
       `Do you want to start analysis on ${analysisTypes} from ${dateRange[0]} to ${dateRange[1]} with Only Null as ${onlyNull}`,
     );
     if (!confirmStart) {
-      console.log(JSON.stringify(data));
       return;
     }
 
@@ -224,7 +245,7 @@ export default function ReanalyzeSection() {
     ) {
       socketRef.current.send(JSON.stringify(data));
     } else {
-      console.error("Cannot send command: WebSocket is disconnected.");
+      console.error("Cannot execute payload broadcast channel: Channel state disconnected.");
     }
   };
 
@@ -250,7 +271,6 @@ export default function ReanalyzeSection() {
         <ProgressBar value={progress} processingStatus={"Reanalyze Progress"} />
       </HStack>
 
-      {/* Real-time Meta Metrics Indicators Display */}
       {currentStatus === "running" && totalPost > 0 && (
         <HStack gap={6} fontSize="sm" color="gray.400" fontWeight="bold">
           <Text>
@@ -289,7 +309,6 @@ export default function ReanalyzeSection() {
         gap={4}
       >
         {loadingData ? (
-          // <Box pos="absolute" inset="0" bg="gray.700/80">
           <Center h="full">
             <Spinner
               borderWidth="4px"
@@ -299,7 +318,6 @@ export default function ReanalyzeSection() {
             />
           </Center>
         ) : (
-          // </Box>
           Object.keys(cacheSummary).map((sub) => (
             <Checkbox.Root
               checked={
@@ -378,7 +396,11 @@ export default function ReanalyzeSection() {
 
       <HStack mt={5}>
         <Blockquote.Root>
-          <Blockquote.Content fontSize="2xl"><Highlight query={"Connected"} styles={{ color: "gray.100", backgroundColor: "green.600", padding: 1, borderRadius: 3 }}>{status}</Highlight></Blockquote.Content>
+          <Blockquote.Content fontSize="2xl">
+            <Highlight query={"Connected"} styles={{ color: "gray.100", backgroundColor: "green.600", padding: 1, borderRadius: 3 }}>
+              {status}
+            </Highlight>
+          </Blockquote.Content>
           <Blockquote.Content
             fontSize="xl"
             color={currentStatus === "running" ? "green.500" : "yellow.400"}

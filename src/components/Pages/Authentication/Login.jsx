@@ -28,13 +28,6 @@ export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate()
 
-  //   useEffect(() => {
-  //     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-  //       console.log(firebaseUser);
-  //     });
-
-  //     return () => unsubscribe();
-  //   }, []);
 
   async function loginHandler() {
     // console.log(email,password)
@@ -48,6 +41,13 @@ export default function Login() {
       );
 
       const token = await userCredentials.user.getIdToken();
+      
+      const tokenDetails = {
+        token: token,
+        created_at: Date.now()
+      }
+      console.log(tokenDetails)
+      localStorage.setItem("tokenDetails",JSON.stringify(tokenDetails))
 
       const response = await fetch(`${BASE_URL}/users/me`, {
         headers: { Authorization: `Bearer ${token}` },

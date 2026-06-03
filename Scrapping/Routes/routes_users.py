@@ -2,7 +2,13 @@ import secrets
 from fastapi import APIRouter, Depends, HTTPException, Body
 from firebase_admin import auth as firebase_auth
 from auth_guard import verify_client_identity, require_role
-from database.users import db_create_user_profile, db_assign_api_key
+from database.users import (
+    db_create_user_profile, 
+    db_assign_api_key,
+    db_get_all_users,
+    db_update_user_profile,
+    db_delete_user_profile
+)
 
 router = APIRouter(prefix="/users", tags=["User & Identity Profiles Management"])
 
@@ -66,3 +72,38 @@ async def fetch_current_client_profile(client: dict = Depends(verify_client_iden
         "role": client["role"],
         "authenticated_via": client["auth_type"]
     }
+
+
+@router.get("")
+async def get_all_users(super_admin: dict = Depends(require_role(["Super Admin"]))):
+    """Retrieves a complete list of registered user profiles and their API limits."""
+    return await db_get_all_users()
+
+
+@router.put("/{user_id}")
+async def update_user_profile(
+    user_id: int,
+    payload: dict = Body(...),
+    super_admin: dict = Depends(require_role(["Super Admin"]))
+):
+    """Updates a user's access role or API consumption limit."""
+    role = payload.get("role")
+    calls_limit = payload.get("api_calls_limit")
+    
+    valid_roles = ["Super Admin", "Admin", "Guest User", "Developer"]
+    if role and role not in valid_roles:
+        raise HTTPException(status_code=400, detail=f"Invalid target configuration role. Supported: {valid_roles}")
+        
+    success = await db_update_user_profile(user_id, role, calls_limit)
+    if not success:
+        raise HTTPException(status_code=404, detail="User record not found in the system.")
+    return {"status": "success", "message": "User profile updated successfully."}
+
+
+@router.delete("/{user_id}")
+async def delete_user_profile(user_id: int, super_admin: dict = Depends(require_role(["Super Admin"]))):
+    """Permanently deletes a user from the local PostgreSQL database."""
+    success = await db_delete_user_profile(user_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="User record not found in the system.")
+    return {"status": "success", "message": "User profile deleted successfully."}

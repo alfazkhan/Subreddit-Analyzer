@@ -21,9 +21,6 @@ const authSlice = createSlice({
       state.role = 'Guest User';
       state.isAuthenticated = false;
     },
-    setAuthLoading: (state, action) => {
-      state.isLoading = action.payload;
-    }
   },
 });
 

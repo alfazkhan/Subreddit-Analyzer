@@ -6,7 +6,6 @@ import UserInput from "./UserInput.jsx";
 import SubredditsSuggestions from "./SubredditsSuggestion.jsx";
 import DataTabs from "./Data/DataTabs.jsx";
 import UpcomingFeatures from "../../Feature Tracker/UpcomingFeatures.jsx";
-import { Link } from "react-router-dom";
 
 import { BASE_URL } from "../../../Constants.js";
 import Logs from "@/components/ui-components/Logs.jsx";
@@ -34,9 +33,7 @@ export default function Homepage() {
     <Flex direction="column" justifyContent="center" width="80%" margin="auto">
       <Flex gap="4" align="anchor-center" justify="space-between" margin="5">
         <Header text={"Subreddit Analyzer"} highlight="Analyzer" />
-        <Link to={"/dashboard"}>
           <ServerStatus />
-        </Link>
       </Flex>
 
       <Flex justifyContent="center" gap="2" margin="5" flexDirection="column">
