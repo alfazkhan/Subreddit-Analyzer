@@ -1,16 +1,18 @@
-import { Button, Dialog, Portal, Alert } from "@chakra-ui/react";
+import { Button, Dialog, Portal, IconButton } from "@chakra-ui/react";
 import { useState } from "react";
 import LoadingAndError from "./LoadingAndError";
 import { useMutation } from "@tanstack/react-query";
-import { sendingData } from "@/util/http";
+import { editingData, queryClient, sendingData } from "@/util/http";
 import { useSelector } from "react-redux";
+import { FiEdit } from "react-icons/fi";
 
 export default function FormDialog({
   title,
   triggerText,
   initialValues,
   children,
-  onFormSuccess
+  onFormSuccess,
+  mode,
 }) {
   const [open, setOpen] = useState(false);
   const [formValues, setFormValues] = useState(initialValues);
@@ -18,10 +20,11 @@ export default function FormDialog({
   const authState = useSelector((state) => state.authState);
 
   const { mutate, isError, error, isPending } = useMutation({
-    mutationFn: sendingData,
+    mutationFn: mode === "new" ? sendingData : editingData,
     onSuccess: () => {
       setOpen(false);
-      onFormSuccess()
+      onFormSuccess();
+      queryClient.invalidateQueries({ queryKey: ["users"] });
     },
   });
 
@@ -29,7 +32,7 @@ export default function FormDialog({
     setFormValues((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleFormSubmit = async (e) => {
+  const handleNewUserSubmit = async (e) => {
     e.preventDefault();
     mutate({
       endpoint: "users/create",
@@ -41,13 +44,43 @@ export default function FormDialog({
     });
   };
 
+  const handleEditUserSubmit = async (e) => {
+    e.preventDefault();
+    const bodyValues = {
+      email: formValues.email,
+      password: formValues.password,
+      name: formValues.name,
+      role: formValues.role,
+      api_calls_count: formValues.api_calls_count,
+      api_calls_limit: formValues.api_calls_limit,
+    };
+
+    console.log(bodyValues);
+
+    mutate({
+      endpoint: `users/${formValues.id}`,
+      headers: {
+        Authorization: `Bearer ${authState.token}`,
+        "Content-Type": "application/json",
+      },
+      body: bodyValues,
+    });
+  };
+
   return (
     <>
       <Dialog.Root open={open} onOpenChange={(e) => setOpen(e.open)}>
-        <Dialog.Trigger asChild>
-          <Button size="sm" color="white" fontWeight="bolder" bg="green.600">
-            {triggerText}
-          </Button>
+        <Dialog.Trigger>
+          {mode === "new" && (
+            <Button size="sm" color="white" fontWeight="bolder" bg="green.600">
+              {triggerText}
+            </Button>
+          )}
+          {mode === "edit" && (
+            <IconButton size="2xs" variant="solid" colorPalette="blue">
+              <FiEdit />
+            </IconButton>
+          )}
         </Dialog.Trigger>
         <Portal>
           <Dialog.Backdrop />
@@ -56,7 +89,9 @@ export default function FormDialog({
               color="black"
               borderColor="whiteAlpha.200"
               as="form"
-              onSubmit={handleFormSubmit}
+              onSubmit={
+                mode === "new" ? handleNewUserSubmit : handleEditUserSubmit
+              }
             >
               <Dialog.Header>
                 <Dialog.Title color="orange.500" fontWeight="bolder">

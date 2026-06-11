@@ -15,17 +15,10 @@ import { useSelector } from "react-redux";
 
 const userRoles = ["Super Admin", "Admin", "Guest User", "Developer"];
 
-export default function NewUser() {
+export default function EditUser({initialUserValues}) {
   const authState = useSelector((state) => state.authState);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const initialUserValues = {
-    email: "user@example.com",
-    password: "",
-    name: "Full Name",
-    role: "Guest User",
-    api_calls_limit: 1000,
-  };
 
   function onSuccessHandler() {
     setIsSuccess(true);
@@ -37,11 +30,11 @@ export default function NewUser() {
         {authState.role === "Super Admin" && (
           <>
             <FormDialog
-              title="Create New User Profile"
-              triggerText="+ Create New User"
+              title="Edit User Profile"
+              triggerText="Edit User"
               initialValues={initialUserValues}
               onFormSuccess={onSuccessHandler}
-              mode="new"
+              mode="edit"
             >
               {({ values, onChange }) => (
                 <>
@@ -61,7 +54,7 @@ export default function NewUser() {
                     />
                   </Field.Root>
                   <Field.Root required>
-                    <Field.Label>Password</Field.Label>
+                    <Field.Label>New Password</Field.Label>
                     <PasswordInput
                       type="password"
                       value={values.password}
@@ -87,6 +80,16 @@ export default function NewUser() {
                     </NativeSelect.Root>
                   </Field.Root>
                   <Field.Root required>
+                    <Field.Label>API Calls Count</Field.Label>
+                    <Input
+                      type="number"
+                      value={values.api_calls_count}
+                      onChange={(e) =>
+                        onChange("api_calls_count", +e.target.value)
+                      }
+                    />
+                  </Field.Root>
+                  <Field.Root required>
                     <Field.Label>API Calls Limit</Field.Label>
                     <Input
                       type="number"
@@ -104,11 +107,11 @@ export default function NewUser() {
       </Flex>
       {isSuccess &&
         createPortal(
-          <Alert.Root status="success" variant="solid">
+          <Alert.Root status="info" variant="solid">
             <Alert.Indicator />
             <Alert.Content>
               <Alert.Title>Success!</Alert.Title>
-              <Alert.Description>User has been created!</Alert.Description>
+              <Alert.Description>User details has been editied</Alert.Description>
             </Alert.Content>
             <CloseButton
               pos="relative"

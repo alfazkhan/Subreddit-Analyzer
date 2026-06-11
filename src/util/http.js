@@ -41,6 +41,25 @@ export async function sendingData({ endpoint, signal, body, headers }) {
   }
 }
 
+export async function editingData({ endpoint, signal, body, headers }) {
+  const response = await fetch(`${BASE_URL}/${endpoint}`, {
+    method: "PUT",
+    signal: signal,
+    body: JSON.stringify(body),
+    headers: headers,
+  });
+  const resData = await response.json();
+  if (!response.ok) {
+    const error = new Error();
+    error.message =
+      resData.detail || "An error occured while sending the data...";
+    error.status = `${response.status}: ${response.statusText}`;
+    throw error;
+  } else {
+    return resData;
+  }
+}
+
 export async function deletingData({ endpoint, signal, headers }) {
   const response = await fetch(`${BASE_URL}/${endpoint}`, {
     method: "DELETE",

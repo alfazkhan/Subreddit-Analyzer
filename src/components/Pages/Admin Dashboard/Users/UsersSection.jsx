@@ -3,7 +3,6 @@ import DataTable from "@/components/ui-components/DataTable";
 import { useState } from "react";
 import {
   Table,
-  IconButton,
   HStack,
   Alert,
   CloseButton,
@@ -13,10 +12,10 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchingData } from "@/util/http";
 import LoadingAndError from "@/components/ui-components/LoadingAndError";
 import NewUser from "./NewUser";
-import { FiEdit, FiTrash2 } from "react-icons/fi";
 
 import DeleteUser from "./DeleteUser";
 import { createPortal } from "react-dom";
+import EditUser from "./EditUser";
 
 export default function UsersSection() {
   const [dataSlice, setdataSlice] = useState([]);
@@ -89,9 +88,7 @@ export default function UsersSection() {
             </Table.Cell>
             <Table.Cell>
               <HStack>
-                <IconButton size="2xs" variant="solid" colorPalette="blue">
-                  <FiEdit />
-                </IconButton>
+                <EditUser initialUserValues={user} />
                 <DeleteUser user={user} onDeleteSuccess={setDeletedUserInfo} />
               </HStack>
             </Table.Cell>
