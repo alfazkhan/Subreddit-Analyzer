@@ -1,12 +1,7 @@
 import DataPagination from "@/components/ui-components/DataPagination";
 import DataTable from "@/components/ui-components/DataTable";
 import { useState } from "react";
-import {
-  Table,
-  HStack,
-  Alert,
-  CloseButton,
-} from "@chakra-ui/react";
+import { Table, HStack, Alert, CloseButton, Text } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
 import { fetchingData } from "@/util/http";
@@ -16,6 +11,7 @@ import NewUser from "./NewUser";
 import DeleteUser from "./DeleteUser";
 import { createPortal } from "react-dom";
 import EditUser from "./EditUser";
+import GenerateAPIKey from "./GenerateAPIKey";
 
 export default function UsersSection() {
   const [dataSlice, setdataSlice] = useState([]);
@@ -72,6 +68,7 @@ export default function UsersSection() {
           "Name",
           "Email",
           "Role",
+          "API Key",
           "API Calls Count",
           "API Calls limit",
           "",
@@ -82,6 +79,13 @@ export default function UsersSection() {
             <Table.Cell>{user.name}</Table.Cell>
             <Table.Cell>{user.email}</Table.Cell>
             <Table.Cell>{user.role}</Table.Cell>
+            <Table.Cell maxWidth="100px">
+              {user.api_key ? (
+                <Text lineClamp="10">{user.api_key}</Text>
+              ) : (
+                <GenerateAPIKey />
+              )}
+            </Table.Cell>
             <Table.Cell>{user.api_calls_count}</Table.Cell>
             <Table.Cell>
               {user.api_calls_limit === -1 ? "Unlimited" : user.api_calls_limit}

@@ -330,8 +330,42 @@ Returns the caller's profile information and role. Requires authentication (API 
   "id": 12,
   "email": "user@example.com",
   "role": "Admin",
-  "authenticated_via": "api_key"
+  "authenticated_via": "api_key",
+  "api_key": null
 }
+```
+
+* **Special behavior:** if the caller is a `Super Admin`, the endpoint includes `api_key` with the stored API key value when available. For all other roles, `api_key` is always `null`.
+
+### `GET /users`
+Retrieves the full list of registered user profiles. Only `Super Admin` may call this endpoint.
+* **Request Body:** None
+* **Response Format:** JSON Array of User Objects
+```json
+[
+  {
+    "id": 12,
+    "firebase_uid": "UID123",
+    "name": "Admin User",
+    "email": "admin@example.com",
+    "role": "Super Admin",
+    "api_calls_limit": 1000,
+    "api_calls_count": 0,
+    "api_key": "alfaz_live_...",
+    "created_at": "2026-06-11T12:00:00"
+  },
+  {
+    "id": 13,
+    "firebase_uid": "UID456",
+    "name": "Guest User",
+    "email": "guest@example.com",
+    "role": "Guest User",
+    "api_calls_limit": 1000,
+    "api_calls_count": 15,
+    "api_key": null,
+    "created_at": "2026-06-10T16:30:00"
+  }
+]
 ```
 
 ### Authorization Notes

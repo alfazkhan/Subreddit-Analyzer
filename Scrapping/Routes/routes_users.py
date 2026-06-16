@@ -6,6 +6,7 @@ from database.users import (
     db_create_user_profile, 
     db_assign_api_key,
     db_get_all_users,
+    db_get_user_by_id,
     db_update_user_profile,
     db_delete_user_profile
 )
@@ -61,22 +62,29 @@ async def provision_api_key(client: dict = Depends(verify_client_identity)):
     """
     secure_token = f"alfaz_live_{secrets.token_urlsafe(32)}"
     await db_assign_api_key(client["id"], secure_token)
+    
     return {
         "status": "success",
         "api_key": secure_token,
-        "note": "Copy this token carefully. For security reasons, it will not be displayed again."
+        # "note": "Copy this token carefully. For security reasons, it will not be displayed again."
     }
 
 
 @router.get("/me")
 async def fetch_current_client_profile(client: dict = Depends(verify_client_identity)):
     """Returns profile parameters and verified scope assignments for the active caller."""
+    user_record = await db_get_user_by_id(client["id"])
+    api_key = None
+    if user_record and client["role"] == "Super Admin":
+        api_key = user_record.get("api_key")
+
     return {
         "id": client["id"],
-        "name": client["name"],
+        "name": user_record.get("name") if user_record else None,
         "email": client["email"],
         "role": client["role"],
-        "authenticated_via": client["auth_type"]
+        "authenticated_via": client["auth_type"],
+        "api_key": api_key
     }
 
 

@@ -8,10 +8,15 @@ import { QueryClient } from "@tanstack/react-query";
 export const queryClient = new QueryClient();
 
 export async function fetchingData({ endpoint, signal, headers }) {
-  const response = await fetch(`${BASE_URL}/${endpoint}`, {
-    signal: signal,
+
+  const fetchOptions = {
     headers: headers,
-  });
+  };
+
+  if (signal) {
+    fetchOptions.signal = signal;
+  }
+  const response = await fetch(`${BASE_URL}/${endpoint}`, fetchOptions);
   const resData = await response.json();
   if (!response.ok) {
     const error = new Error("An error occured while fetching the data...");

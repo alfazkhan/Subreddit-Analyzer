@@ -6,7 +6,7 @@ async def db_get_all_users():
     pool = await get_db_pool()
     async with pool.acquire() as conn:
         rows = await conn.fetch('''
-            SELECT id, firebase_uid, name, email, role, api_calls_limit, api_calls_count, created_at 
+            SELECT id, firebase_uid, name, email, role, api_calls_limit, api_calls_count, api_key, created_at 
             FROM users 
             ORDER BY created_at DESC
         ''')
@@ -99,6 +99,16 @@ async def db_get_user_by_uid(uid: str):
     """
     async with pool.acquire() as conn:
         return await conn.fetchrow(query, uid)
+
+async def db_get_user_by_id(user_id: int):
+    pool = await get_db_pool()
+    query = """
+        SELECT id, name, email, role, api_key
+        FROM public.users
+        WHERE id = $1;
+    """
+    async with pool.acquire() as conn:
+        return await conn.fetchrow(query, user_id)
 
 async def db_increment_api_usage(user_id: int):
     pool = await get_db_pool()

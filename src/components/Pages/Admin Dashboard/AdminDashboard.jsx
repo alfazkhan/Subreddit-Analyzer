@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import Header from "../../ui-components/Header";
-import IgnoredWordsSection from "./IgnoredWordsSection";
+import IgnoredWordsSection from "./Ignored-Words/IgnoredWordsSection";
 import ReanalyzeSection from "./ReanalyzeSection";
 import { Flex, Tabs } from "@chakra-ui/react";
 import SubredditsSection from "./SubredditsSection";
@@ -28,7 +28,7 @@ export default function AdminDashboard() {
       </Flex>
       <Tabs.Root
         variant="plain"
-        defaultValue="subreddits"
+        defaultValue="ignored words"
         orientation="horizontal"
         fitted
         lazyMount
