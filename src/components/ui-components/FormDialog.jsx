@@ -1,4 +1,4 @@
-import { Button, Dialog, Portal, IconButton } from "@chakra-ui/react";
+import { Button, Dialog, Portal, IconButton, Text } from "@chakra-ui/react";
 import { useState } from "react";
 import LoadingAndError from "./LoadingAndError";
 import { useMutation } from "@tanstack/react-query";
@@ -70,16 +70,17 @@ export default function FormDialog({
   return (
     <>
       <Dialog.Root open={open} onOpenChange={(e) => setOpen(e.open)}>
-        <Dialog.Trigger>
-          {mode === "new" && (
+        <Dialog.Trigger asChild>
+          {mode === "new" ? (
             <Button size="sm" color="white" fontWeight="bolder" bg="green.600">
               {triggerText}
             </Button>
-          )}
-          {mode === "edit" && (
-            <IconButton size="2xs" variant="solid" colorPalette="blue">
-              <FiEdit />
-            </IconButton>
+          ) : (
+            mode === "edit" && (
+              <IconButton size="2xs" variant="solid" colorPalette="blue">
+                <FiEdit />
+              </IconButton>
+            )
           )}
         </Dialog.Trigger>
         <Portal>

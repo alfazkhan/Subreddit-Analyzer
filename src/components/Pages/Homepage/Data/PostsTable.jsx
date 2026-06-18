@@ -125,8 +125,8 @@ export default function KeywordTable({ data: postsData }) {
             "Entities",
           ]}
         >
-          {filteredData.map((post) => (
-            <Table.Row key={post.id} color="gray.100">
+          {paginatedSlice.map((post) => (
+            <Table.Row key={post.id} color="gray.900">
               <Table.Cell maxW="200px" whiteSpace="normal" verticalAlign="top">
                 <Link
                   color="blue.400"
@@ -154,7 +154,7 @@ export default function KeywordTable({ data: postsData }) {
                         variant="solid"
                         size="xs"
                         fontSize="x-small"
-                        color="gray.400"
+                        // color="gray.400"
                         padding={1}
                         borderColor="gray.200"
                       >

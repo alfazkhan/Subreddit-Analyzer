@@ -80,7 +80,7 @@ export default function NewUser() {
                         }
                       >
                         {userRoles.map((role) => (
-                          <option value={role}>{role}</option>
+                          <option key={role} value={role}>{role}</option>
                         ))}
                       </NativeSelect.Field>
                       <NativeSelect.Indicator />

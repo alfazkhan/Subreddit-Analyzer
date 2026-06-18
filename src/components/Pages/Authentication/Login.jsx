@@ -30,9 +30,13 @@ export default function Login() {
   const navigate = useNavigate();
   const authState = useSelector((state) => state.authState);
 
-  if (authState.isAuthenticated) {
-    navigate("/dashboard");
-  }
+  useEffect(() => {
+    if (authState.isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [authState.isAuthenticated, navigate]);
+
+  
   async function loginHandler() {
     setLoading(true);
 

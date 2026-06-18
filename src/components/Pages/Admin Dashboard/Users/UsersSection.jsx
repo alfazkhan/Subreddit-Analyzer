@@ -1,6 +1,6 @@
 import DataPagination from "@/components/ui-components/DataPagination";
 import DataTable from "@/components/ui-components/DataTable";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Table, HStack, Alert, CloseButton, Text } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
@@ -12,11 +12,13 @@ import DeleteUser from "./DeleteUser";
 import { createPortal } from "react-dom";
 import EditUser from "./EditUser";
 import GenerateAPIKey from "./GenerateAPIKey";
+import paginationDataSlicer from "@/util/paginationDataSlicer";
 
 export default function UsersSection() {
-  const [dataSlice, setdataSlice] = useState([]);
   const [deletedUserInfo, setDeletedUserInfo] = useState(null);
   const authState = useSelector((state) => state.authState);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20); //Will be implemented later
 
   const {
     data: users,
@@ -33,6 +35,10 @@ export default function UsersSection() {
         headers: { Authorization: `Bearer ${authState.token}` },
       }),
   });
+
+  const paginatedSlice = useMemo(() => {
+    return paginationDataSlicer(users, currentPage, pageSize);
+  }, [users, currentPage, pageSize]);
 
   if (isError || isPending || isLoading) {
     return (
@@ -74,7 +80,7 @@ export default function UsersSection() {
           "",
         ]}
       >
-        {dataSlice.map((user) => (
+        {paginatedSlice.map((user) => (
           <Table.Row key={user.id} textAlign="center">
             <Table.Cell>{user.name}</Table.Cell>
             <Table.Cell>{user.email}</Table.Cell>
@@ -99,7 +105,12 @@ export default function UsersSection() {
           </Table.Row>
         ))}
       </DataTable>
-      <DataPagination data={users} setPaginationData={setdataSlice} />
+      <DataPagination
+        totalItems={users.length}
+        currentPage={currentPage}
+        pageSize={pageSize}
+        onPageChange={(newPage) => setCurrentPage(newPage)}
+      />
     </>
   );
 }

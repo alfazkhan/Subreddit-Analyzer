@@ -28,7 +28,7 @@ export default function AdminDashboard() {
       </Flex>
       <Tabs.Root
         variant="plain"
-        defaultValue="ignored words"
+        defaultValue="manage users"
         orientation="horizontal"
         fitted
         lazyMount
@@ -44,7 +44,7 @@ export default function AdminDashboard() {
         <Tabs.List>
           {Object.keys(tabsConfig).map((tab)=>{
             if(tabsConfig[tab].findIndex(e=> e===authState.role) !== -1){
-              return <Tabs.Trigger fontWeight="bolder" color="gray.100" value={tab.toLowerCase()}>{tab}</Tabs.Trigger>
+              return <Tabs.Trigger key={tab} fontWeight="bolder" color="gray.100" value={tab.toLowerCase()}>{tab}</Tabs.Trigger>
             }
           })}
           <Tabs.Indicator rounded="l2" />

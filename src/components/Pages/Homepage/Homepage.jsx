@@ -36,7 +36,7 @@ export default function Homepage() {
 
   const {
     mutate,
-    data: posts,
+    data: posts = [],
     isPending,
     isLoading,
     isError,
@@ -80,9 +80,12 @@ export default function Homepage() {
         <Logs/>
       </Flex> */}
       {errorContent && errorContent}
-      <Flex justifyContent="center" gap="4" margin="5" flexDirection="column">
-        <DataTabs postsData={posts || []} processingStatus={isPending} />
-      </Flex>
+        <Flex justifyContent="center" gap="4" margin="5" flexDirection="column">
+          <DataTabs
+            postsData={posts || []}
+            processingStatus={isPending}
+          />
+        </Flex>
       {/* {import.meta.env.PROD && (
         <Flex justifyContent="center" gap="4" margin="5" flexDirection="column">
           <UpcomingFeatures />

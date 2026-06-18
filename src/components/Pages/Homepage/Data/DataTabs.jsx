@@ -21,9 +21,11 @@ export default function DataTabs({ postsData, processingStatus }) {
       currentdate.getSeconds() +
       ":" +
       currentdate.getMilliseconds();
-
-    // console.log("App.jsx rendered at:", datetime);
   }, []);
+
+  useEffect(() => {
+    console.log(processingStatus);
+  }, [processingStatus]);
 
   const TabsListData = [
     {
@@ -57,6 +59,11 @@ export default function DataTabs({ postsData, processingStatus }) {
       content: <EmotionsThroughoutDay data={postsData} />,
     },
   ];
+
+  if (postsData.length === 0 && !processingStatus) {
+    return;
+  }
+
 
   return (
     <Box position="relative" aria-busy="true" userSelect="none">
@@ -98,7 +105,7 @@ export default function DataTabs({ postsData, processingStatus }) {
           </Tabs.Content>
         ))}
       </Tabs.Root>
-      {(postsData.length === 0 || processingStatus) && (
+      {(processingStatus) && (
         <Box pos="absolute" inset="0" bg="gray.700/80">
           <Center h="full">
             <Spinner

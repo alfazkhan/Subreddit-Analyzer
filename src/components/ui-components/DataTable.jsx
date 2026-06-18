@@ -4,11 +4,11 @@ export default function DataTable({ tableHeaders, children }) {
   return (
     <>
       <Table.Root
-        colorPalette="orange"
+        // colorPalette="gr"
         variant="outline"
         // showColumnBorder
         stickyHeader
-        css={{ "& td": { textAlign: "center" } }}
+        css={{ "& td": { textAlign: "center", color:"colorPalette.100" } }}
       >
         <Table.Caption />
         <Table.Header>
