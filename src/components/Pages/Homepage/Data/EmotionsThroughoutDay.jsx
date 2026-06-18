@@ -48,7 +48,7 @@ export const options = {
         display: false,
       },
       grid: {
-        color: "#fff"
+        color: "#fff",
       },
     },
   },
@@ -84,7 +84,6 @@ export default function EmotionsThroughoutDay({ data: postsData }) {
 
       counts[post.sentiment][localHour]++;
     });
-    console.log(counts);
 
     return counts;
   }, [postsData]);
@@ -96,11 +95,10 @@ export default function EmotionsThroughoutDay({ data: postsData }) {
       {
         label: "Positive",
         data: hourlySentimentData.Positive,
-        borderColor: "rgb(40, 175, 28)",
-        // borderWidth: 1,
-        backgroundColor: "rgb(40, 175, 28)",
+        borderColor: "#dd6b20",
+        backgroundColor: "rgba(221, 107, 32, 0.1)",
         tension: 0.4,
-      pointRadius: 4,
+        pointRadius: 4,
       },
       // {
       //   label: "Neutral",
@@ -115,7 +113,7 @@ export default function EmotionsThroughoutDay({ data: postsData }) {
         backgroundColor: "rgb(194, 36, 36)",
         borderColor: "rgb(194, 36, 36)",
         tension: 0.4,
-      pointRadius: 4,
+        pointRadius: 4,
         // borderWidth: 1,
       },
     ],

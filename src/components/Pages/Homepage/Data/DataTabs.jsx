@@ -23,9 +23,6 @@ export default function DataTabs({ postsData, processingStatus }) {
       currentdate.getMilliseconds();
   }, []);
 
-  useEffect(() => {
-    console.log(processingStatus);
-  }, [processingStatus]);
 
   const TabsListData = [
     {
@@ -68,7 +65,7 @@ export default function DataTabs({ postsData, processingStatus }) {
   return (
     <Box position="relative" aria-busy="true" userSelect="none">
       <Tabs.Root
-        defaultValue="Posts Table"
+        defaultValue="Posts Frequency"
         variant="plain"
         lazyMount
         unmountOnExit
