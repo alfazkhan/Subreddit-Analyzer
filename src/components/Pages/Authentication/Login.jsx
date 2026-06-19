@@ -14,9 +14,10 @@ import Header from "@/components/ui-components/Header";
 import { PasswordInput } from "@/components/ui/password-input";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { BASE_URL } from "@/Constants";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { authSliceActions } from "@/store/authSlice";
 import { useNavigate } from "react-router-dom";
+import Loading from "@/components/ui-components/LoadingAndError";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -26,11 +27,17 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const authState = useSelector((state) => state.authState);
 
+  useEffect(() => {
+    if (authState.isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [authState.isAuthenticated, navigate]);
 
+  
   async function loginHandler() {
-    // console.log(email,password)
     setLoading(true);
 
     try {
@@ -41,17 +48,15 @@ export default function Login() {
       );
 
       const token = await userCredentials.user.getIdToken();
-      
-
 
       const response = await fetch(`${BASE_URL}/users/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!response.ok) throw new Error("Database profile sync failed."); //Throwing error if there's a user mismatch
-      
+
       const dbUser = await response.json();
-      
+
       dispatch(
         authSliceActions.setCredentials({
           user: { uid: userCredentials.user.uid, email, name: dbUser.name },
@@ -61,9 +66,8 @@ export default function Login() {
       );
 
       setLoading(false);
-      navigate('/dashboard');
+      navigate("/dashboard");
       console.log(dbUser);
-
     } catch (error) {
       setErrorMsg(error.message);
       setLoading(false);
@@ -116,6 +120,18 @@ export default function Login() {
                 disabled={loading}
               >
                 Login
+              </Button>
+            </Stack>
+            <Stack mt="5">
+              <Button
+                size="sm"
+                color="black"
+                fontWeight="bold"
+                bg="gray.100"
+                onClick={() => navigate("/")}
+                disabled={loading}
+              >
+                Back
               </Button>
             </Stack>
           </GridItem>

@@ -1,7 +1,6 @@
 import DataPagination from "@/components/ui-components/DataPagination";
 import paginationDataSlicer from "../../../../util/paginationDataSlicer";
 import {
-  HStack,
   Table,
   Badge,
   Flex,
@@ -11,31 +10,45 @@ import {
   Button,
   Link,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 import { LuChevronDown } from "react-icons/lu";
 import DataTable from "@/components/ui-components/DataTable";
+import PostTableFilter from "./PostTableFilters";
 
 export default function KeywordTable({ data: postsData }) {
   const [sentiment, setSentiment] = useState("All");
   const [topics, setTopics] = useState("All");
-  const [dataSlice, setdataSlice] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20); //Will be implemented later
 
-  let data = postsData;
+  let filteredData = postsData;
 
   if (sentiment !== "All") {
-    data = postsData.filter((post) => post.sentiment === sentiment);
+    filteredData = postsData.filter((post) => {
+      if (!post.sentiment) {
+        return;
+      }
+      return post.sentiment === sentiment;
+    });
   }
 
   if (topics !== "All") {
-    data = postsData.filter((post) => {
+    filteredData = postsData.filter((post) => {
+      if (!post.topics) {
+        return;
+      }
       return JSON.parse(post.topics).primary_topic === topics;
     });
   }
 
+  const totalItems = filteredData?.length || 0;
+
   function parseTopics(topicData) {
     const parsedData = JSON.parse(topicData);
-    // console.log(parsedData.primary_topic);
+    if (Object.keys(parsedData).length === 0) {
+      return <Text>No Data</Text>;
+    }
     return (
       <>
         {parsedData?.labels.map((label, idx) => {
@@ -84,74 +97,18 @@ export default function KeywordTable({ data: postsData }) {
       });
   }
 
+  const paginatedSlice = useMemo(() => {
+    return paginationDataSlicer(filteredData, currentPage, pageSize);
+  }, [filteredData, currentPage, pageSize]);
+
   return (
     <Flex direction="column">
-      <HStack
-        width="full"
-        justifyContent="space-around"
-        gap="4"
-        mb={4}
-        borderWidth="0.1px"
-        padding={3}
-        borderColor="gray.700"
-      >
-        <Text fontSize="lg" fontWeight="bold">
-          Filter Posts By
-        </Text>
-        {config.map((emotion) => (
-          <Flex
-            key={emotion.label}
-            alignItems="center"
-            borderRadius="xs"
-            padding={2}
-            cursor="pointer"
-            backgroundColor={
-              emotion.label === sentiment ? "orange.600" : "gray.800"
-            }
-            _hover={{ bg: "whiteAlpha.100" }}
-            onClick={() => {
-              setSentiment(emotion.label);
-            }}
-          >
-            <Text>{emotion.emoji}</Text>
-            <Text fontWeight="bold" color="white">
-              {emotion.label}
-            </Text>
-          </Flex>
-        ))}
-      </HStack>
-      <HStack
-        width="full"
-        justifyContent="space-around"
-        gap="4"
-        mb={4}
-        borderWidth="0.1px"
-        padding={3}
-        borderColor="gray.700"
-        overflowX="scroll"
-      >
-        <Text fontSize="lg" fontWeight="bold">
-          Filter Posts By
-        </Text>
-        {topicsConfig.map((topic) => (
-          <Flex
-            key={topic}
-            alignItems="center"
-            borderRadius="xs"
-            padding={2}
-            cursor="pointer"
-            backgroundColor={topic === topics ? "orange.600" : "gray.800"}
-            _hover={{ bg: "whiteAlpha.100" }}
-            onClick={() => {
-              setTopics(topic);
-            }}
-          >
-            <Text fontSize="xx-small" fontWeight="bold" color="white">
-              {topic}
-            </Text>
-          </Flex>
-        ))}
-      </HStack>
+      <PostTableFilter
+        sentiment={sentiment}
+        onSentimentChange={setSentiment}
+        topics={topics}
+        onTopicsChange={setTopics}
+      />
       <Table.ScrollArea
         h="500px"
         borderWidth="1px"
@@ -168,8 +125,8 @@ export default function KeywordTable({ data: postsData }) {
             "Entities",
           ]}
         >
-          {dataSlice.map((post) => (
-            <Table.Row key={post.id} color="gray.100">
+          {paginatedSlice.map((post) => (
+            <Table.Row key={post.id} color="gray.900">
               <Table.Cell maxW="200px" whiteSpace="normal" verticalAlign="top">
                 <Link
                   color="blue.400"
@@ -197,7 +154,7 @@ export default function KeywordTable({ data: postsData }) {
                         variant="solid"
                         size="xs"
                         fontSize="x-small"
-                        color="gray.400"
+                        // color="gray.400"
                         padding={1}
                         borderColor="gray.200"
                       >
@@ -243,30 +200,13 @@ export default function KeywordTable({ data: postsData }) {
               </Table.Cell>
               <Table.Cell>
                 <Stack direction="column">
-                  {post.topics && parseTopics(post.topics)}
-                  {!post.topics && "No Data Right now..."}
+                  {!post.topics || Object.keys(post.topics).length === 0
+                    ? "No Data Right now..."
+                    : post.topics && parseTopics(post.topics)}
                 </Stack>
               </Table.Cell>
               <Table.Cell>
                 <Stack direction="column">
-                  {/* {JSON.parse(post.entities)
-                    .filter(
-                      (item, index, self) =>
-                        index === self.findIndex((t) => t.label === item.label),
-                    )
-                    .map((e, idx) => {
-                      if (labelConfig[e.label] !== undefined) {
-                        return (
-                          <Badge
-                            id={labelConfig[e.label]?.type}
-                            colorPalette={labelConfig[e.label]?.color}
-                            key={idx}
-                          >
-                            {labelConfig[e.label]?.type}
-                          </Badge>
-                        );
-                      }
-                    })} */}
                   {post.entities && parseEntities(post.entities, post.id)}
                   {!post.entities && "No Data Right now..."}
                 </Stack>
@@ -275,7 +215,12 @@ export default function KeywordTable({ data: postsData }) {
           ))}
         </DataTable>
       </Table.ScrollArea>
-      <DataPagination data={data} setPaginationData={setdataSlice} />
+      <DataPagination
+        totalItems={totalItems}
+        currentPage={currentPage}
+        pageSize={pageSize}
+        onPageChange={(newPage) => setCurrentPage(newPage)}
+      />
     </Flex>
   );
 }

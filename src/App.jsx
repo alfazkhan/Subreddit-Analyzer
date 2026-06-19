@@ -4,13 +4,14 @@ import Login from "./components/Pages/Authentication/Login";
 import Homepage from "./components/Pages/Homepage/Homepage";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ProtectedRoute from "./components/Pages/ProtectedRoute";
-import { useEffect, useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
+import { useEffect } from "react";
+
 import { useDispatch } from "react-redux";
-import { authSliceActions } from "./store/authSlice";
+
 import { BASE_URL } from "./Constants";
 import { serverStatusActions } from "./store/serverStatus";
-import { auth } from "../firebase_config";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient, Unsubscribe } from "./util/http";
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,8 @@ const router = createBrowserRouter([
   },
 ]);
 
+
+
 function App() {
   const dispatch = useDispatch();
 
@@ -39,7 +42,7 @@ function App() {
       try {
         const response = await fetch(`${BASE_URL}/summary`);
         const resData = await response.json();
-        
+
         if (!response.ok) {
           dispatch(serverStatusActions.serverStatusChange("offline"));
           throw new Error(resData.message || "Server is Offline!");
@@ -56,48 +59,14 @@ function App() {
   }, [dispatch]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (!firebaseUser) {
-        dispatch(authSliceActions.logoutUser());
-        // setIsAuthResolving(false);
-        return;
-      }
-
-      try {
-        const token = await firebaseUser.getIdToken();
-        
-        const response = await fetch(`${BASE_URL}/users/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (response.ok) {
-          const dbUser = await response.json();
-          dispatch(
-            authSliceActions.setCredentials({
-              user: {
-                uid: firebaseUser.uid,
-                email: firebaseUser.email,
-                name: dbUser.name
-              },
-              token: token,
-              role: dbUser.role,
-            })
-          );
-        } else {
-          dispatch(authSliceActions.logoutUser());
-        }
-      } catch (error) {
-        console.error("Authentication synchronization failed:", error);
-        dispatch(authSliceActions.logoutUser());
-      } 
-    });
-
-    // Safely unsubscribe from the auth listener when the component unmounts
-    return () => unsubscribe();
+    Unsubscribe(dispatch);
   }, [dispatch]);
 
-
-  return <RouterProvider router={router} />;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  );
 }
 
 export default App;

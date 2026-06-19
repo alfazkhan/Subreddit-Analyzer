@@ -9,7 +9,7 @@ import {
   Portal,
   Select,
   createListCollection,
-  Spinner
+  Spinner,
 } from "@chakra-ui/react";
 import { useEffect, useState, useMemo } from "react";
 import { userInputAction } from "../../../store/userInput.js";
@@ -31,8 +31,8 @@ export default function UserInput({ onFetchData, processingStatus }) {
 
   useEffect(() => {
     setPostCount(targetCount);
-    if(Object.keys(cacheSummary).length !== 0){
-      setSubredditName(Object.keys(cacheSummary)[0])
+    if (Object.keys(cacheSummary).length !== 0) {
+      setSubredditName(Object.keys(cacheSummary)[0]);
     }
     setSubredditName(subreddit);
   }, [subreddit, targetCount, cacheSummary]);
@@ -64,10 +64,10 @@ export default function UserInput({ onFetchData, processingStatus }) {
           <Select.Root
             collection={selectCollection}
             onValueChange={(e) => setSubredditName(e.value[0] || "")}
-            value={[subredditName] }
+            value={[subredditName]}
           >
             <Select.HiddenSelect required />
-            <Field.Label >
+            <Field.Label>
               Select Subreddit <Field.RequiredIndicator />
             </Field.Label>
             <Select.Control>
@@ -82,7 +82,13 @@ export default function UserInput({ onFetchData, processingStatus }) {
               <Select.Positioner>
                 <Select.Content color="gray.900">
                   {Object.keys(cacheSummary).map((subreddit, idx) => (
-                    <Select.Item item={subreddit} key={idx} onClick={()=>setSubredditName(subreddit)}>
+                    <Select.Item
+                      item={subreddit}
+                      key={idx}
+                      onClick={() => {
+                        setSubredditName(subreddit);
+                      }}
+                    >
                       {subreddit}
                       <Select.ItemIndicator />
                     </Select.Item>
@@ -124,13 +130,13 @@ export default function UserInput({ onFetchData, processingStatus }) {
             onClick={onFetchdataHandler}
             disabled={processingStatus}
           >
-            {processingStatus?
-            
-            <>
-            <Spinner color="white" /> Fetching Posts...
-            </>: 
-            
-            "Fetch Posts"}
+            {processingStatus ? (
+              <>
+                <Spinner color="white" /> Fetching Posts...
+              </>
+            ) : (
+              "Fetch Posts"
+            )}
           </Button>
         </HStack>
       </HStack>

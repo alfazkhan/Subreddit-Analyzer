@@ -1,30 +1,37 @@
 import { Table } from "@chakra-ui/react";
 
 export default function DataTable({ tableHeaders, children }) {
-
   return (
     <>
       <Table.Root
-        colorPalette="orange"
+        // colorPalette="gr"
         variant="outline"
         // showColumnBorder
         stickyHeader
+        css={{ "& td": { textAlign: "center", color:"colorPalette.100" } }}
       >
         <Table.Caption />
         <Table.Header>
           <Table.Row>
-            {tableHeaders.map((header)=>(
-            <Table.ColumnHeader color="orange.600" fontWeight="extrabold" key={header} textAlign="center">
-              {header}
-            </Table.ColumnHeader>
-            ))}
+            {tableHeaders.map((header) => {
+              if (!header) {
+                return;
+              }
+              return (
+                <Table.ColumnHeader
+                  color="orange.600"
+                  fontWeight="extrabold"
+                  key={header}
+                  textAlign="center"
+                >
+                  {header}
+                </Table.ColumnHeader>
+              );
+            })}
           </Table.Row>
         </Table.Header>
-        <Table.Body justifyContent="center">
-          {children}
-        </Table.Body>
+        <Table.Body>{children}</Table.Body>
       </Table.Root>
-
     </>
   );
 }

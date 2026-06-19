@@ -15,9 +15,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   </React.StrictMode>,
 );
 
-const script = document.createElement("script");
-script.src = "//cdn.jsdelivr.net/npm/eruda";
-script.onload = () => {
-  window.eruda.init();
-};
-document.body.appendChild(script);
+// if (!import.meta.env.PROD) {
+//   const script = document.createElement("script")
+//   script.src = "//cdn.jsdelivr.net/npm/eruda"
+//   script.onload = () => {
+//     window.eruda.init()
+//   };
+//   document.body.appendChild(script);
+// }

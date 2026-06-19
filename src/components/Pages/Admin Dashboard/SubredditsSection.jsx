@@ -1,27 +1,31 @@
 import DataPagination from "@/components/ui-components/DataPagination";
 import DataTable from "@/components/ui-components/DataTable";
-import { BASE_URL } from "@/Constants";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Table } from "@chakra-ui/react";
+import { useQuery } from "@tanstack/react-query";
+import { fetchingData } from "@/util/http";
+import LoadingAndError from "@/components/ui-components/LoadingAndError";
 
 export default function SubredditsSection() {
-  const [subreddits, setSubreddits] = useState([]);
   const [dataSlice, setdataSlice] = useState([]);
 
-  useEffect(() => {
-    async function fetchIgnoredWords() {
-      const response = await fetch(BASE_URL + "/subreddits");
-      const resData = await response.json();
-      if (!response.ok) {
-        throw new Error(resData.message || "Something went wrong!");
-      } else {
-        console.log(resData);
-        setSubreddits(resData);
-      }
-    }
+  const {
+    data: subreddits,
+    isPending,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["subreddits"],
+    queryFn: ({ signal }) => fetchingData({ endpoint: "subreddits", signal }),
+  });
 
-    fetchIgnoredWords();
-  }, []);
+  if (isError || isPending || isLoading) {
+    return (
+      <LoadingAndError isError={isError} error={error} />
+    );
+  }
+
 
   return (
     <>

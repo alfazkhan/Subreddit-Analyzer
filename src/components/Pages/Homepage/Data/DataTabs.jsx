@@ -21,9 +21,8 @@ export default function DataTabs({ postsData, processingStatus }) {
       currentdate.getSeconds() +
       ":" +
       currentdate.getMilliseconds();
-
-    // console.log("App.jsx rendered at:", datetime);
   }, []);
+
 
   const TabsListData = [
     {
@@ -58,10 +57,15 @@ export default function DataTabs({ postsData, processingStatus }) {
     },
   ];
 
+  if (postsData.length === 0 && !processingStatus) {
+    return;
+  }
+
+
   return (
     <Box position="relative" aria-busy="true" userSelect="none">
       <Tabs.Root
-        defaultValue="Posts Table"
+        defaultValue="Posts Frequency"
         variant="plain"
         lazyMount
         unmountOnExit
@@ -98,7 +102,7 @@ export default function DataTabs({ postsData, processingStatus }) {
           </Tabs.Content>
         ))}
       </Tabs.Root>
-      {(postsData.length === 0 || processingStatus) && (
+      {(processingStatus) && (
         <Box pos="absolute" inset="0" bg="gray.700/80">
           <Center h="full">
             <Spinner
