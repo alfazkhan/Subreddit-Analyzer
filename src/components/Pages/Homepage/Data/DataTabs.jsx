@@ -65,7 +65,7 @@ export default function DataTabs({ postsData, processingStatus }) {
   return (
     <Box position="relative" aria-busy="true" userSelect="none">
       <Tabs.Root
-        defaultValue="Posts Frequency"
+        defaultValue="Keyword Table"
         variant="plain"
         lazyMount
         unmountOnExit
