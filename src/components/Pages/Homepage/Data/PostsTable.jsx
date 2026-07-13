@@ -16,7 +16,7 @@ import { LuChevronDown } from "react-icons/lu";
 import DataTable from "@/components/ui-components/DataTable";
 import PostTableFilter from "./PostTableFilters";
 
-export default function KeywordTable({ data: postsData }) {
+export default function PostsTable({ data: postsData }) {
   const [sentiment, setSentiment] = useState("All");
   const [topics, setTopics] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);

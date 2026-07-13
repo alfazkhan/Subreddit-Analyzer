@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from Routes import routes_posts, routes_subreddits, routes_reanalyze, routes_ignored_words, routes_users, routes_reanalyze
 
 IS_PRODUCTION = os.getenv("APP_ENV") == "production"
-API_HOST = "0.0.0.0" if IS_PRODUCTION else "192.168.0.246"
+API_HOST = "0.0.0.0" if IS_PRODUCTION else "127.0.0.1"
 
 # Initialize Firebase Admin SDK prior to spinning up network dependencies
 if os.path.exists("firebase_creds.json"):
