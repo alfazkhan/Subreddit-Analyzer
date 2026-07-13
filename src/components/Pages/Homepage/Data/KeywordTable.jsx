@@ -28,7 +28,6 @@ import PostsTable from "./PostsTable";
 
 export default function KeywordTable({ data }) {
   // --- 1. Core Filter States ---
-  // --- 1. Core Filter States ---
   const [minValue, setMinValue] = useState(20);
   const [maxValue, setMaxValue] = useState(10000);
   const [searchTerm, setSearchTerm] = useState("");
@@ -275,12 +274,6 @@ export default function KeywordTable({ data }) {
             }}
             size="sm"
             color="white"
-            onValueChange={(details) => {
-              setMinValue(details.valueAsNumber);
-              setActivePreset(null);
-            }}
-            size="sm"
-            color="white"
           >
             <NumberInput.Control />
             <NumberInput.Input />
@@ -294,12 +287,6 @@ export default function KeywordTable({ data }) {
           <NumberInput.Root
             value={maxValue}
             allowMouseWheel
-            onValueChange={(details) => {
-              setMaxValue(details.valueAsNumber);
-              setActivePreset(null);
-            }}
-            size="sm"
-            color="white"
             onValueChange={(details) => {
               setMaxValue(details.valueAsNumber);
               setActivePreset(null);
@@ -524,8 +511,6 @@ export default function KeywordTable({ data }) {
                 No keywords match the current filters.
               </Table.Cell>
             </Table.Row>
-          )}
-        </DataTable>
           )}
         </DataTable>
       </Table.ScrollArea>
