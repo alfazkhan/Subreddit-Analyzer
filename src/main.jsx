@@ -6,13 +6,11 @@ import store from "./store/index.js";
 import { ChakraUIProvider } from "./components/ui-components/provider";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
     <ChakraUIProvider>
       <Provider store={store}>
         <App />
       </Provider>
     </ChakraUIProvider>
-  </React.StrictMode>,
 );
 
 // if (!import.meta.env.PROD) {

@@ -35,7 +35,6 @@ export default function KeywordTable({ data }) {
   const [customTop, setCustomTop] = useState(25);
   const [selectedKeyword, setSelectedKeyword] = useState(null);
 
-  // --- 2. Interaction States ---
   const [sortConfig, setSortConfig] = useState({
     key: "total",
     direction: "desc",
@@ -44,7 +43,6 @@ export default function KeywordTable({ data }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
 
-  // --- 3. NLP Tokenizer & Sentiment Aggregator ---
   const processedData = useMemo(() => {
     if (!data || data.length === 0) return [];
 
@@ -60,12 +58,10 @@ export default function KeywordTable({ data }) {
     // Scan posts, tokenize text, and bucket sentiments
     data.forEach((post) => {
       const text = `${post.title || ""} ${post.body || ""}`.toLowerCase();
-      // Extract words with 3 or more alphabetical characters
       const words = text.match(/\b[a-z]{3,}\b/g) || [];
       const sentiment = post.sentiment || "Neutral";
 
       words.forEach((word) => {
-        // Only exclude exactly what the user typed in the custom input
         if (customStopWords.includes(word)) return;
         if (searchLower && !word.includes(searchLower)) return;
 
@@ -98,11 +94,9 @@ export default function KeywordTable({ data }) {
           : a.name.localeCompare(b.name);
       }
     });
-
     return entries;
   }, [data, minValue, maxValue, searchTerm, stopWordsStr, sortConfig]);
-
-  // Reset to page 1 whenever filters change
+  
   useEffect(() => {
     setCurrentPage(1);
   }, [minValue, maxValue, searchTerm, stopWordsStr, sortConfig]);

@@ -10,6 +10,8 @@ import {
   Badge,
   Button,
   NativeSelect,
+  Center,
+  Spinner,
 } from "@chakra-ui/react";
 import {
   Chart as ChartJS,
@@ -23,7 +25,15 @@ import {
 } from "chart.js";
 import DateSelector from "@/components/ui-components/DateSelector";
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Tooltip,
+  Legend,
+  Filler,
+);
 
 const ALL_TZ_OPTIONS = Intl.supportedValuesOf("timeZone");
 const PARSED_TIMEZONES = (() => {
@@ -40,9 +50,11 @@ const PARSED_TIMEZONES = (() => {
 })();
 
 export default function PostTime({ data }) {
-  const systemTimeZone = useMemo(() => Intl.DateTimeFormat().resolvedOptions().timeZone, []);
-  
-  // Set defaults explicitly to Jan 1st of current year to Today natively
+  const systemTimeZone = useMemo(
+    () => Intl.DateTimeFormat().resolvedOptions().timeZone,
+    [],
+  );
+
   const defaultDates = useMemo(() => {
     const today = new Date();
     const currentYear = today.getFullYear();
@@ -54,14 +66,58 @@ export default function PostTime({ data }) {
   const [activeTz, setActiveTz] = useState(systemTimeZone);
   const [activeStart, setActiveStart] = useState(defaultDates.start);
   const [activeEnd, setActiveEnd] = useState(defaultDates.end);
+  const [processingStatus, setProcessingStatus] = useState(false);
+  const [hourlyData, setHourlyData] = useState(Array(24).fill(0));
+
+  // Logic moved to useEffect to properly trigger loading state
+  useEffect(() => {
+    let isCancelled = false;
+
+    const processData = async () => {
+      setProcessingStatus(true);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      if (isCancelled) return;
+
+      const counts = Array(24).fill(0);
+      if (data) {
+        data.forEach((post) => {
+          if (!post.timestamp) return;
+          const dateObj = new Date(post.timestamp);
+          const localDateStr = dateObj.toLocaleDateString("en-CA", {
+            timeZone: activeTz,
+          });
+
+          const localHour =
+            parseInt(
+              dateObj.toLocaleString("en-US", {
+                hour: "numeric",
+                hour12: false,
+                timeZone: activeTz,
+              }),
+            ) % 24;
+
+          if (localDateStr >= activeStart && localDateStr <= activeEnd) {
+            counts[localHour]++;
+          }
+        });
+      }
+
+      setProcessingStatus(false);
+      setHourlyData(counts);
+    };
+
+    processData();
+    return () => {
+      isCancelled = true;
+    };
+  }, [data, activeStart, activeEnd, activeTz]);
 
   const handleAllTime = () => {
     if (!data || data.length === 0) return;
-
     const timestamps = data
       .map((p) => new Date(p.timestamp).getTime())
       .filter((t) => !isNaN(t));
-
     if (timestamps.length === 0) return;
 
     const minDate = new Date(Math.min(...timestamps));
@@ -71,85 +127,119 @@ export default function PostTime({ data }) {
     setActiveEnd(maxDate.toLocaleDateString("en-CA", { timeZone: activeTz }));
   };
 
-  const hourlyData = useMemo(() => {
-    const counts = Array(24).fill(0);
-    if (!data) return counts;
+  const chartData = useMemo(() => {
+    return {
+      labels: Array.from({ length: 24 }, (_, i) => `${i}:00`),
+      datasets: [
+        {
+          label: "Post Count",
+          data: hourlyData,
+          fill: true,
+          borderColor: "#dd6b20",
+          backgroundColor: "rgba(221, 107, 32, 0.1)",
+          tension: 0.4,
+          pointRadius: 4,
+        },
+      ],
+    };
+  }, [hourlyData]);
 
-    data.forEach((post) => {
-      if (!post.timestamp) return;
-
-      const dateObj = new Date(post.timestamp);
-      const localDateStr = dateObj.toLocaleDateString("en-CA", { timeZone: activeTz });
-      
-      const localHour = parseInt(
-        dateObj.toLocaleString("en-US", { hour: "numeric", hour12: false, timeZone: activeTz })
-      ) % 24;
-
-      const isAfterStart = !activeStart || localDateStr >= activeStart;
-      const isBeforeEnd = !activeEnd || localDateStr <= activeEnd;
-
-      if (isAfterStart && isBeforeEnd) {
-        counts[localHour]++;
-      }
-    });
-    return counts;
-  }, [data, activeStart, activeEnd, activeTz]);
-
-  const chartData = useMemo(() => ({
-    labels: Array.from({ length: 24 }, (_, i) => `${i}:00`),
-    datasets: [
-      {
-        label: "Post Count",
-        data: hourlyData,
-        fill: true,
-        borderColor: "#dd6b20",
-        backgroundColor: "rgba(221, 107, 32, 0.1)",
-        tension: 0.4,
-        pointRadius: 4,
+  const options = useMemo(
+    () => ({
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: (items) => `Time: ${items[0].label} (${activeTz})`,
+          },
+        },
       },
-    ],
-  }), [hourlyData]);
-
-  const options = useMemo(() => ({
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: { title: (items) => `Time: ${items[0].label} (${activeTz})` },
+      scales: {
+        x: {
+          ticks: { color: "rgba(255,255,255,0.5)" },
+          grid: { display: false },
+        },
+        y: {
+          beginAtZero: true,
+          ticks: { stepSize: 1, color: "rgba(255,255,255,0.5)" },
+        },
       },
-    },
-    scales: {
-      x: { ticks: { color: "rgba(255,255,255,0.5)" }, grid: { display: false } },
-      y: { beginAtZero: true, ticks: { stepSize: 1, color: "rgba(255,255,255,0.5)" } },
-    },
-  }), [activeTz]);
+    }),
+    [activeTz],
+  );
 
   return (
-    <Box p={6} bg="blackAlpha.400" borderRadius="xl" borderWidth="1px" borderColor="whiteAlpha.200">
-      <Flex justifyContent="space-between" alignItems="flex-start" mb={6} wrap="wrap" gap={4}>
+    <Box
+      p={6}
+      bg="blackAlpha.400"
+      borderRadius="xl"
+      borderWidth="1px"
+      borderColor="whiteAlpha.200"
+      position="relative"
+    >
+      {processingStatus && (
+        <Box
+          position="absolute"
+          inset="0"
+          bg="rgba(23, 23, 27, 0.6)"
+          zIndex={10}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Spinner
+            borderWidth="4px"
+            size="xl"
+            color="orange.600"
+            animationDuration="0.6s"
+          />
+        </Box>
+      )}
+
+      <Flex
+        justifyContent="space-between"
+        alignItems="flex-start"
+        mb={6}
+        wrap="wrap"
+        gap={4}
+      >
         <Box>
-          <Heading size="md" color="orange.600">Time Distribution</Heading>
-          <Text fontSize="xs" color="whiteAlpha.500">Currently showing: {activeTz}</Text>
+          <Heading size="md" color="orange.600">
+            Time Distribution
+          </Heading>
+          <Text fontSize="xs" color="whiteAlpha.500">
+            Currently showing: {activeTz}
+          </Text>
         </Box>
 
         <HStack gap={4} wrap="wrap" alignItems="flex-start">
-          <Button type="button" size="sm" mt={5} variant="outline" colorPalette="orange" onClick={handleAllTime}>
+          <Button
+            size="sm"
+            mt={5}
+            variant="outline"
+            colorPalette="orange"
+            onClick={handleAllTime}
+          >
             All Time
           </Button>
 
           <Field.Root width="auto" mt={5}>
             <Field.Label fontSize="xs">Timezone</Field.Label>
-            <TimeZoneSelect onTimeZoneChange={setActiveTz} currentTimeZone={activeTz} />
+            <TimeZoneSelect
+              onTimeZoneChange={setActiveTz}
+              currentTimeZone={activeTz}
+            />
           </Field.Root>
 
-          <DateSelector 
+          <DateSelector
             start={activeStart}
             end={activeEnd}
             onChange={(s, e) => {
               setActiveStart(s);
               setActiveEnd(e);
-            }} 
+            }}
           />
         </HStack>
       </Flex>
@@ -168,12 +258,8 @@ export default function PostTime({ data }) {
 }
 
 function TimeZoneSelect({ onTimeZoneChange, currentTimeZone }) {
-  const [initialCountry, initialZone] = currentTimeZone.includes("/") 
-    ? currentTimeZone.split("/") 
-    : ["", ""];
-
-  const [country, setCountry] = useState(initialCountry);
-  const [zone, setZone] = useState(initialZone);
+  const [country, setCountry] = useState(currentTimeZone.split("/")[0] || "");
+  const [zone, setZone] = useState(currentTimeZone.split("/")[1] || "");
 
   useEffect(() => {
     if (currentTimeZone.includes("/")) {
@@ -183,39 +269,36 @@ function TimeZoneSelect({ onTimeZoneChange, currentTimeZone }) {
     }
   }, [currentTimeZone]);
 
-  const handleCountryChange = (e) => {
-    const nextCountry = e.currentTarget.value;
-    setCountry(nextCountry);
-    setZone("");
-  };
-
-  const handleZoneChange = (e) => {
-    const nextZone = e.target.value;
-    setZone(nextZone);
-    if (nextZone) {
-      onTimeZoneChange(`${country}/${nextZone}`);
-    }
-  };
-
   return (
     <HStack>
       <NativeSelect.Root color="white">
-        <NativeSelect.Field placeholder="Select Country" value={country} onChange={handleCountryChange}>
+        <NativeSelect.Field
+          value={country}
+          onChange={(e) => {
+            setCountry(e.currentTarget.value);
+            setZone("");
+          }}
+        >
+          <option value="">Select Country</option>
           {Object.keys(PARSED_TIMEZONES).map((c) => (
-            <option style={{ color: "#000" }} key={c} value={c}>{c}</option>
+            <option key={c} value={c} style={{ color: "#000" }}>
+              {c}
+            </option>
           ))}
         </NativeSelect.Field>
-        <NativeSelect.Indicator />
       </NativeSelect.Root>
-      
       {country && PARSED_TIMEZONES[country] && (
         <NativeSelect.Root color="white">
-          <NativeSelect.Field placeholder="Select Zone" value={zone} onChange={handleZoneChange}>
+          <NativeSelect.Field
+            value={zone}
+            onChange={(e) => onTimeZoneChange(`${country}/${e.target.value}`)}
+          >
             {PARSED_TIMEZONES[country].map((z) => (
-              <option style={{ color: "#000" }} key={z} value={z}>{z}</option>
+              <option key={z} value={z} style={{ color: "#000" }}>
+                {z}
+              </option>
             ))}
           </NativeSelect.Field>
-          <NativeSelect.Indicator />
         </NativeSelect.Root>
       )}
     </HStack>
