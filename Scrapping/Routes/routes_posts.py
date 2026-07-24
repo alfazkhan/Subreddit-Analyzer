@@ -34,7 +34,7 @@ async def api_update_post(
     payload: dict = Body(...),
     super_admin: dict = Depends(require_role(["Super Admin"]))
 ):
-    allowed_fields = {"title", "body", "sentiment", "keywords", "entities", "topics"}
+    allowed_fields = {"title", "body", "sentiment", "sentiment_scores", "keywords", "entities", "topics"}
     updates = {k: payload[k] for k in payload if k in allowed_fields}
 
     if not updates:

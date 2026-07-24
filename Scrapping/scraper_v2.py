@@ -56,12 +56,16 @@ async def scrape_post_by_id(context, post_id: str, subreddit_name: str, ignored_
 
             combined_text = f"{title} {content}"
 
+            # Calculate sentiment details (returns label and probability distribution)
+            sentiment_data = get_sentiment(combined_text)
+
             post_entry = {
                 "id": post_id, 
                 "timestamp": ts, 
                 "title": title, 
                 "body": content,
-                "sentiment": get_sentiment(combined_text),
+                "sentiment": sentiment_data["label"],           # "Positive", "Neutral", "Negative"
+                "sentiment_scores": sentiment_data["scores"],   # {"positive": 0.8521, "neutral": 0.1102, ...}
                 "keywords": extract_keywords(combined_text, ignored_words),
                 "entities": extract_entities(combined_text),
                 "topics": classify_topics(combined_text)
@@ -69,7 +73,7 @@ async def scrape_post_by_id(context, post_id: str, subreddit_name: str, ignored_
             
             await save_post_to_db(post_entry, subreddit_name)
             await update_queue_status(post_id, 'completed')
-            logging.info(f"Scraper: Successfully archived {post_id} with Zero-Shot categorization.")
+            logging.info(f"Scraper: Successfully archived {post_id} with Zero-Shot categorization and sentiment scores.")
             return post_entry
             
         except Exception as e:

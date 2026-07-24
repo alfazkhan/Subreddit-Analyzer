@@ -33,7 +33,9 @@ export default function DataTabs({ postsData, processingStatus }) {
       currentdate.getMilliseconds();
   }, []);
 
-
+  useEffect(() => {
+    console.log(postsData);
+  }, [postsData]);
 
   const TabsListData = [
     {

@@ -12,81 +12,136 @@ from nltk.corpus import stopwords
 from transformers import pipeline
 from collections import Counter
 
-logging.info("NLP: Loading models and resources...")
-nlp = spacy.load("en_core_web_sm")
+logging.info("NLP: Loading multilingual models and resources...")
+
+# Load spaCy NLP model for entity extraction
+try:
+    nlp = spacy.load("en_core_web_sm")
+except Exception:
+    logging.warning("NLP: Fallback loading spaCy sm pipeline...")
+    nlp = spacy.blank("en")
+
 lemmatizer = WordNetLemmatizer()
 
-# Sentiment Analysis Engine
+# Multilingual Sentiment Analysis Engine (XLM-RoBERTa)
 sentiment_pipeline = pipeline(
     "sentiment-analysis", 
-    model="cardiffnlp/twitter-roberta-base-sentiment-latest", 
+    model="cardiffnlp/twitter-xlm-roberta-base-sentiment", 
     device=-1
 )
 
-# Zero-Shot Topic Classification Engine
+# Multilingual Zero-Shot Topic Classification Engine (mDeBERTa-v3)
 classifier_pipeline = pipeline(
     "zero-shot-classification", 
-    model="facebook/bart-large-mnli", 
+    model="MoritzLaurer/mDeBERTa-v3-base-mnli-fever-anli", 
     device=-1
 )
 
-# Universal Global City Analytics Classification Labels
+# Exact 30 original candidate strings categorized under the 5 Thesis KPI domains
 CANDIDATE_LABELS = [
-    # Housing & Living Accommodations
+    # 1. Economic Sentiment Index (ESI)
     "Rent Prices & Affordability",
-    "Apartment Viewings & Contracts",
-    "Flatmates & Shared Housing",
-    "Landlord Disputes & Evictions",
     "Utility Bills & Energy Costs",
-    "Home Maintenance & Damage Repairs",
+    "Job Postings & Career Advice",
+    "Salaries & Cost of Living Rants",
+    "Supermarket Prices & Groceries",
 
-    # Public Transit & Urban Mobility
+    # 2. Infrastructure & Services Index (ISI)
     "Subway, Tram & Train Schedules",
     "Bus Routes & Reliability",
     "Transit Passes & Ticket Pricing",
     "Bicycle Lanes & Cycling Safety",
     "Traffic Congestion & Roadwork",
     "City Parking & Driving Permits",
-
-    # Local Administration, Law & Politics
     "City Registration & Paperwork",
-    "Visas & Residence Permits",
-    "Local Elections & Candidates",
-    "City Council Policies & Budgets",
-    "Protests, Strikes & Demonstrations",
+    "Home Maintenance & Damage Repairs",
 
-    # Jobs & Daily Economy
-    "Job Postings & Career Advice",
-    "Student Shifts & Part-Time Work",
-    "Supermarket Prices & Groceries",
-    "Salaries & Cost of Living Rants",
-
-    # Social Life, Culture & Recreation
+    # 3. Local Consumer Intent Index (CII)
     "Restaurant & Cafe Reviews",
     "Bars, Nightclubs & Nightlife",
     "Street Food & Local Cuisines",
     "Festivals, Concerts & Public Events",
     "Museums, Art & Theater",
     "Amateur Sports & Fitness Groups",
-
-    # Public Safety & Travel
     "Tourist Attractions & Sightseeing",
-    "Neighborhood Safety & Crime Alerts",
-    "Lost Items & Found Belongings"
-]
-logging.info("NLP: Models ready.")
 
-def get_sentiment(text: str) -> str:
-    truncated = text[:512]
-    result = sentiment_pipeline(truncated)[0]
-    return result['label'].capitalize()
+    # 4. Community Concern & Safety Index (CCI)
+    "Neighborhood Safety & Crime Alerts",
+    "Protests, Strikes & Demonstrations",
+    "City Council Policies & Budgets",
+    "Local Elections & Candidates",
+    "Lost Items & Found Belongings",
+
+    # 5. Expat & Integration Index (EII)
+    "Visas & Residence Permits",
+    "Apartment Viewings & Contracts",
+    "Flatmates & Shared Housing",
+    "Landlord Disputes & Evictions",
+    "Student Shifts & Part-Time Work"
+]
+
+logging.info("NLP: Multilingual Models ready.")
+
+
+def get_sentiment(text: str) -> dict:
+    """
+    Extracts multilingual sentiment category and continuous probability scores 
+    using XLM-RoBERTa.
+    Returns:
+        {
+            "label": "Positive",
+            "scores": {"positive": 0.8521, "neutral": 0.1102, "negative": 0.0377}
+        }
+    """
+    truncated = text[:512].strip()
+    if not truncated:
+        return {
+            "label": "Neutral",
+            "scores": {"positive": 0.0, "neutral": 1.0, "negative": 0.0}
+        }
+    
+    # top_k=None forces pipeline to return confidence probabilities for all 3 classes
+    results = sentiment_pipeline(truncated, top_k=None)
+    
+    # Standardize output keys
+    scores = {}
+    for res in results:
+        raw_label = res["label"].lower()
+        if "pos" in raw_label:
+            key = "positive"
+        elif "neg" in raw_label:
+            key = "negative"
+        else:
+            key = "neutral"
+        scores[key] = round(float(res["score"]), 4)
+    
+    # Fallback default values if keys are missing
+    for default_key in ["positive", "neutral", "negative"]:
+        if default_key not in scores:
+            scores[default_key] = 0.0
+
+    # Determine primary string label for backward compatibility
+    top_label = max(scores, key=scores.get).capitalize()
+    
+    return {
+        "label": top_label,
+        "scores": scores
+    }
+
 
 def extract_entities(text: str) -> list:
+    """
+    Extracts named entities from text using spaCy.
+    """
     doc = nlp(text)
     labels = ["PERSON", "ORG", "GPE", "LOC", "PRODUCT", "DATE", "MONEY"]
     return [{"text": ent.text, "label": ent.label_} for ent in doc.ents if ent.label_ in labels]
 
+
 def extract_keywords(text: str, dynamic_ignored_words: set = None) -> dict:
+    """
+    Cleans, tokenizes, and extracts word frequency counts from text.
+    """
     if dynamic_ignored_words is None:
         dynamic_ignored_words = set()
     words = word_tokenize(text.lower())
@@ -94,13 +149,14 @@ def extract_keywords(text: str, dynamic_ignored_words: set = None) -> dict:
     clean = [lemmatizer.lemmatize(w) for w in words if w.isalnum() and w not in sw]
     return dict(Counter(clean))
 
+
 def classify_topics(text: str) -> dict:
     """
-    Runs text through BART-large-MNLI to map content into abstract behavioral buckets.
-    Returns a structured dictionary matching the required frontend analytical state.
+    Runs text through mDeBERTa-v3 to map content into business domains.
+    Returns structured dict for frontend analytics state.
     """
-    truncated = text[:1024]  # BART accepts up to 1024 tokens safely
-    if not truncated.strip():
+    truncated = text[:1024].strip()  # DeBERTa accepts up to 1024 tokens safely
+    if not truncated:
         return {"labels": [], "scores": [], "primary_topic": "Community Discussion"}
         
     result = classifier_pipeline(truncated, candidate_labels=CANDIDATE_LABELS)
@@ -108,5 +164,5 @@ def classify_topics(text: str) -> dict:
     return {
         "labels": result["labels"],
         "scores": [round(score, 3) for score in result["scores"]],
-        "primary_topic": result["labels"][0] # Highest confidence classification choice
+        "primary_topic": result["labels"][0]  # Highest confidence choice
     }

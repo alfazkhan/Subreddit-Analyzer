@@ -37,17 +37,19 @@ async def save_post_to_db(post_entry: dict, subreddit_name: str):
         ts_obj = safe_parse_timestamp(post_entry.get('timestamp'))
         
         await conn.execute('''
-            INSERT INTO reddit_posts (id, subreddit_id, timestamp, title, body, sentiment, keywords, entities, topics)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
+            INSERT INTO reddit_posts (id, subreddit_id, timestamp, title, body, sentiment, sentiment_scores, keywords, entities, topics)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
             ON CONFLICT (id) DO UPDATE SET
                 title = EXCLUDED.title,
                 body = EXCLUDED.body,
                 sentiment = EXCLUDED.sentiment,
+                sentiment_scores = EXCLUDED.sentiment_scores,
                 keywords = EXCLUDED.keywords,
                 entities = EXCLUDED.entities,
                 topics = EXCLUDED.topics
         ''', post_entry['id'], sub_id, ts_obj, post_entry['title'], 
            post_entry['body'], post_entry['sentiment'], 
+           json.dumps(post_entry.get('sentiment_scores', {})),
            json.dumps(post_entry['keywords']), json.dumps(post_entry['entities']),
            json.dumps(post_entry['topics']))
 
@@ -93,7 +95,6 @@ async def get_cache_summary():
         ''')
         return {r['name']: {"id": r['id'], "count": r['count'], "last_updated": r['last_updated'].isoformat() if r['last_updated'] else None} for r in rows}
 
-
 async def db_update_post(post_id: str, updates: dict):
     if not updates:
         return False
@@ -111,6 +112,9 @@ async def db_update_post(post_id: str, updates: dict):
         if "sentiment" in updates:
             args.append(updates["sentiment"])
             set_clauses.append(f"sentiment = ${len(args)}")
+        if "sentiment_scores" in updates:
+            args.append(json.dumps(updates["sentiment_scores"]))
+            set_clauses.append(f"sentiment_scores = ${len(args)}")
         if "keywords" in updates:
             args.append(json.dumps(updates["keywords"]))
             set_clauses.append(f"keywords = ${len(args)}")
@@ -129,7 +133,6 @@ async def db_update_post(post_id: str, updates: dict):
         status = await conn.execute(query, *args)
         return status == "UPDATE 1"
 
-
 async def db_delete_post(post_id: str):
     pool = await get_db_pool()
     async with pool.acquire() as conn:
@@ -137,7 +140,6 @@ async def db_delete_post(post_id: str):
             DELETE FROM reddit_posts WHERE id = $1
         ''', post_id)
         return status == "DELETE 1"
-
 
 async def get_post_content_for_reanalysis(subreddit_name: str):
     pool = await get_db_pool()
@@ -160,15 +162,15 @@ async def get_post_keywords_for_cleaning(subreddit_name: str):
         ''', subreddit_name)
         return [dict(row) for row in rows]
 
-async def update_post_nlp_data(post_id: str, sentiment: str, keywords: list, entities: dict, topics: dict):
+async def update_post_nlp_data(post_id: str, sentiment: str, sentiment_scores: dict, keywords: list, entities: dict, topics: dict):
     """Updates the complete suite including our new classification objects."""
     pool = await get_db_pool()
     async with pool.acquire() as conn:
         await conn.execute('''
             UPDATE reddit_posts
-            SET sentiment = $1, keywords = $2, entities = $3, topics = $4
-            WHERE id = $5
-        ''', sentiment, json.dumps(keywords), json.dumps(entities), json.dumps(topics), post_id)
+            SET sentiment = $1, sentiment_scores = $2, keywords = $3, entities = $4, topics = $5
+            WHERE id = $6
+        ''', sentiment, json.dumps(sentiment_scores), json.dumps(keywords), json.dumps(entities), json.dumps(topics), post_id)
 
 async def update_post_keywords_only(post_id: str, keywords: dict):
     pool = await get_db_pool()
@@ -178,7 +180,7 @@ async def update_post_keywords_only(post_id: str, keywords: dict):
             SET keywords = $1
             WHERE id = $2
         ''', json.dumps(keywords), post_id)
-        
+
 async def get_all_posts_for_dynamic_reanalysis(subreddit: str, target_pipelines: list, only_null: bool, start_date: str = None, end_date: str = None):
     """
     Dynamically loads text records from PostgreSQL based on the requested features.
@@ -188,7 +190,7 @@ async def get_all_posts_for_dynamic_reanalysis(subreddit: str, target_pipelines:
     pool = await get_db_pool()
     
     # Base extraction query mapping
-    query = "SELECT id, title, body, sentiment, keywords, entities, topics FROM public.reddit_posts WHERE subreddit_id = (SELECT id FROM public.subreddits WHERE name = $1)"
+    query = "SELECT id, title, body, sentiment, sentiment_scores, keywords, entities, topics FROM public.reddit_posts WHERE subreddit_id = (SELECT id FROM public.subreddits WHERE name = $1)"
     args = [subreddit]
     
     if start_date:
@@ -204,7 +206,7 @@ async def get_all_posts_for_dynamic_reanalysis(subreddit: str, target_pipelines:
         clauses = []
         for feature in target_pipelines:
             if feature == "sentiment":
-                clauses.append("sentiment IS NULL")
+                clauses.append("(sentiment IS NULL OR sentiment_scores IS NULL)")
             elif feature == "keywords":
                 clauses.append("keywords IS NULL")
             elif feature == "entities":

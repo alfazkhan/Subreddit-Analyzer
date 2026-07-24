@@ -7,7 +7,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPExce
 from typing import Optional
 from nlp_processor import get_sentiment, extract_keywords, extract_entities, classify_topics
 
-# Leverage your existing unified HTTP security interceptor directly
+# Leverage existing unified HTTP security interceptor
 from auth_guard import verify_client_identity
 # Database modules
 from database.subreddits import db_get_all_subreddits
@@ -129,8 +129,27 @@ async def run_dynamic_text_reanalysis(subreddit: str, target_pipelines: list, on
         pid = row['id']
         combined_text = f"{row['title'] or ''} {row['body'] or ''}"
 
-        sentiment = get_sentiment(combined_text) if "sentiment" in target_pipelines else row.get('sentiment')
+        # 1. Sentiment & Sentiment Scores Pipeline
+        if "sentiment" in target_pipelines:
+            sent_res = get_sentiment(combined_text)
+            if isinstance(sent_res, dict):
+                sentiment = sent_res.get("label", "Neutral")
+                sentiment_scores = sent_res.get("scores", {})
+            else:
+                sentiment = sent_res
+                sentiment_scores = {}
+        else:
+            sentiment = row.get('sentiment')
+            raw_scores = row.get('sentiment_scores')
+            if isinstance(raw_scores, str):
+                try:
+                    sentiment_scores = json.loads(raw_scores)
+                except Exception:
+                    sentiment_scores = {}
+            else:
+                sentiment_scores = raw_scores or {}
         
+        # 2. Keywords Pipeline
         if "keywords" in target_pipelines:
             raw_keywords = extract_keywords(combined_text, ignored_words)
             keywords = list(raw_keywords) if isinstance(raw_keywords, set) else raw_keywords
@@ -140,8 +159,20 @@ async def run_dynamic_text_reanalysis(subreddit: str, target_pipelines: list, on
             except Exception:
                 keywords = row.get('keywords') or {}
 
-        entities = extract_entities(combined_text) if "entities" in target_pipelines else row.get('entities')
-        
+        # 3. Entities Pipeline (Safety check added: decode string if entities is not being re-analyzed)
+        if "entities" in target_pipelines:
+            entities = extract_entities(combined_text)
+        else:
+            raw_entities = row.get('entities')
+            if isinstance(raw_entities, str):
+                try:
+                    entities = json.loads(raw_entities)
+                except Exception:
+                    entities = []
+            else:
+                entities = raw_entities or []
+
+        # 4. Topic Classification Pipeline
         if "topic" in target_pipelines:
             topics = classify_topics(combined_text)
         else:
@@ -150,7 +181,8 @@ async def run_dynamic_text_reanalysis(subreddit: str, target_pipelines: list, on
             except Exception:
                 topics = row.get('topics') or {}
 
-        await update_post_nlp_data(pid, sentiment, keywords, entities, topics)
+        # Persist updated NLP fields into database
+        await update_post_nlp_data(pid, sentiment, sentiment_scores, keywords, entities, topics)
 
         percent = round((count / total_posts) * 100, 1)
         msg_prog = f"r/{subreddit} | Dynamic Progress: {count}/{total_posts} ({percent}%)"
@@ -215,9 +247,8 @@ async def dynamic_pipeline_orchestrator(target_pipelines: list, only_null: bool,
 @router.post("/ws/ticket")
 async def generate_websocket_ticket(client: dict = Depends(verify_client_identity)):
     """
-    Exchanges a highly sensitive Firebase Bearer token for a short-lived, 
+    Exchanges a Firebase Bearer token for a short-lived, 
     single-use ticket specifically for secure WebSocket handshakes.
-    Matches HTTP route mapping layout under Router prefixes.
     """
     if not client or client.get("role") != "Super Admin":
         raise HTTPException(
@@ -240,8 +271,7 @@ async def generate_websocket_ticket(client: dict = Depends(verify_client_identit
 @router.websocket("/ws/reanalyze")
 async def reanalyze_endpoint(websocket: WebSocket, ticket: str = Query(...)):
     """
-    Secured WebSocket upgrading route utilizing single-use exchange tickets 
-    to prevent token exposure in server transit routing parameters.
+    Secured WebSocket upgrading route utilizing single-use exchange tickets.
     """
     client = _ws_auth_tickets.pop(ticket, None)
     

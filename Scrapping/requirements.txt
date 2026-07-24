@@ -11,6 +11,9 @@ fastapi
 nltk
 spacy
 collections-extended
+sentencepiece
+tiktoken
+protobuf
 
 # Testing
 pytest
