@@ -6,6 +6,9 @@ import os
 os.environ["TRANSFORMERS_VERBOSITY"] = "error"
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
+# Set Hugging Face cache directory to D Drive
+os.environ["HF_HOME"] = r"D:\huggingface_cache"
+
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
@@ -33,7 +36,7 @@ sentiment_pipeline = pipeline(
 # Multilingual Zero-Shot Topic Classification Engine (mDeBERTa-v3)
 classifier_pipeline = pipeline(
     "zero-shot-classification", 
-    model="MoritzLaurer/mDeBERTa-v3-base-mnli-fever-anli", 
+    model="MoritzLaurer/mDeBERTa-v3-base-mnli-xnli", 
     device=-1
 )
 
