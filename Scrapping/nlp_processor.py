@@ -1,12 +1,13 @@
 import spacy
 import logging
 import os
+import torch
 
 # Suppress Hugging Face and TensorFlow initialization warnings
 os.environ["TRANSFORMERS_VERBOSITY"] = "error"
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
-# Set Hugging Face cache directory to D Drive
+# Set Hugging Face cache directory
 os.environ["HF_HOME"] = r"D:\huggingface_cache"
 
 from nltk.tokenize import word_tokenize
@@ -26,21 +27,31 @@ except Exception:
 
 lemmatizer = WordNetLemmatizer()
 
+# Dynamic GPU detection for PyTorch
+device_id = 0 if torch.cuda.is_available() else -1
+
+SENTIMENT_MODEL_NAME = "cardiffnlp/twitter-xlm-roberta-base-sentiment"
+
 # Multilingual Sentiment Analysis Engine (XLM-RoBERTa)
 sentiment_pipeline = pipeline(
     "sentiment-analysis", 
-    model="cardiffnlp/twitter-xlm-roberta-base-sentiment", 
-    device=-1
+    model=SENTIMENT_MODEL_NAME,
+    tokenizer=SENTIMENT_MODEL_NAME,
+    device=device_id,
+    truncation=True,
+    max_length=512
 )
 
 # Multilingual Zero-Shot Topic Classification Engine (mDeBERTa-v3)
 classifier_pipeline = pipeline(
     "zero-shot-classification", 
     model="MoritzLaurer/mDeBERTa-v3-base-mnli-xnli", 
-    device=-1
+    device=device_id,
+    truncation=True,
+    max_length=1024
 )
 
-# Exact 30 original candidate strings categorized under the 5 Thesis KPI domains
+# Exact candidate strings categorized under the 5 Thesis KPI domains
 CANDIDATE_LABELS = [
     # 1. Economic Sentiment Index (ESI)
     "Rent Prices & Affordability",
@@ -96,32 +107,29 @@ def get_sentiment(text: str) -> dict:
             "scores": {"positive": 0.8521, "neutral": 0.1102, "negative": 0.0377}
         }
     """
-    truncated = text[:512].strip()
-    if not truncated:
+    clean_text = text.strip() if text else ""
+    if not clean_text:
         return {
             "label": "Neutral",
             "scores": {"positive": 0.0, "neutral": 1.0, "negative": 0.0}
         }
     
     # top_k=None forces pipeline to return confidence probabilities for all 3 classes
-    results = sentiment_pipeline(truncated, top_k=None)
+    results = sentiment_pipeline(clean_text, top_k=None)
     
-    # Standardize output keys
-    scores = {}
-    for res in results:
-        raw_label = res["label"].lower()
+    scores = {"positive": 0.0, "neutral": 0.0, "negative": 0.0}
+    
+    # Handle nested prediction structure safely
+    predictions = results[0] if isinstance(results[0], list) else results
+
+    for res in predictions:
+        raw_label = str(res["label"]).lower()
         if "pos" in raw_label:
-            key = "positive"
+            scores["positive"] = round(float(res["score"]), 4)
         elif "neg" in raw_label:
-            key = "negative"
+            scores["negative"] = round(float(res["score"]), 4)
         else:
-            key = "neutral"
-        scores[key] = round(float(res["score"]), 4)
-    
-    # Fallback default values if keys are missing
-    for default_key in ["positive", "neutral", "negative"]:
-        if default_key not in scores:
-            scores[default_key] = 0.0
+            scores["neutral"] = round(float(res["score"]), 4)
 
     # Determine primary string label for backward compatibility
     top_label = max(scores, key=scores.get).capitalize()
@@ -158,14 +166,14 @@ def classify_topics(text: str) -> dict:
     Runs text through mDeBERTa-v3 to map content into business domains.
     Returns structured dict for frontend analytics state.
     """
-    truncated = text[:1024].strip()  # DeBERTa accepts up to 1024 tokens safely
-    if not truncated:
+    clean_text = text.strip() if text else ""
+    if not clean_text:
         return {"labels": [], "scores": [], "primary_topic": "Community Discussion"}
         
-    result = classifier_pipeline(truncated, candidate_labels=CANDIDATE_LABELS)
+    result = classifier_pipeline(clean_text, candidate_labels=CANDIDATE_LABELS)
     
     return {
         "labels": result["labels"],
         "scores": [round(score, 3) for score in result["scores"]],
-        "primary_topic": result["labels"][0]  # Highest confidence choice
+        "primary_topic": result["labels"][0]
     }

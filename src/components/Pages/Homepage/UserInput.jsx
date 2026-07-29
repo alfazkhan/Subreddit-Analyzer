@@ -38,6 +38,11 @@ export default function UserInput({ onFetchData, processingStatus }) {
   }, [subreddit, targetCount, cacheSummary]);
 
   function onFetchdataHandler() {
+    let index = Object.keys(cacheSummary).findIndex(
+      (name) => name === subredditName,
+    );
+    const subredditId = Object.values(cacheSummary)[index].id;
+    dispatch(userInputAction.handleIDChange(subredditId));
     dispatch(userInputAction.handleNameChange(subredditName));
     dispatch(userInputAction.handleCountChange(postCount));
     onFetchData(subredditName, postCount);

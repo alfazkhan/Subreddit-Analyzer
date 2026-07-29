@@ -49,7 +49,7 @@ function App() {
         }
 
         dispatch(serverStatusActions.serverStatusChange("online"));
-        dispatch(serverStatusActions.updateCacheSummary(resData));
+        dispatch(serverStatusActions.updateCacheSummary(resData)); 
       } catch (error) {
         console.error("Failed to fetch public summary data:", error);
       }

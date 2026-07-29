@@ -38,7 +38,6 @@ export default function Homepage() {
   }
 
   function fetchSubredditData(subredditName, currentCount) {
-    console.log(subredditName, currentCount);
     mutate({
       endpoint: `posts/${subredditName}?limit=${currentCount}`,
       headers: { "Content-Type": "application/json" },

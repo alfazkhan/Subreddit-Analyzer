@@ -21,3 +21,4 @@ pytest-asyncio
 
 #firebase
 firebase-admin
+websockets>=12.0

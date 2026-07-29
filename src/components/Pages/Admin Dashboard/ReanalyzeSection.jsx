@@ -8,7 +8,7 @@ import {
   Flex,
   Center,
   Spinner,
-  Highlight
+  Highlight,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import ProgressBar from "../../ui-components/ProgressBar.jsx";
@@ -37,8 +37,12 @@ export default function ReanalyzeSection() {
   const [onlyNull, setOnlyNull] = useState(false);
   const date = new Date();
 
-  let day = parseInt(date.getDate()) < 10 ? "0" + date.getDate() : date.getDate();
-  let month = parseInt(date.getMonth()) < 10 ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1);
+  let day =
+    parseInt(date.getDate()) < 10 ? "0" + date.getDate() : date.getDate();
+  let month =
+    parseInt(date.getMonth()) < 10
+      ? "0" + (date.getMonth() + 1)
+      : date.getMonth() + 1;
   let year = date.getFullYear();
   let currentDate = `${year}-${month}-${day}`;
   const [dateRange, setDateRange] = useState(["2026-01-01", currentDate]);
@@ -74,13 +78,14 @@ export default function ReanalyzeSection() {
         });
 
         if (!response.ok) {
-          throw new Error("Failed to claim high-security pipeline ticket validation profile.");
+          throw new Error(
+            "Failed to claim high-security pipeline ticket validation profile.",
+          );
         }
 
         const { ticket } = await response.json();
 
-
-        // Safe unmount abort branch guard checkpoint 
+        // Safe unmount abort branch guard checkpoint
         if (!isCurrent) return;
 
         // 2. Open channels using safe verification keys
@@ -107,7 +112,10 @@ export default function ReanalyzeSection() {
             setCurrentStatus(data.current_status);
 
             // --- TIME REMAINING CALCULATION LOGIC ---
-            if (lastTimeRef.current !== null && data.current_status === "running") {
+            if (
+              lastTimeRef.current !== null &&
+              data.current_status === "running"
+            ) {
               const duration = (currentTime - lastTimeRef.current) / 1000;
 
               if (duration > 0 && duration < 60) {
@@ -120,7 +128,8 @@ export default function ReanalyzeSection() {
 
                 const remainingPosts = currentTotal - currentProcessed;
                 if (remainingPosts > 0 && avgTimePerPostRef.current > 0) {
-                  const totalSecondsLeft = remainingPosts * avgTimePerPostRef.current;
+                  const totalSecondsLeft =
+                    remainingPosts * avgTimePerPostRef.current;
                   setTimeRemaining(formatTime(totalSecondsLeft));
                 } else {
                   setTimeRemaining("0s");
@@ -155,7 +164,6 @@ export default function ReanalyzeSection() {
           console.error("WebSocket Error Encountered:", error);
           if (isCurrent) setStatus("Connection Error");
         };
-
       } catch (err) {
         console.error("Initialization pipeline connection failure:", err);
         if (isCurrent) setStatus("Authentication Error");
@@ -245,7 +253,9 @@ export default function ReanalyzeSection() {
     ) {
       socketRef.current.send(JSON.stringify(data));
     } else {
-      console.error("Cannot execute payload broadcast channel: Channel state disconnected.");
+      console.error(
+        "Cannot execute payload broadcast channel: Channel state disconnected.",
+      );
     }
   };
 
@@ -337,7 +347,11 @@ export default function ReanalyzeSection() {
       </Flex>
 
       <HStack gap={4} borderWidth={0.5} p={5} borderColor="orange.400">
-        <DateSelector dateSetter={setDateRange} />
+        <DateSelector
+          start={dateRange[0]}
+          end={dateRange[1]}
+          onChange={(newStart, newEnd) => setDateRange([newStart, newEnd])}
+        />
       </HStack>
 
       <HStack>
@@ -397,7 +411,15 @@ export default function ReanalyzeSection() {
       <HStack mt={5}>
         <Blockquote.Root>
           <Blockquote.Content fontSize="2xl">
-            <Highlight query={"Connected"} styles={{ color: "gray.100", backgroundColor: "green.600", padding: 1, borderRadius: 3 }}>
+            <Highlight
+              query={"Connected"}
+              styles={{
+                color: "gray.100",
+                backgroundColor: "green.600",
+                padding: 1,
+                borderRadius: 3,
+              }}
+            >
               {status}
             </Highlight>
           </Blockquote.Content>

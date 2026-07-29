@@ -17,8 +17,11 @@ import PostsFrequency from "../Data/PostsFrequency";
 import { useEffect } from "react";
 import EmotionsThroughoutDay from "../Data/EmotionsThroughoutDay";
 import KeywordsWordCloud from "./KeywordsWordCloud";
+import KPIAnalyticsChart from "./KPIAnalyticsChart";
 
 export default function DataTabs({ postsData, processingStatus }) {
+  
+
   useEffect(() => {
     var currentdate = new Date();
     var datetime =
@@ -33,11 +36,14 @@ export default function DataTabs({ postsData, processingStatus }) {
       currentdate.getMilliseconds();
   }, []);
 
-  useEffect(() => {
-    console.log(postsData);
-  }, [postsData]);
+
 
   const TabsListData = [
+    {
+      value: "KPIs",
+      icon: LuSmile,
+      content: <KPIAnalyticsChart />,
+    },
     {
       value: "Sentiments",
       icon: LuSmile,
@@ -83,7 +89,7 @@ export default function DataTabs({ postsData, processingStatus }) {
     <>
       <Box position="relative" aria-busy="true" userSelect="none">
         <Tabs.Root
-          defaultValue="Pie Chart"
+          defaultValue="KPIs"
           variant="enclosed"
           lazyMount
           // unmountOnExit

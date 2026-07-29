@@ -32,3 +32,12 @@ Scrapping/config.py
 Scrapping/firebase_creds.json
 Scrapping/Routes/__pycache__/
 .env
+
+# Docker / Local Caches & Downloads
+.devcontainer/
+*.dump
+*.log
+*.sqlite3
+Scrapping/docker-compose.yml
+D:*
+*huggingface_cache*

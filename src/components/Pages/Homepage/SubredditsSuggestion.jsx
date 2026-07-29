@@ -47,9 +47,13 @@ export default function SubredditsSuggestions() {
             bg="orange.600"
             onClick={() => {
               dispatch(userInputAction.handleNameChange(`${sub}`));
-              dispatch(
-                userInputAction.handleCountChange(cacheSummary[sub]?.count),
-              );
+              if (cacheSummary[sub]?.count >= 10000) {
+                dispatch(userInputAction.handleCountChange(10000));
+              } else {
+                dispatch(
+                  userInputAction.handleCountChange(cacheSummary[sub]?.count),
+                );
+              }
             }}
             marginBottom={2}
             minW={"100px"}
