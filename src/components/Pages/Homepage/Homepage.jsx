@@ -1,6 +1,6 @@
 import ServerStatus from "../../ui-components/ServerStatus.jsx";
 import Header from "../../ui-components/Header.jsx";
-import { Flex } from "@chakra-ui/react";
+import { Flex, HStack, Progress } from "@chakra-ui/react";
 import UserInput from "./UserInput.jsx";
 import SubredditsSuggestions from "./SubredditsSuggestion.jsx";
 import DataTabs from "./Data/DataTabs.jsx";
@@ -9,6 +9,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { fetchingData } from "@/util/http.js";
 import LoadingAndError from "@/components/ui-components/LoadingAndError.jsx";
+import { useEffect, useState } from "react";
 
 export default function Homepage() {
   const subreddit = useSelector((state) => state.userInputState.subredditName);
@@ -16,6 +17,11 @@ export default function Homepage() {
     (state) => state.userInputState.targetPostCount,
   );
 
+  useEffect(() => {
+    console.log("Rendered");
+  }, []);
+
+  const [progress, setProgress] = useState(0);
 
   const {
     mutate,
@@ -37,10 +43,12 @@ export default function Homepage() {
     );
   }
 
+
   function fetchSubredditData(subredditName, currentCount) {
     mutate({
       endpoint: `posts/${subredditName}?limit=${currentCount}`,
       headers: { "Content-Type": "application/json" },
+      progressCallBackFn: setProgress,
     });
   }
 
@@ -62,17 +70,32 @@ export default function Homepage() {
         <Logs/>
       </Flex> */}
       {errorContent && errorContent}
-        <Flex justifyContent="center" gap="4" margin="5" flexDirection="column">
-          <DataTabs
-            postsData={posts || []}
-            processingStatus={isPending}
-          />
-        </Flex>
-      {/* {import.meta.env.PROD && (
-        <Flex justifyContent="center" gap="4" margin="5" flexDirection="column">
-          <UpcomingFeatures />
-        </Flex>
-      )} */}
+      <Flex justifyContent="center" gap="4" margin="5" flexDirection="column">
+        {isPending && <ProgressBar progressValue={progress} />}
+        <DataTabs postsData={posts || []} processingStatus={isPending} />
+      </Flex>
     </Flex>
+  );
+}
+
+function ProgressBar({ progressValue }) {
+  useEffect(() => {
+    console.log("Rendered");
+  }, []);
+  return (
+    <Progress.Root
+      value={progressValue > 0 ? progressValue : null}
+      colorPalette="orange"
+      striped={progressValue > 0 && progressValue < 100}
+      animated
+    >
+      <HStack>
+        <Progress.Label>Downloaded</Progress.Label>
+        <Progress.Track flex="1">
+          <Progress.Range />
+        </Progress.Track>
+        <Progress.ValueText>{progressValue}%</Progress.ValueText>
+      </HStack>
+    </Progress.Root>
   );
 }

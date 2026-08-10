@@ -15,6 +15,7 @@ from Routes import (
     routes_ignored_words,
     routes_users,
     routes_kpis,
+    routes_queue
 )
 
 IS_PRODUCTION = os.getenv("APP_ENV") == "production"
@@ -29,12 +30,14 @@ else:
 
 app = FastAPI(title="Subreddit Scrapper REST API Gateway", version="3.0.0")
 
+
 # Explicit permitted origins for CORS configuration
 allowed_origins = [
     "https://subanalyzer.theonlyalfaz.com",
     "http://localhost:3000",
     "http://localhost:5173",
     "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
     "http://127.0.0.1:5173",
 ]
 
@@ -44,6 +47,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["Content-Length"],
 )
 
 # Mount all underlying platform controllers
@@ -53,6 +57,7 @@ app.include_router(routes_reanalyze.router)
 app.include_router(routes_ignored_words.router)
 app.include_router(routes_users.router)
 app.include_router(routes_kpis.router)
+app.include_router(routes_queue.router)
 
 logging.basicConfig(
     level=logging.INFO, 

@@ -1,7 +1,9 @@
 import asyncio
+import gc
 import logging
 import sys
 from datetime import datetime
+import torch
 from config import SCRAPE_INTERVAL
 from database.core import get_db_pool
 from database.posts import get_last_post_timestamp
@@ -53,6 +55,11 @@ async def background_worker():
             except Exception as e:
                 logging.error(f"Error processing subreddit r/{sub}: {e}")
             
+            # Post-loop GPU VRAM memory release
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            gc.collect()
+
             await asyncio.sleep(10)
             
         logging.info(f"All subreddits parsed. Worker cooling down for {SCRAPE_INTERVAL} seconds.")

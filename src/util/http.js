@@ -7,8 +7,7 @@ import { QueryClient } from "@tanstack/react-query";
 
 export const queryClient = new QueryClient();
 
-export async function fetchingData({ endpoint, signal, headers }) {
-
+export async function fetchingData({ endpoint, signal, headers, progressCallBackFn = ()=>{} }) {
   const fetchOptions = {
     headers: headers,
   };
@@ -16,14 +15,49 @@ export async function fetchingData({ endpoint, signal, headers }) {
   if (signal) {
     fetchOptions.signal = signal;
   }
+
   const response = await fetch(`${BASE_URL}/${endpoint}`, fetchOptions);
-  const resData = await response.json();
+
   if (!response.ok) {
-    const error = new Error("An error occured while fetching the data...");
+    const errorData = await response.json().catch(() => ({}));
+    const error = new Error(
+      errorData.detail || "An error occured while fetching the data..."
+    );
     error.status = response.status;
     throw error;
   } else {
-    return resData;
+    const contentLength = response.headers.get("content-length");
+    const totalBytes = contentLength ? parseInt(contentLength, 10) : 0;
+    const reader = response.body.getReader();
+    let loadedBytes = 0;
+    const chunks = [];
+
+    while (true) {
+      const { done, value } = await reader.read();
+
+      if (done) {
+        break;
+      }
+
+      chunks.push(value);
+      loadedBytes += value.length;
+
+      if (totalBytes > 0) {
+        const progress = Math.round((loadedBytes / totalBytes) * 100);
+        progressCallBackFn(progress);
+      } else {
+        progressCallBackFn(100);
+      }
+    }
+
+    const allChunks = new Uint8Array(loadedBytes);
+    let position = 0;
+    for (const chunk of chunks) {
+      allChunks.set(chunk, position);
+      position += chunk.length;
+    }
+    const jsonString = new TextDecoder("utf-8").decode(allChunks);
+    return JSON.parse(jsonString);
   }
 }
 

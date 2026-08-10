@@ -1,5 +1,6 @@
+Here is the updated documentation reflecting the new WebSocket endpoint added to the Queue subsystem.
 
-
+---
 
 # The Only Alfaz City Analytics Engine - API Documentation
 
@@ -10,9 +11,12 @@ This document outlines all available endpoints, their expected request formats, 
 ## 1. Posts Endpoints (`/Routes/routes_posts.py`)
 
 ### `GET /summary`
+
 Retrieves a high-level cache summary of all active subreddits, including post counts and the latest timestamp.
+
 * **Request Body:** None
 * **Response Format:** JSON Dictionary
+
 ```json
 {
   "Munich": {
@@ -483,9 +487,10 @@ Calculates the 5 Core Net Sentiment Indices (ESI, ISI, CII, CCI, EII) bounded on
 
 * **Path Parameters:** `subreddit_id` (integer, e.g. `1` or `3`)
 * **Query Parameters:**
-  * `start_date` (optional, ISO string format `YYYY-MM-DD`)
-  * `end_date` (optional, ISO string format `YYYY-MM-DD`)
-  * `granularity` (optional, string: `daily`, `weekly`, or `monthly`, default: `daily`)
+* `start_date` (optional, ISO string format `YYYY-MM-DD`)
+* `end_date` (optional, ISO string format `YYYY-MM-DD`)
+* `granularity` (optional, string: `daily`, `weekly`, or `monthly`, default: `daily`)
+
 
 * **Request Body:** None
 * **Mathematical Formula:**
@@ -558,3 +563,64 @@ $$\text{Index} = 50 + 50 \times \left(\frac{\sum P_{\text{pos}} - \sum P_{\text{
     }
   ]
 }
+
+```
+
+---
+
+## 7. Process Queue Endpoints & Streaming (`/Routes/routes_queue.py`)
+
+### `GET /queue`
+
+Retrieves all tasks in the scraping and ingestion queue.
+
+* **Request Body:** None
+* **Response Format:** JSON Array of Queue Objects
+
+```json
+[
+  {
+    "id": 104,
+    "subreddit_id": 1,
+    "subreddit_name": "Munich",
+    "post_id": "t3_xyz987",
+    "status": "pending",
+    "retry_count": 0,
+    "error_message": null,
+    "created_at": "2026-08-10T17:00:00",
+    "updated_at": "2026-08-10T17:00:00"
+  }
+]
+
+```
+
+### `WS /ws/queue`
+
+Real-time, single-direction WebSocket stream pushing scraping queue mutations directly to connected frontend clients. Backed by PostgreSQL `LISTEN / NOTIFY` triggers on `scraping_queue`.
+
+#### **Connection Lifecycle**
+
+1. **Initial Push:** Upon successful handshake, the server immediately sends the current snapshot of all tasks in the queue.
+2. **Real-time Broadcasts:** Whenever a row in `scraping_queue` is inserted, updated, or deleted, a database trigger emits a `pg_notify` event (`queue_updates`), causing the API to broadcast the newly fetched queue state to all active WebSocket clients.
+
+#### **Server-to-Client Payload Structure**
+
+```json
+{
+  "type": "QUEUE_UPDATED",
+  "data": [
+    {
+      "id": 104,
+      "subreddit_id": 1,
+      "subreddit_name": "Munich",
+      "post_id": "t3_xyz987",
+      "status": "processing",
+      "retry_count": 0,
+      "error_message": null,
+      "created_at": "2026-08-10T17:00:00",
+      "updated_at": "2026-08-10T17:02:15"
+    }
+  ]
+}
+
+```

@@ -20,64 +20,51 @@ import KeywordsWordCloud from "./KeywordsWordCloud";
 import KPIAnalyticsChart from "./KPIAnalyticsChart";
 
 export default function DataTabs({ postsData, processingStatus }) {
-  
-
   useEffect(() => {
-    var currentdate = new Date();
-    var datetime =
-      "Last Sync: " +
-      " @ " +
-      currentdate.getHours() +
-      ":" +
-      currentdate.getMinutes() +
-      ":" +
-      currentdate.getSeconds() +
-      ":" +
-      currentdate.getMilliseconds();
+    console.log("Rendered");
   }, []);
 
-
-
+  // Store components as functions so they don't execute on array creation
   const TabsListData = [
     {
       value: "KPIs",
       icon: LuSmile,
-      content: <KPIAnalyticsChart />,
+      render: () => <KPIAnalyticsChart />,
     },
     {
       value: "Sentiments",
       icon: LuSmile,
-      content: <Sentiment data={postsData} />,
+      render: () => <Sentiment data={postsData} />,
     },
     {
       value: "WordCloud",
       icon: LuCloud,
-      content: <KeywordsWordCloud data={postsData} />,
+      render: () => <KeywordsWordCloud data={postsData} />,
     },
     {
       value: "Pie Chart",
       icon: LuDonut,
-      content: <KeywordsPieChart data={postsData} />,
+      render: () => <KeywordsPieChart data={postsData} />,
     },
     {
       value: "Posts Table",
       icon: LuTable,
-      content: <PostsTable data={postsData} />,
+      render: () => <PostsTable data={postsData} />,
     },
     {
       value: "Keyword Table",
       icon: VscSymbolKeyword,
-      content: <KeywordTable data={postsData} />,
+      render: () => <KeywordTable data={postsData} />,
     },
     {
       value: "Posts Frequency",
       icon: LuChartSpline,
-      content: <PostsFrequency data={postsData} />,
+      render: () => <PostsFrequency data={postsData} />,
     },
     {
       value: "Sentiments Frequency",
       icon: RiBubbleChartLine,
-      content: <EmotionsThroughoutDay data={postsData} />,
+      render: () => <EmotionsThroughoutDay data={postsData} />,
     },
   ];
 
@@ -92,9 +79,6 @@ export default function DataTabs({ postsData, processingStatus }) {
           defaultValue="KPIs"
           variant="enclosed"
           lazyMount
-          // unmountOnExit
-          // width="auto"
-          // fitted
           css={{
             "--tabs-indicator-bg": "colors.orange.600",
             "--tabs-indicator-color": "colors.orange.600",
@@ -107,7 +91,7 @@ export default function DataTabs({ postsData, processingStatus }) {
           <Tabs.List rounded="l3" p="1" overflowX="scroll" bg="transparent">
             {TabsListData.map((tab) => (
               <Tabs.Trigger
-                key={tab.value} // Always add a key
+                key={tab.value}
                 value={tab.value}
                 color="white"
                 fontWeight="bold"
@@ -122,7 +106,7 @@ export default function DataTabs({ postsData, processingStatus }) {
 
           {TabsListData.map((tab) => (
             <Tabs.Content key={tab.value} value={tab.value}>
-              {tab.content}
+              {tab.render()}
             </Tabs.Content>
           ))}
           {processingStatus && (
@@ -131,8 +115,6 @@ export default function DataTabs({ postsData, processingStatus }) {
               inset="0"
               bg="rgba(23, 23, 27, 0.6)"
               backdropFilter="blur(4px)"
-              // zIndex={10}
-              // borderRadius="l3"
             >
               <Center h="full">
                 <Spinner

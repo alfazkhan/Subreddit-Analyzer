@@ -1,11 +1,17 @@
 # Core Dependencies
+--extra-index-url https://download.pytorch.org/whl/cu121
+torch
+torchvision
+torchaudio
+
 asyncpg
 # websockets
 playwright
 transformers
-torch
 uvicorn
 fastapi
+pandas
+scipy
 
 # NLP & Text Processing
 nltk

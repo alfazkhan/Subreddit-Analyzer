@@ -41,3 +41,4 @@ Scrapping/Routes/__pycache__/
 Scrapping/docker-compose.yml
 D:*
 *huggingface_cache*
+Reddit-Scrapper/

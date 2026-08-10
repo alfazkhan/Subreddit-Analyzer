@@ -1,6 +1,7 @@
 import os
 import asyncio
 import logging
+import torch
 from playwright.async_api import async_playwright
 from config import AUTH_FILE, semaphore
 from database.core import get_db_pool

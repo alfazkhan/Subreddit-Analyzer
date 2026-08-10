@@ -123,7 +123,7 @@ export default function UserInput({ onFetchData, processingStatus }) {
               />
             </NumberInput.Root>
             <Field.HelperText>
-              Enter Number of Posts to be analyzed (Max=10,000)
+              Enter Number of Posts to be analyzed (Max=20,000)
             </Field.HelperText>
           </Field.Root>
 
