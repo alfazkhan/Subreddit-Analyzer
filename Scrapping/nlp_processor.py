@@ -1,4 +1,5 @@
 import os
+import nltk
 from collections import Counter
 import spacy
 import torch
@@ -7,12 +8,21 @@ from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 from transformers import pipeline
 
-# Suppress Hugging Face verbosity
+# Configure PyTorch allocator
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+
+# Force Hugging Face offline mode
+os.environ["HF_HUB_OFFLINE"] = "1"
+os.environ["TRANSFORMERS_OFFLINE"] = "1"
 os.environ["TRANSFORMERS_VERBOSITY"] = "error"
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 os.environ["HF_HOME"] = r"D:\huggingface_cache"
 
-# Bypass torch.load safety check for legacy transformers
+# Register local NLTK directory paths
+nltk.data.path.append(r"C:\Users\Administrator\AppData\Roaming\nltk_data")
+nltk.data.path.append(r"D:\React JS\Reddit-Data-Scrapper\Reddit-Scrapper\nltk_data")
+
+# Bypass torch.load safety check
 import transformers.utils.import_utils
 import transformers.modeling_utils
 transformers.utils.import_utils.check_torch_load_is_safe = lambda: None
@@ -21,9 +31,9 @@ transformers.modeling_utils.check_torch_load_is_safe = lambda: None
 SENTIMENT_MODEL_NAME = "cardiffnlp/twitter-xlm-roberta-base-sentiment"
 CLASSIFIER_MODEL_NAME = "MoritzLaurer/mDeBERTa-v3-base-mnli-xnli"
 
-# Target GPU device 0 if CUDA is available
-device_id = 0 if torch.cuda.is_available() else -1
-dtype = torch.float16 if torch.cuda.is_available() else torch.float32
+# Lazy global model containers
+_sentiment_pipeline = None
+_classifier_pipeline = None
 
 # Global lightweight NLP tools initialization
 try:
@@ -33,27 +43,6 @@ except Exception:
 
 lemmatizer = WordNetLemmatizer()
 ENGLISH_STOPWORDS = set(stopwords.words('english'))
-
-# Pre-load Sentiment Pipeline on GPU in FP16
-sentiment_pipeline = pipeline(
-    "sentiment-analysis",
-    model=SENTIMENT_MODEL_NAME,
-    tokenizer=SENTIMENT_MODEL_NAME,
-    device=device_id,
-    torch_dtype=dtype,
-    truncation=True,
-    max_length=512
-)
-
-# Pre-load Zero-Shot Classifier Pipeline on GPU in FP16
-classifier_pipeline = pipeline(
-    "zero-shot-classification",
-    model=CLASSIFIER_MODEL_NAME,
-    device=device_id,
-    torch_dtype=dtype,
-    truncation=True,
-    max_length=1024
-)
 
 CANDIDATE_LABELS = [
     "Rent Prices & Affordability",
@@ -89,6 +78,72 @@ CANDIDATE_LABELS = [
 ]
 
 
+def _get_target_device():
+    """Determines whether to use GPU or CPU based on environment flags."""
+    force_cpu = os.getenv("FORCE_CPU", "0") == "1"
+    if force_cpu or not torch.cuda.is_available():
+        return -1, torch.float32
+    return 0, torch.float16
+
+
+def get_sentiment_pipeline():
+    """Lazy loader for sentiment analysis pipeline."""
+    global _sentiment_pipeline
+    if _sentiment_pipeline is None:
+        device_id, dtype = _get_target_device()
+        if device_id == 0:
+            _sentiment_pipeline = pipeline(
+                "sentiment-analysis",
+                model=SENTIMENT_MODEL_NAME,
+                tokenizer=SENTIMENT_MODEL_NAME,
+                device=device_id,
+                dtype=dtype,
+                truncation=True,
+                max_length=512,
+                local_files_only=True,
+                model_kwargs={"low_cpu_mem_usage": True}
+            )
+        else:
+            _sentiment_pipeline = pipeline(
+                "sentiment-analysis",
+                model=SENTIMENT_MODEL_NAME,
+                tokenizer=SENTIMENT_MODEL_NAME,
+                device=-1,
+                truncation=True,
+                max_length=512,
+                local_files_only=True
+            )
+    return _sentiment_pipeline
+
+
+def get_classifier_pipeline():
+    """Lazy loader for zero-shot classifier pipeline."""
+    global _classifier_pipeline
+    if _classifier_pipeline is None:
+        device_id, dtype = _get_target_device()
+        if device_id == 0:
+            _classifier_pipeline = pipeline(
+                "zero-shot-classification",
+                model=CLASSIFIER_MODEL_NAME,
+                device=device_id,
+                dtype=dtype,
+                truncation=True,
+                max_length=1024,
+                local_files_only=True,
+                model_kwargs={"low_cpu_mem_usage": True}
+            )
+        else:
+            _classifier_pipeline = pipeline(
+                "zero-shot-classification",
+                model=CLASSIFIER_MODEL_NAME,
+                device=-1,
+                truncation=True,
+                max_length=1024,
+                local_files_only=True
+            )
+    return _classifier_pipeline
+
+
 def get_sentiment(text: str) -> dict:
     clean_text = text.strip() if text else ""
     if not clean_text:
@@ -97,7 +152,8 @@ def get_sentiment(text: str) -> dict:
             "scores": {"positive": 0.0, "neutral": 1.0, "negative": 0.0}
         }
     
-    results = sentiment_pipeline(clean_text, top_k=None)
+    pipe = get_sentiment_pipeline()
+    results = pipe(clean_text, top_k=None)
     scores = {"positive": 0.0, "neutral": 0.0, "negative": 0.0}
     predictions = results[0] if isinstance(results[0], list) else results
 
@@ -134,7 +190,8 @@ def classify_topics(text: str) -> dict:
     if not clean_text:
         return {"labels": [], "scores": [], "primary_topic": "Community Discussion"}
         
-    result = classifier_pipeline(clean_text, candidate_labels=CANDIDATE_LABELS)
+    pipe = get_classifier_pipeline()
+    result = pipe(clean_text, candidate_labels=CANDIDATE_LABELS)
     return {
         "labels": result["labels"],
         "scores": [round(score, 3) for score in result["scores"]],

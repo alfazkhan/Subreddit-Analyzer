@@ -1,7 +1,3 @@
-import paginationDataSlicer from "@/util/paginationDataSlicer.js";
-import DataTable from "@/components/ui-components/DataTable";
-import DataPagination from "@/components/ui-components/DataPagination";
-
 import {
   HStack,
   Table,
@@ -25,6 +21,7 @@ import {
   LuArrowUp10,
 } from "react-icons/lu";
 import PostsTable from "./PostsTable";
+import DataTable from "@/components/ui-components/Data Table/DataTable";
 
 export default function KeywordTable({ data }) {
   // --- 1. Core Filter States ---
@@ -40,8 +37,6 @@ export default function KeywordTable({ data }) {
     direction: "desc",
   });
   const [activePreset, setActivePreset] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
 
   const processedData = useMemo(() => {
     if (!data || data.length === 0) return [];
@@ -96,16 +91,9 @@ export default function KeywordTable({ data }) {
     });
     return entries;
   }, [data, minValue, maxValue, searchTerm, stopWordsStr, sortConfig]);
-  
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [minValue, maxValue, searchTerm, stopWordsStr, sortConfig]);
 
   // --- 4. Pagination & Data Scaling ---
   const totalItems = processedData.length;
-  const paginatedSlice = useMemo(() => {
-    return paginationDataSlicer(processedData, currentPage, pageSize);
-  }, [processedData, currentPage, pageSize]);
 
   const currentMaxValue =
     processedData.length > 0
@@ -225,7 +213,6 @@ export default function KeywordTable({ data }) {
       borderWidth="1px"
       borderColor="whiteAlpha.200"
     >
-      {/* --- Filter Row 1: Text Analysis Filters --- */}
       <HStack gap={4} alignItems="flex-start">
         <Field.Root>
           <Field.Label fontSize="xs" color="whiteAlpha.700">
@@ -294,7 +281,6 @@ export default function KeywordTable({ data }) {
         </Field.Root>
       </HStack>
 
-      {/* --- Filter Row 3: Presets, Custom Top, Sorting, and Actions --- */}
       <Flex
         justifyContent="space-between"
         alignItems="center"
@@ -402,7 +388,6 @@ export default function KeywordTable({ data }) {
         </HStack>
       </Flex>
 
-      {/* --- Data Table Integration --- */}
       <Table.ScrollArea
         h="500px"
         borderWidth="1px"
@@ -413,108 +398,96 @@ export default function KeywordTable({ data }) {
         <DataTable
           tableHeaders={["Keyword", "Count", "Sentiment Breakdown", "Actions"]}
         >
-          {paginatedSlice.map((item) => {
-            const posPct = ((item.Positive / item.total) * 100).toFixed(1);
-            const neuPct = ((item.Neutral / item.total) * 100).toFixed(1);
-            const negPct = ((item.Negative / item.total) * 100).toFixed(1);
+          {(paginatedSlide) =>
+            paginatedSlide.map((item) => {
+              const posPct = ((item.Positive / item.total) * 100).toFixed(1);
+              const neuPct = ((item.Neutral / item.total) * 100).toFixed(1);
+              const negPct = ((item.Negative / item.total) * 100).toFixed(1);
 
-            return (
-              <Table.Row key={item.name} color="gray.900">
-                <Table.Cell fontWeight="medium" color="whiteAlpha.900">
-                  <Button
-                    variant="plain"
-                    color="orange.400"
-                    onClick={() => handleKeywordClick(item.name)}
-                  >
-                    {item.name}
-                  </Button>
-                </Table.Cell>
-
-                <Table.Cell>
-                  <Box
-                    position="relative"
-                    width="100%"
-                    height="24px"
-                    display="flex"
-                    alignItems="center"
-                    borderRadius="md"
-                    overflow="hidden"
-                    bg="whiteAlpha.50"
-                  >
-                    <Box
-                      position="absolute"
-                      left={0}
-                      top={0}
-                      height="100%"
-                      bg="orange.600"
-                      opacity={0.4}
-                      width={`${(item.total / currentMaxValue) * 100}%`}
-                    />
-                    <Text
-                      zIndex={1}
-                      position="relative"
-                      pl={3}
-                      fontWeight="bold"
+              return (
+                <Table.Row key={item.name} color="gray.900">
+                  <Table.Cell fontWeight="medium" color="whiteAlpha.900">
+                    <Button
+                      variant="plain"
                       color="orange.400"
-                      fontSize="sm"
+                      onClick={() => handleKeywordClick(item.name)}
                     >
-                      {item.total}
-                    </Text>
-                  </Box>
-                </Table.Cell>
+                      {item.name}
+                    </Button>
+                  </Table.Cell>
 
-                <Table.Cell>
-                  <Flex
-                    w="100%"
-                    h="16px"
-                    rounded="full"
-                    overflow="hidden"
-                    bg="whiteAlpha.100"
-                    title={`Pos: ${posPct}% | Neu: ${neuPct}% | Neg: ${negPct}%`}
-                    cursor="help"
-                  >
-                    {item.Positive > 0 && <Box w={`${posPct}%`} bg="#009637" />}
-                    {item.Neutral > 0 && <Box w={`${neuPct}%`} bg="#52719c" />}
-                    {item.Negative > 0 && <Box w={`${negPct}%`} bg="#aa0505" />}
-                  </Flex>
-                </Table.Cell>
+                  <Table.Cell>
+                    <Box
+                      position="relative"
+                      width="100%"
+                      height="24px"
+                      display="flex"
+                      alignItems="center"
+                      borderRadius="md"
+                      overflow="hidden"
+                      bg="whiteAlpha.50"
+                    >
+                      <Box
+                        position="absolute"
+                        left={0}
+                        top={0}
+                        height="100%"
+                        bg="orange.600"
+                        opacity={0.4}
+                        width={`${(item.total / currentMaxValue) * 100}%`}
+                      />
+                      <Text
+                        zIndex={1}
+                        position="relative"
+                        pl={3}
+                        fontWeight="bold"
+                        color="orange.400"
+                        fontSize="sm"
+                      >
+                        {item.total}
+                      </Text>
+                    </Box>
+                  </Table.Cell>
 
-                <Table.Cell textAlign="center">
-                  <IconButton
-                    size="xs"
-                    variant="ghost"
-                    color="gray.400"
-                    _hover={{ color: "orange.400" }}
-                    onClick={() => copyToClipboard(item.name)}
-                  >
-                    <LuCopy />
-                  </IconButton>
-                </Table.Cell>
-              </Table.Row>
-            );
-          })}
+                  <Table.Cell>
+                    <Flex
+                      w="100%"
+                      h="16px"
+                      rounded="full"
+                      overflow="hidden"
+                      bg="whiteAlpha.100"
+                      title={`Pos: ${posPct}% | Neu: ${neuPct}% | Neg: ${negPct}%`}
+                      cursor="help"
+                    >
+                      {item.Positive > 0 && (
+                        <Box w={`${posPct}%`} bg="#009637" />
+                      )}
+                      {item.Neutral > 0 && (
+                        <Box w={`${neuPct}%`} bg="#52719c" />
+                      )}
+                      {item.Negative > 0 && (
+                        <Box w={`${negPct}%`} bg="#aa0505" />
+                      )}
+                    </Flex>
+                  </Table.Cell>
 
-          {paginatedSlice.length === 0 && (
-            <Table.Row>
-              <Table.Cell
-                colSpan={4}
-                textAlign="center"
-                color="gray.500"
-                py={10}
-              >
-                No keywords match the current filters.
-              </Table.Cell>
-            </Table.Row>
-          )}
+                  <Table.Cell textAlign="center">
+                    <IconButton
+                      size="xs"
+                      variant="ghost"
+                      color="gray.400"
+                      _hover={{ color: "orange.400" }}
+                      onClick={() => copyToClipboard(item.name)}
+                    >
+                      <LuCopy />
+                    </IconButton>
+                  </Table.Cell>
+                </Table.Row>
+              );
+            })
+          }
         </DataTable>
       </Table.ScrollArea>
-
-      <DataPagination
-        totalItems={totalItems}
-        currentPage={currentPage}
-        pageSize={pageSize}
-        onPageChange={(newPage) => setCurrentPage(newPage)}
-      />
     </Flex>
   );
 }

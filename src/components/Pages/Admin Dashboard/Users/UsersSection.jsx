@@ -1,5 +1,3 @@
-import DataPagination from "@/components/ui-components/DataPagination";
-import DataTable from "@/components/ui-components/DataTable";
 import { useState, useMemo } from "react";
 import { Table, HStack, Alert, CloseButton, Text } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
@@ -13,6 +11,7 @@ import { createPortal } from "react-dom";
 import EditUser from "./EditUser";
 import GenerateAPIKey from "./GenerateAPIKey";
 import paginationDataSlicer from "@/util/paginationDataSlicer";
+import DataTable from "@/components/ui-components/Data Table/DataTable";
 
 export default function UsersSection() {
   const [deletedUserInfo, setDeletedUserInfo] = useState(null);
@@ -80,37 +79,38 @@ export default function UsersSection() {
           "",
         ]}
       >
-        {paginatedSlice.map((user) => (
-          <Table.Row key={user.id} textAlign="center">
-            <Table.Cell>{user.name}</Table.Cell>
-            <Table.Cell>{user.email}</Table.Cell>
-            <Table.Cell>{user.role}</Table.Cell>
-            <Table.Cell maxWidth="100px">
-              {user.api_key ? (
-                <Text lineClamp="10">{user.api_key}</Text>
-              ) : (
-                <GenerateAPIKey />
-              )}
-            </Table.Cell>
-            <Table.Cell>{user.api_calls_count}</Table.Cell>
-            <Table.Cell>
-              {user.api_calls_limit === -1 ? "Unlimited" : user.api_calls_limit}
-            </Table.Cell>
-            <Table.Cell>
-              <HStack>
-                <EditUser initialUserValues={user} />
-                <DeleteUser user={user} onDeleteSuccess={setDeletedUserInfo} />
-              </HStack>
-            </Table.Cell>
-          </Table.Row>
-        ))}
+        {(paginatedSlice) =>
+          paginatedSlice.map((user) => (
+            <Table.Row key={user.id} textAlign="center">
+              <Table.Cell>{user.name}</Table.Cell>
+              <Table.Cell>{user.email}</Table.Cell>
+              <Table.Cell>{user.role}</Table.Cell>
+              <Table.Cell maxWidth="100px">
+                {user.api_key ? (
+                  <Text lineClamp="10">{user.api_key}</Text>
+                ) : (
+                  <GenerateAPIKey />
+                )}
+              </Table.Cell>
+              <Table.Cell>{user.api_calls_count}</Table.Cell>
+              <Table.Cell>
+                {user.api_calls_limit === -1
+                  ? "Unlimited"
+                  : user.api_calls_limit}
+              </Table.Cell>
+              <Table.Cell>
+                <HStack>
+                  <EditUser initialUserValues={user} />
+                  <DeleteUser
+                    user={user}
+                    onDeleteSuccess={setDeletedUserInfo}
+                  />
+                </HStack>
+              </Table.Cell>
+            </Table.Row>
+          ))
+        }
       </DataTable>
-      <DataPagination
-        totalItems={users.length}
-        currentPage={currentPage}
-        pageSize={pageSize}
-        onPageChange={(newPage) => setCurrentPage(newPage)}
-      />
     </>
   );
 }

@@ -1,7 +1,6 @@
 import { Pagination, ButtonGroup, IconButton } from "@chakra-ui/react";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
-import paginatedDataSlicer from "@/util/paginationDataSlicer.js";
-import { useEffect, useState } from "react";
+
 
 export default function DataPagination({
   totalItems,
@@ -12,6 +11,8 @@ export default function DataPagination({
   if (!totalItems || totalItems <= pageSize) {
     return null;
   }
+
+  
 
   return (
     <>

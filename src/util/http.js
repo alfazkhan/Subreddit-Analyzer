@@ -2,12 +2,11 @@ import { BASE_URL } from "@/Constants";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../firebase_config";
 import { authSliceActions } from "@/store/authSlice";
-import { useSelector } from "react-redux";
 import { QueryClient } from "@tanstack/react-query";
 
 export const queryClient = new QueryClient();
 
-export async function fetchingData({ endpoint, signal, headers, progressCallBackFn = ()=>{} }) {
+export async function fetchingData({ endpoint, signal, headers, progressCallBackFn = null }) {
   const fetchOptions = {
     headers: headers,
   };
@@ -25,7 +24,7 @@ export async function fetchingData({ endpoint, signal, headers, progressCallBack
     );
     error.status = response.status;
     throw error;
-  } else {
+  } else if(progressCallBackFn !== null) {
     const contentLength = response.headers.get("content-length");
     const totalBytes = contentLength ? parseInt(contentLength, 10) : 0;
     const reader = response.body.getReader();
@@ -58,6 +57,9 @@ export async function fetchingData({ endpoint, signal, headers, progressCallBack
     }
     const jsonString = new TextDecoder("utf-8").decode(allChunks);
     return JSON.parse(jsonString);
+  }else{
+    const resData = await response.json();
+    return resData
   }
 }
 

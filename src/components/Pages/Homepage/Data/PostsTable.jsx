@@ -1,5 +1,3 @@
-import DataPagination from "@/components/ui-components/DataPagination";
-import paginationDataSlicer from "../../../../util/paginationDataSlicer";
 import {
   Table,
   Badge,
@@ -9,18 +7,20 @@ import {
   Stack,
   Button,
   Link,
+  Popover,
+  Portal,
+  VStack,
+  HStack,
 } from "@chakra-ui/react";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 
 import { LuChevronDown } from "react-icons/lu";
-import DataTable from "@/components/ui-components/DataTable";
 import PostTableFilter from "./PostTableFilters";
+import DataTable from "@/components/ui-components/Data Table/DataTable";
 
 export default function PostsTable({ data: postsData }) {
   const [sentiment, setSentiment] = useState("All");
   const [topics, setTopics] = useState("All");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20); //Will be implemented later
 
   let filteredData = postsData;
 
@@ -42,37 +42,7 @@ export default function PostsTable({ data: postsData }) {
     });
   }
 
-  const totalItems = filteredData?.length || 0;
-
-  function parseTopics(topicData) {
-    const parsedData = JSON.parse(topicData);
-    if (Object.keys(parsedData).length === 0) {
-      return <Text>No Data</Text>;
-    }
-    return (
-      <>
-        {parsedData?.labels.map((label, idx) => {
-          return (
-            <Badge
-              key={idx}
-              colorPalette={
-                label === parsedData.primary_topic ? "green" : "gray"
-              }
-              variant={label === parsedData.primary_topic && "solid"}
-              size={label === parsedData.primary_topic ? "lg" : "xs"}
-            >
-              <Text key={idx}>{label}</Text>
-              <Badge key={idx + "score"} size="xs" colorPalette="yellow">
-                {(parsedData.scores[idx] * 100).toFixed(2)}%
-              </Badge>
-            </Badge>
-          );
-        })}
-      </>
-    );
-  }
-
-  function parseEntities(entitiesData, id) {
+  function parseEntities(entitiesData) {
     const parsedData = JSON.parse(entitiesData);
     if (parsedData.length === 0 || !Array.isArray(parsedData)) {
       return <p>No entities data</p>;
@@ -97,12 +67,10 @@ export default function PostsTable({ data: postsData }) {
       });
   }
 
-  const paginatedSlice = useMemo(() => {
-    return paginationDataSlicer(filteredData, currentPage, pageSize);
-  }, [filteredData, currentPage, pageSize]);
+  console.log(filteredData);
 
   return (
-    <Flex direction="column">
+    <Flex direction="column" width="full">
       <PostTableFilter
         sentiment={sentiment}
         onSentimentChange={setSentiment}
@@ -110,12 +78,13 @@ export default function PostsTable({ data: postsData }) {
         onTopicsChange={setTopics}
       />
       <Table.ScrollArea
-        h="500px"
+        // h="500px"
         borderWidth="1px"
         rounded="md"
         borderColor="gray.700"
       >
         <DataTable
+          data={filteredData}
           tableHeaders={[
             "Title",
             "Post",
@@ -124,104 +93,158 @@ export default function PostsTable({ data: postsData }) {
             "Topics",
             "Entities",
           ]}
+          pageSize={5}
         >
-          {paginatedSlice.map((post) => (
-            <Table.Row key={post.id} color="gray.900">
-              <Table.Cell maxW="200px" whiteSpace="normal" verticalAlign="top">
-                <Link
-                  color="blue.400"
-                  href={`https://www.reddit.com/r/${post.subreddit}/comments/${post.id.substring(3)}`}
+          {(paginatedSlice) =>
+            paginatedSlice.map((post) => (
+              <Table.Row key={post.id} color="gray.900">
+                <Table.Cell
+                  maxW="200px"
+                  whiteSpace="normal"
+                  verticalAlign="top"
                 >
-                  {post.title}
-                </Link>
-              </Table.Cell>
-              <Table.Cell maxW="300px" whiteSpace="normal" verticalAlign="top">
-                <Collapsible.Root collapsedHeight="80px">
-                  <Collapsible.Content>
-                    <Stack>
-                      {post.body ? (
-                        post.body
-                      ) : (
-                        <Text color="red.400" textAlign="center">
-                          No body content
-                        </Text>
-                      )}
-                    </Stack>
-                  </Collapsible.Content>
-                  {post.body.length >= 300 && (
-                    <Collapsible.Trigger asChild mt="3">
-                      <Button
-                        variant="solid"
-                        size="xs"
-                        fontSize="x-small"
-                        // color="gray.400"
-                        padding={1}
-                        borderColor="gray.200"
-                      >
-                        <Collapsible.Context>
-                          {(api) => (api.open ? "Show Less" : "Show More")}
-                        </Collapsible.Context>
-                        <Collapsible.Indicator
-                          transition="transform 0.2s"
-                          _open={{ transform: "rotate(180deg)" }}
+                  <Link
+                    color="blue.400"
+                    href={`https://www.reddit.com/r/${post.subreddit}/comments/${post.id.substring(3)}`}
+                  >
+                    {post.title}
+                  </Link>
+                </Table.Cell>
+                <Table.Cell
+                  maxW="300px"
+                  whiteSpace="normal"
+                  verticalAlign="top"
+                >
+                  <Collapsible.Root collapsedHeight="80px">
+                    <Collapsible.Content>
+                      <Stack>
+                        {post.body ? (
+                          post.body
+                        ) : (
+                          <Text color="red.400" textAlign="center">
+                            No body content
+                          </Text>
+                        )}
+                      </Stack>
+                    </Collapsible.Content>
+                    {post.body.length >= 300 && (
+                      <Collapsible.Trigger asChild mt="3">
+                        <Button
+                          variant="solid"
+                          size="xs"
+                          fontSize="x-small"
+                          // color="gray.400"
+                          padding={1}
+                          borderColor="gray.200"
                         >
-                          <LuChevronDown />
-                        </Collapsible.Indicator>
-                      </Button>
-                    </Collapsible.Trigger>
-                  )}
-                </Collapsible.Root>
-              </Table.Cell>
-              <Table.Cell>
-                <Text>
-                  {Intl.DateTimeFormat("en-DE", {
-                    year: "numeric",
-                    month: "numeric",
-                    day: "numeric",
-                  }).format(new Date(post.timestamp))}
-                </Text>
-                <Text>
-                  {Intl.DateTimeFormat("en-DE", {
-                    hour: "numeric",
-                    minute: "numeric",
-                    second: "numeric",
-                    hour12: true,
-                    timeZone: "Europe/Berlin",
-                  }).format(new Date(post.timestamp))}
-                </Text>
-              </Table.Cell>
-              <Table.Cell
-                color={
-                  config.find((element) => post.sentiment === element.label)
-                    .color
-                }
-              >
-                {post.sentiment}
-              </Table.Cell>
-              <Table.Cell>
-                <Stack direction="column">
-                  {!post.topics || Object.keys(post.topics).length === 0
-                    ? "No Data Right now..."
-                    : post.topics && parseTopics(post.topics)}
-                </Stack>
-              </Table.Cell>
-              <Table.Cell>
-                <Stack direction="column">
-                  {post.entities && parseEntities(post.entities, post.id)}
-                  {!post.entities && "No Data Right now..."}
-                </Stack>
-              </Table.Cell>
-            </Table.Row>
-          ))}
+                          <Collapsible.Context>
+                            {(api) => (api.open ? "Show Less" : "Show More")}
+                          </Collapsible.Context>
+                          <Collapsible.Indicator
+                            transition="transform 0.2s"
+                            _open={{ transform: "rotate(180deg)" }}
+                          >
+                            <LuChevronDown />
+                          </Collapsible.Indicator>
+                        </Button>
+                      </Collapsible.Trigger>
+                    )}
+                  </Collapsible.Root>
+                </Table.Cell>
+                <Table.Cell>
+                  <Text>
+                    {Intl.DateTimeFormat("en-DE", {
+                      year: "numeric",
+                      month: "numeric",
+                      day: "numeric",
+                    }).format(new Date(post.timestamp))}
+                  </Text>
+                  <Text>
+                    {Intl.DateTimeFormat("en-DE", {
+                      hour: "numeric",
+                      minute: "numeric",
+                      second: "numeric",
+                      hour12: true,
+                      timeZone: "Europe/Berlin",
+                    }).format(new Date(post.timestamp))}
+                  </Text>
+                </Table.Cell>
+                <Table.Cell
+                  color={
+                    config.find((element) => post.sentiment === element.label)
+                      .color
+                  }
+                >
+                  {post.sentiment}
+                </Table.Cell>
+                <Table.Cell>
+                  <TopicsCell topics={post.topics} />
+                </Table.Cell>
+                <Table.Cell>
+                  <Stack direction="column">
+                    {post.entities && parseEntities(post.entities, post.id)}
+                    {!post.entities && "No Data Right now..."}
+                  </Stack>
+                </Table.Cell>
+              </Table.Row>
+            ))
+          }
         </DataTable>
       </Table.ScrollArea>
-      <DataPagination
-        totalItems={totalItems}
-        currentPage={currentPage}
-        pageSize={pageSize}
-        onPageChange={(newPage) => setCurrentPage(newPage)}
-      />
     </Flex>
+  );
+}
+
+function TopicsCell({ topics }) {
+  if (Object.keys(topics).length === 0) {
+    return <Text>No Data</Text>;
+  }
+
+  const parsedData = JSON.parse(topics);
+
+  const topicsMap = new Map();
+  parsedData.labels.map((label, index) => {
+    topicsMap.set(label, parsedData.scores[index]);
+  });
+
+  return (
+    <VStack>
+      <Badge
+        key={parsedData.primary_topic}
+        colorPalette="green"
+        variant="solid"
+        size="lg"
+      >
+        <Text>{parsedData.primary_topic}</Text>
+        <Badge size="xs" colorPalette="yellow">
+          {(topicsMap.get(parsedData.primary_topic) * 100).toFixed(2)}%
+        </Badge>
+      </Badge>
+      <Popover.Root>
+        <Popover.Trigger asChild>
+          <Button size="xs" variant="solid" borderColor="gray.200" p="1">
+            All labels
+          </Button>
+        </Popover.Trigger>
+        <Portal>
+          <Popover.Positioner>
+            <Popover.Content overflow="scroll">
+              <Popover.Arrow />
+              {parsedData.labels.map((value) => (
+                <Popover.Body bg="gray.800" p="2" >
+                  <HStack>
+                    <Text>{value}</Text>
+                    <Badge size="xs" colorPalette="red">
+                      {(topicsMap.get(value) * 100).toFixed(2)}%
+                    </Badge>
+                  </HStack>
+                </Popover.Body>
+              ))}
+            </Popover.Content>
+          </Popover.Positioner>
+        </Portal>
+      </Popover.Root>
+    </VStack>
   );
 }
 

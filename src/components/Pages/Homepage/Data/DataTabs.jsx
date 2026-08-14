@@ -79,6 +79,7 @@ export default function DataTabs({ postsData, processingStatus }) {
           defaultValue="KPIs"
           variant="enclosed"
           lazyMount
+          fitted
           css={{
             "--tabs-indicator-bg": "colors.orange.600",
             "--tabs-indicator-color": "colors.orange.600",
@@ -88,7 +89,7 @@ export default function DataTabs({ postsData, processingStatus }) {
             animation: "fade-in 800ms ease-out",
           }}
         >
-          <Tabs.List rounded="l3" p="1" overflowX="scroll" bg="transparent">
+          <Tabs.List rounded="l3" p="1"  bg="transparent">
             {TabsListData.map((tab) => (
               <Tabs.Trigger
                 key={tab.value}
@@ -105,7 +106,7 @@ export default function DataTabs({ postsData, processingStatus }) {
           </Tabs.List>
 
           {TabsListData.map((tab) => (
-            <Tabs.Content key={tab.value} value={tab.value}>
+            <Tabs.Content key={tab.value} value={tab.value} >
               {tab.render()}
             </Tabs.Content>
           ))}

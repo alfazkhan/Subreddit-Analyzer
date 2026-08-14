@@ -16,6 +16,9 @@ This project is built to discover and analyze Reddit data with a full-stack plat
 - #### Subreddit selection and post count input with Cache summary display of tracked subreddit statistics
    ![Subreddit Input](./src/assets/Screenshots/UserInput.png)
 
+- KPI Analytics
+   ![KPI Analytics](./src/assets/Screenshots/KPI-Analytics.png)
+
 - Sentiment analysis views
    ![Sentiment Analysis](./src/assets/Screenshots/Sentiments.png)
 
@@ -27,6 +30,9 @@ This project is built to discover and analyze Reddit data with a full-stack plat
 
 - Post frequency analytics
   ![Post Frequency](./src/assets/Screenshots/Post-Frequency.png)
+
+- Sentiment frequency analytics
+  ![Post Frequency](./src/assets/Screenshots/Sentiment-Frequency.png)
 
 <!-- - Dynamic reanalysis UI panel
   - ![Reanalysis Panel](https://picsum.photos/seed/reanalysis-panel/800/450) -->
@@ -77,7 +83,7 @@ The application allows a user to select a subreddit, request a number of posts, 
 
 ### Subreddits
 
-- `POST /subreddits` #PendingFeature
+- `POST /subreddits` 
   - body: `{ name, description?, total_users?, is_active?, keep_updated? }`
   - Creates a new tracked subreddit configuration.
 - `GET /subreddits`

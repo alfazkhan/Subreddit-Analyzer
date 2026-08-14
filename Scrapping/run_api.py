@@ -20,6 +20,7 @@ from Routes import (
 
 IS_PRODUCTION = os.getenv("APP_ENV") == "production"
 API_HOST = "0.0.0.0" if IS_PRODUCTION else "0.0.0.0"
+os.environ["FORCE_CPU"] = "1"
 
 # Initialize Firebase Admin SDK prior to spinning up network dependencies
 if os.path.exists("firebase_creds.json"):

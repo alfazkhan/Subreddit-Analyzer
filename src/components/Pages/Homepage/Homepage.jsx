@@ -53,7 +53,7 @@ export default function Homepage() {
   }
 
   return (
-    <Flex direction="column" justifyContent="center" width="80%" margin="auto">
+    <Flex direction="column" justifyContent="center" width="full" margin="auto">
       <Flex gap="4" align="anchor-center" justify="space-between" margin="5">
         <Header text={"Subreddit Analyzer"} highlight="Analyzer" />
         <ServerStatus />

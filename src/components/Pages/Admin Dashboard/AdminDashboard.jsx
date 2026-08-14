@@ -28,7 +28,7 @@ export default function AdminDashboard() {
       </Flex>
       <Tabs.Root
         variant="plain"
-        defaultValue="manage users"
+        defaultValue="ignored words"
         orientation="horizontal"
         fitted
         lazyMount
