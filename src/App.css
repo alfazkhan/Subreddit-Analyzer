@@ -12,7 +12,7 @@
 body {
   background-color: var(--bg-dark);
   color: var(--text-main);
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   margin: 0;
   padding: 0;
 }
@@ -38,8 +38,12 @@ body {
   background: #24282e;
 }
 
-.connected { color: var(--success-green); }
-.disconnected { color: var(--error-red); }
+.connected {
+  color: var(--success-green);
+}
+.disconnected {
+  color: var(--error-red);
+}
 
 /* Progress Bar Styles */
 .progress-section {
@@ -233,7 +237,7 @@ body {
 }
 
 .table-count {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: "Courier New", Courier, monospace;
   color: #00d1b2;
 }
 
@@ -316,7 +320,27 @@ body {
 }
 
 @keyframes pulse {
-  0% { opacity: 0.6; }
-  50% { opacity: 1; }
-  100% { opacity: 0.6; }
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
 }
+
+.resizer {
+  opacity: 0;
+}
+
+.resizer:hover {
+  opacity: 1;
+}
+
+.resizer.isResizing {
+  opacity: 1;
+}
+
+

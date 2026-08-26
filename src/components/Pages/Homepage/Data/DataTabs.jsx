@@ -14,17 +14,13 @@ import Sentiment from "../Data/Sentiment";
 import KeywordsPieChart from "../Data/KeywordsPieChart";
 import PostsTable from "../Data/PostsTable";
 import PostsFrequency from "../Data/PostsFrequency";
-import { useEffect } from "react";
 import EmotionsThroughoutDay from "../Data/EmotionsThroughoutDay";
 import KeywordsWordCloud from "./KeywordsWordCloud";
 import KPIAnalyticsChart from "./KPIAnalyticsChart";
 
 export default function DataTabs({ postsData, processingStatus }) {
-  useEffect(() => {
-    console.log("Rendered");
-  }, []);
 
-  // Store components as functions so they don't execute on array creation
+
   const TabsListData = [
     {
       value: "KPIs",

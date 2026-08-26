@@ -3,7 +3,7 @@ import DataPagination from "../DataPagination";
 import { useState } from "react";
 import paginationDataSlicer from "@/util/paginationDataSlicer";
 
-export default function DataTable({ data, tableHeaders, pageSize = 20, children }) {
+export default function DataTable({ data, tableHeaders, pageSize = 20, children, ...props }) {
   const [currentPage, setCurrentPage] = useState(1);
 
   const dataSlice = paginationDataSlicer(data, currentPage, pageSize);
@@ -16,6 +16,7 @@ export default function DataTable({ data, tableHeaders, pageSize = 20, children 
         // showColumnBorder
         stickyHeader
         css={{ "& td": { textAlign: "center", color: "colorPalette.100" } }}
+        {...props}
       >
         <Table.Caption />
         <Table.Header>
@@ -39,12 +40,12 @@ export default function DataTable({ data, tableHeaders, pageSize = 20, children 
         </Table.Header>
         <Table.Body>{children(dataSlice)}</Table.Body>
       </Table.Root>
-      <DataPagination
+      {/* <DataPagination
         totalItems={data.length}
         currentPage={currentPage}
         pageSize={pageSize}
         onPageChange={setCurrentPage}
-      />
+      /> */}
     </>
   );
 }

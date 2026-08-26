@@ -17,10 +17,6 @@ export default function Homepage() {
     (state) => state.userInputState.targetPostCount,
   );
 
-  useEffect(() => {
-    console.log("Rendered");
-  }, []);
-
   const [progress, setProgress] = useState(0);
 
   const {
@@ -45,7 +41,7 @@ export default function Homepage() {
 
 
   function fetchSubredditData(subredditName, currentCount) {
-    mutate({
+    mutate({ 
       endpoint: `posts/${subredditName}?limit=${currentCount}`,
       headers: { "Content-Type": "application/json" },
       progressCallBackFn: setProgress,

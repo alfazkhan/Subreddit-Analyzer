@@ -3,10 +3,12 @@ import { Button } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 
-export default function ApproveWord({ word }) {
+export default function ApproveWord({ getValue, row, column, table }) {
+  const word = row?.original || { aprroved: false, row: row };
+  console.log(row);
+  console.log(word);
 
   const authState = useSelector((state) => state.authState);
-
 
   const { mutate, isPending, isError, error } = useMutation({
     mutationFn: editingData,
@@ -22,9 +24,9 @@ export default function ApproveWord({ word }) {
         approved: payload,
       },
       headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authState.token}`,
-        },
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authState.token}`,
+      },
     });
   }
   return (
