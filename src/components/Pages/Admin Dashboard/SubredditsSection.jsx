@@ -3,6 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchingData } from "@/util/http";
 import LoadingAndError from "@/components/ui-components/LoadingAndError";
 import TanStackDataTable from "@/components/ui-components/Data Table/TanstackDataTable";
+import {
+  TextSearch,
+  ValueSearch,
+} from "@/components/ui-components/Data Table/Filters";
 
 export default function SubredditsSection() {
   const {
@@ -46,7 +50,7 @@ export default function SubredditsSection() {
               return true;
             }
             const value = row.getValue(columnID).toLowerCase();
-            return value.includes(filterValue.toLowerCase())
+            return value.includes(filterValue.toLowerCase());
           },
         },
         {
@@ -96,53 +100,33 @@ export default function SubredditsSection() {
 }
 
 const TableFilters = ({ table }) => {
-  const nameColumn = table.getColumn("name");
-  const isActiveColumn = table.getColumn("is_active");
-  const isUpdatedColumn = table.getColumn("keep_updated");
-
 
   return (
     <HStack>
-      <Input
-        size="2xs"
+      <TextSearch
+        table={table}
+        fieldName={"name"}
         placeholder="Subreddit Name..."
-        variant="outline"
-        onChange={(e) => nameColumn?.setFilterValue(e.target.value)}
       />
-      <NativeSelect.Root size="xs">
-        <NativeSelect.Field
-          onChange={(e) => {
-            const val = e.target.value;
-            if (val === "") {
-              isActiveColumn?.setFilterValue(undefined);
-            } else {
-              isActiveColumn?.setFilterValue(val === "true");
-            }
-          }}
-        >
-          <option value="">Subreddit Active</option>
-          <option value="true">Active</option>
-          <option value="false">Not Active</option>
-        </NativeSelect.Field>
-        <NativeSelect.Indicator />
-      </NativeSelect.Root>
-      <NativeSelect.Root size="xs">
-        <NativeSelect.Field
-          onChange={(e) => {
-            const val = e.target.value;
-            if (val === "") {
-              isUpdatedColumn?.setFilterValue(undefined);
-            } else {
-              isUpdatedColumn?.setFilterValue(val === "true");
-            }
-          }}
-        >
-          <option value="">Subreddit Updated</option>
-          <option value="true">Updated</option>
-          <option value="false">Not Updated</option>
-        </NativeSelect.Field>
-        <NativeSelect.Indicator />
-      </NativeSelect.Root>
+
+      <ValueSearch
+        table={table}
+        fieldName="is_active"
+        options={[
+          { value: "", text: "All" },
+          { value: "true", text: "Active" },
+          { value: "false", text: "Not Active" },
+        ]}
+      />
+      <ValueSearch
+        table={table}
+        fieldName="keep_updated"
+        options={[
+          { value: "", text: "All" },
+          { value: "true", text: "Updated" },
+          { value: "false", text: "Not Updated" },
+        ]}
+      />
     </HStack>
   );
 };

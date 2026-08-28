@@ -17,11 +17,6 @@ export default function AlertDialog({ ref, onDelete, id, message }) {
   
   return (
     <Dialog.Root role="dialog" modal open={open} >
-      {/* <Dialog.Trigger asChild>
-        <Button variant="outline" size="sm">
-          Open Dialog
-        </Button>
-      </Dialog.Trigger> */}
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>

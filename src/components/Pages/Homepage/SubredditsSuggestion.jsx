@@ -1,15 +1,6 @@
-import { Button, HStack, VStack, Text, Flex } from "@chakra-ui/react";
+import { Button, VStack, Text, Flex } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { userInputAction } from "../../../store/userInput.js";
-
-// const Suggestions = [
-//   { name: "r/India", link: "India" },
-//   { name: "r/Mumbai", link: "Mumbai" },
-//   { name: "r/Munich", link: "Munich" },
-//   { name: "r/AskIndianWomen", link: "AskIndianWomen" },
-//   { name: "r/BoycottIsrael", link: "BoycottIsrael" },
-//   { name: "r/LegalAdviceIndia", link: "LegalAdviceIndia" },
-// ];
 
 function dateTimeFormatter(rawTimestamp) {
   const date = new Date(rawTimestamp);

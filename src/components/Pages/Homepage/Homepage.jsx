@@ -29,6 +29,7 @@ export default function Homepage() {
   } = useMutation({
     queryKey: ["posts", subreddit, targetCount],
     mutationFn: fetchingData,
+    onSuccess:()=>{setProgress(0)}
   });
 
   let errorContent;
@@ -75,9 +76,9 @@ export default function Homepage() {
 }
 
 function ProgressBar({ progressValue }) {
-  useEffect(() => {
-    console.log("Rendered");
-  }, []);
+  // useEffect(() => {
+  //   console.log(progressValue);
+  // }, [progressValue]);
   return (
     <Progress.Root
       value={progressValue > 0 ? progressValue : null}
@@ -86,7 +87,7 @@ function ProgressBar({ progressValue }) {
       animated
     >
       <HStack>
-        <Progress.Label>Downloaded</Progress.Label>
+        <Progress.Label>{progressValue < 100 ? "Downloading..." : "Downloaded"}</Progress.Label>
         <Progress.Track flex="1">
           <Progress.Range />
         </Progress.Track>

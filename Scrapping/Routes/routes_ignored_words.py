@@ -4,8 +4,10 @@ from typing import Optional, List
 
 from auth_guard import require_role
 from database.ignored_words import (
-    db_add_ignored_word, db_get_all_ignored_words_details, 
-    db_update_ignored_word, db_delete_ignored_word
+    db_add_ignored_word, 
+    db_get_all_ignored_words_details, 
+    db_update_ignored_word, 
+    db_delete_ignored_word
 )
 
 router = APIRouter(prefix="/ignored-words", tags=["Ignored Words Control Layer"])
@@ -17,14 +19,14 @@ class IgnoredWordBase(BaseModel):
 
 class IgnoredWordUpdate(BaseModel):
     language: Optional[str] = 'en'
-    approved: Optional[bool] = False
-    processed: Optional[bool] = False
+    approved: bool
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 async def create_ignored_word(payload: List[IgnoredWordBase]):
+    """Users/Admins report new words to ignore (defaults: approved=False, processed=False)."""
     for item in payload:
         await db_add_ignored_word(item.word, item.language, False)
-    return {"message": f"{len(payload)} ignored word(s) added successfully"}
+    return {"message": f"{len(payload)} ignored word(s) submitted successfully"}
 
 @router.get("", response_model=List[dict])
 async def list_ignored_words():
@@ -36,10 +38,23 @@ async def update_ignored_word(
     payload: IgnoredWordUpdate,
     super_admin: dict = Depends(require_role(["Super Admin"]))
 ):
-    success = await db_update_ignored_word(word, payload.language, payload.approved, payload.processed)
-    if not success:
+    """
+    Admin updates approval state:
+    - Setting approved=True purges the keyword from reddit_posts and marks processed=True.
+    - Setting approved=False marks processed=False.
+    """
+    result = await db_update_ignored_word(word, payload.language, payload.approved)
+    
+    if not result["success"]:
         raise HTTPException(status_code=404, detail="Ignored word not found")
-    return {"message": "Ignored word updated successfully"}
+        
+    return {
+        "message": "Ignored word status updated successfully",
+        "word": word,
+        "approved": payload.approved,
+        "processed": result["processed"],
+        "affected_posts": result["affected_posts"]
+    }
 
 @router.delete("/{word}")
 async def delete_ignored_word(

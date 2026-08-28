@@ -9,7 +9,7 @@ import {
 } from "react-icons/lu";
 import { RiBubbleChartLine } from "react-icons/ri";
 import { VscSymbolKeyword } from "react-icons/vsc";
-import KeywordTable from "../Data/KeywordTable";
+import KeywordTable from "./KeywordTable";
 import Sentiment from "../Data/Sentiment";
 import KeywordsPieChart from "../Data/KeywordsPieChart";
 import PostsTable from "../Data/PostsTable";
@@ -72,9 +72,10 @@ export default function DataTabs({ postsData, processingStatus }) {
     <>
       <Box position="relative" aria-busy="true" userSelect="none">
         <Tabs.Root
-          defaultValue="KPIs"
+          defaultValue="Keyword Table"
           variant="enclosed"
           lazyMount
+          unmountOnExit
           fitted
           css={{
             "--tabs-indicator-bg": "colors.orange.600",

@@ -3,10 +3,9 @@ import { Button } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 
-export default function ApproveWord({ getValue, row, column, table }) {
-  const word = row?.original || { aprroved: false, row: row };
-  console.log(row);
-  console.log(word);
+export default function ApproveWord({row }) {
+  const word = row?.original
+
 
   const authState = useSelector((state) => state.authState);
 
@@ -14,14 +13,15 @@ export default function ApproveWord({ getValue, row, column, table }) {
     mutationFn: editingData,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["ignored-words"] });
+      queryClient.invalidateQueries({ queryKey: ["keywords"] });
     },
   });
 
   function ignoredWordApprovalHandler(word, payload) {
     mutate({
-      endpoint: `ignored-words/${word.word}`,
+      endpoint: `ignored-words/${encodeURIComponent(word.word)}`,
       body: {
-        approved: payload,
+        approved: Boolean(payload),
       },
       headers: {
         "Content-Type": "application/json",
@@ -34,7 +34,7 @@ export default function ApproveWord({ getValue, row, column, table }) {
       colorPalette={!word.approved ? "green" : "red"}
       variant="solid"
       size="2xs"
-      // disabled={isLoading}
+      disabled={isPending}
       onClick={() => ignoredWordApprovalHandler(word, !word.approved)}
     >
       {!word.approved ? "Approve" : "Dis-Approve"}

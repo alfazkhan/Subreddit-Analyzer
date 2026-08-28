@@ -5,6 +5,7 @@ import {
   flexRender,
   getPaginationRowModel,
   getFilteredRowModel,
+  getSortedRowModel,
 } from "@tanstack/react-table";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import {
@@ -14,7 +15,10 @@ import {
   ButtonGroup,
   IconButton,
   Stack,
+  Text,
+  HStack,
 } from "@chakra-ui/react";
+import { FaArrowDown, FaArrowUp, FaMinus } from "react-icons/fa";
 
 export default function TanStackDataTable({
   data,
@@ -23,14 +27,13 @@ export default function TanStackDataTable({
   TableFiltersComponent = () => <></>,
   ...props
 }) {
-  const sortedData = data.sort((a, b) => b.id - a.id);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: pageSize,
   });
 
   const table = useReactTable({
-    data: sortedData,
+    data: data,
     state: {
       pagination,
     },
@@ -38,12 +41,10 @@ export default function TanStackDataTable({
       columnFilters: [],
     },
     columns: tableColumns,
-    meta: {
-      add: (a, b) => a + b,
-    },
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     columnResizeMode: "onChange",
   });
 
@@ -72,12 +73,44 @@ export default function TanStackDataTable({
                   position="relative"
                   width={`${header.getSize()}px`}
                 >
-                  <div>
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext(),
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                  >
+                    <div
+                    
+                    >
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
+                    </div>
+                    {header.column.getCanSort() && (
+                      <Text
+                        as="button"
+                        size="2xs"
+                        fontSize="2xs"
+                        padding="0.5"
+                        rounded="full"
+                        bgColor="gray.200"
+                        color="orange.600"
+                        justifySelf="end"
+                        onClick={() => {
+                          header.column.toggleSorting(
+                            header.column.getIsSorted() === "asc",
+                          );
+                        }}
+                        marginLeft={2}
+                      >
+                        {!header.column.getIsSorted() && <FaMinus />}
+                        {header.column.getIsSorted() === "asc" && <FaArrowUp />}
+                        {header.column.getIsSorted() === "desc" && (
+                          <FaArrowDown />
+                        )}
+                      </Text>
                     )}
-                  </div>
+                  </Box>
                   <Resizer header={header} />
                 </Table.ColumnHeader>
               ))}

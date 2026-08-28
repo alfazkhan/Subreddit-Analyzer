@@ -79,31 +79,6 @@ export default function IgnoredWordsSection() {
         ]}
         pageSize={10}
       />
-      <DataTable
-        data={words}
-        tableHeaders={["Words", "Language", "Processed", "Approved"]}
-        display="none"
-      >
-        {(slicedData) =>
-          slicedData.map((word) => (
-            <DataTable.Row key={word.id}>
-              <DataTable.Cell>{word.word}</DataTable.Cell>
-              <DataTable.Cell>{word.language}</DataTable.Cell>
-              <DataTable.Cell textAlign="center">
-                <Badge
-                  variant="subtle"
-                  colorPalette={word.processed ? "green" : "gray"}
-                >
-                  {word.processed ? "Processed" : "Not Processed"}
-                </Badge>
-              </DataTable.Cell>
-              <DataTable.Cell textAlign="center">
-                <ApproveWord word={word} />
-              </DataTable.Cell>
-            </DataTable.Row>
-          ))
-        }
-      </DataTable>
     </>
   );
 }
