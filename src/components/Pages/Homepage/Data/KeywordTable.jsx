@@ -6,10 +6,11 @@ import {
 import TanStackDataTable from "@/components/ui-components/Data Table/TanstackDataTable";
 import LoadingAndError from "@/components/ui-components/LoadingAndError";
 import { sendingData, fetchingData, queryClient } from "@/util/http";
-import { Button, HStack, Text, VStack } from "@chakra-ui/react";
+import { Button, HStack, Text, VStack, Checkbox } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
 import { useSelector } from "react-redux";
+import { ActionBar, Portal } from "@chakra-ui/react";
+import { LuShare, LuTrash2 } from "react-icons/lu";
 
 export default function KeywordTable() {
   const {
@@ -26,7 +27,9 @@ export default function KeywordTable() {
   });
 
   if (isError || isPending || isLoading) {
-    return <LoadingAndError isLoading={isLoading} isError={isError} error={error} />;
+    return (
+      <LoadingAndError isLoading={isLoading} isError={isError} error={error} />
+    );
   }
 
   return (
@@ -34,7 +37,46 @@ export default function KeywordTable() {
       <TanStackDataTable
         data={keywords}
         TableFiltersComponent={KeywordFilters}
+        TableToolbarComponent={ToolBar}
+        getRowId={(row) => row.word}
+        enableRowSelection={(row) => !row.original.reported}
         tableColumns={[
+          {
+            accessorFn: (originalRow) => originalRow.word,
+            id: (row) => row.word,
+            header: ({ table }) => {
+              let checked = false;
+              const someChecked = table.getIsSomeRowsSelected();
+              const allChecked = table.getIsAllRowsSelected();
+              if (someChecked && !allChecked) {
+                checked = "indeterminate";
+              } else if (allChecked) {
+                checked = true;
+              }
+              return (
+                <Checkbox.Root
+                  checked={checked}
+                  onChange={table.getToggleAllRowsSelectedHandler()}
+                >
+                  <Checkbox.HiddenInput />
+                  <Checkbox.Control />
+                </Checkbox.Root>
+              );
+            },
+            cell: ({ row }) => (
+              <Checkbox.Root
+                checked={row.getIsSelected()}
+                disabled={!row.getCanSelect()}
+                onCheckedChange={row.getToggleSelectedHandler()}
+                size="sm"
+              >
+                <Checkbox.HiddenInput />
+                <Checkbox.Control />
+              </Checkbox.Root>
+            ),
+            size: 50,
+            enableSorting: false,
+          },
           {
             accessorKey: "word",
             header: "Word",
@@ -44,14 +86,14 @@ export default function KeywordTable() {
               </Button>
             ),
             filterFn: "includesString",
-            sortingFn: "text"
+            sortingFn: "text",
           },
           {
             accessorKey: "frequency",
             header: "Count",
             cell: (props) => props.getValue(),
             filterFn: "inNumberRange",
-            sortingFn: "alphanumeric"
+            sortingFn: "alphanumeric",
           },
           {
             accessorKey: "sentiment_distribution",
@@ -69,7 +111,7 @@ export default function KeywordTable() {
                 </Text>
               </HStack>
             ),
-            enableSorting: false
+            enableSorting: false,
           },
           {
             accessorKey: "reported",
@@ -77,21 +119,48 @@ export default function KeywordTable() {
             cell: ReportWord,
             filterFn: (row, columnID, filterValue) => {
               const value = row.getValue(columnID);
-              if(filterValue){
-                return true
+              if (filterValue) {
+                return true;
               }
-              if(filterValue === value){
-                return true
+              if (filterValue === value) {
+                return true;
               }
-              return false
+              return false;
             },
-            enableSorting: false
+            enableSorting: false,
           },
         ]}
       />
     </>
   );
 }
+
+const ToolBar = ({ table }) => {
+  // console.log(Object.keys(table.getState().rowSelection));
+  // console.log(table.getSelectedRowModel().rows);
+  if (table.getSelectedRowModel().rows.length !== 0) {
+    return (
+      <>
+        <ActionBar.Root open>
+          <Portal>
+            <ActionBar.Positioner>
+              <ActionBar.Content>
+                <ActionBar.SelectionTrigger color="black">
+                  {table.getSelectedRowModel().rows.length} selected
+                </ActionBar.SelectionTrigger>
+                <ActionBar.Separator />
+                <Button variant="outline" size="sm" color="red">
+                  <LuTrash2 />
+                  Report as Useless
+                </Button>
+              </ActionBar.Content>
+            </ActionBar.Positioner>
+          </Portal>
+        </ActionBar.Root>
+      </>
+    );
+  }
+};
 
 const KeywordFilters = ({ table }) => {
   return (

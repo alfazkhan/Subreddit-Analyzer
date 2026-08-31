@@ -16,15 +16,16 @@ import {
   IconButton,
   Stack,
   Text,
-  HStack,
 } from "@chakra-ui/react";
 import { FaArrowDown, FaArrowUp, FaMinus } from "react-icons/fa";
+
 
 export default function TanStackDataTable({
   data,
   tableColumns,
   pageSize = 10,
   TableFiltersComponent = () => <></>,
+  TableToolbarComponent=()=><></>,
   ...props
 }) {
   const [pagination, setPagination] = useState({
@@ -46,11 +47,14 @@ export default function TanStackDataTable({
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     columnResizeMode: "onChange",
+    ...props,
   });
+
 
   return (
     <Stack>
       <TableFiltersComponent table={table} />
+      <TableToolbarComponent table={table} />
       <Table.Root
         variant="outline"
         stickyHeader
@@ -59,7 +63,6 @@ export default function TanStackDataTable({
         width={`${table.getTotalSize()}px`}
         minWidth="100%"
         showColumnBorder
-        {...props}
       >
         <Table.Header>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -78,9 +81,7 @@ export default function TanStackDataTable({
                     justifyContent="center"
                     alignItems="center"
                   >
-                    <div
-                    
-                    >
+                    <div>
                       {flexRender(
                         header.column.columnDef.header,
                         header.getContext(),
@@ -121,7 +122,10 @@ export default function TanStackDataTable({
           {table.getRowModel().rows.map((row) => (
             <Table.Row key={row.id} textAlign="center">
               {row.getVisibleCells().map((cell) => (
-                <Table.Cell key={cell.id}>
+                <Table.Cell
+                  key={cell.id}
+                  backgroundColor={row.getIsSelected() ? "rgba(255, 255, 255, 0.1);" : "transparent"}
+                >
                   <div>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </div>

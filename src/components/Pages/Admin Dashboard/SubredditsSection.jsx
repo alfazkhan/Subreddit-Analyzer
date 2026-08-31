@@ -1,4 +1,4 @@
-import { Badge, Text, NativeSelect, HStack, Input } from "@chakra-ui/react";
+import { Badge, HStack, Checkbox } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchingData } from "@/util/http";
 import LoadingAndError from "@/components/ui-components/LoadingAndError";
@@ -30,16 +30,32 @@ export default function SubredditsSection() {
     <TanStackDataTable
       data={subreddits}
       TableFiltersComponent={TableFilters}
+      getRowId= {(row)=>row.id}
       tableColumns={[
         {
           accessorKey: "id",
-          header: "ID",
-          cell: (props) => (
-            <Text textStyle="2xs" color="gray.600">
-              {props.getValue()}
-            </Text>
+          header: ({ table }) => (
+            <Checkbox.Root
+              checked={table.getIsAllRowsSelected()}
+              indeterminate={table.getIsSomeRowsSelected()}
+              onChange={table.getToggleAllRowsSelectedHandler()}
+            >
+              <Checkbox.HiddenInput />
+              <Checkbox.Control />
+            </Checkbox.Root>
+          ),
+          cell: ({ row }) => (
+            <Checkbox.Root
+              checked={row.getIsSelected()}
+              disabled={!row.getCanSelect()}
+              onCheckedChange={row.getToggleSelectedHandler()}
+            >
+              <Checkbox.HiddenInput />
+              <Checkbox.Control />
+            </Checkbox.Root>
           ),
           size: 50,
+          enableSorting: false
         },
         {
           accessorKey: "name",
@@ -100,7 +116,6 @@ export default function SubredditsSection() {
 }
 
 const TableFilters = ({ table }) => {
-
   return (
     <HStack>
       <TextSearch
