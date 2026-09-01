@@ -1,6 +1,7 @@
 import os
 import asyncio
 import logging
+from datetime import datetime, timezone
 import torch
 from playwright.async_api import async_playwright
 from config import AUTH_FILE, semaphore
@@ -32,10 +33,38 @@ async def scrape_post_by_id(context, post_id: str, subreddit_name: str, ignored_
             await page.goto(url, wait_until="load", timeout=45000)
             
             try:
-                await page.wait_for_selector('h1', timeout=10000, state="attached")
+                await page.wait_for_selector('shreddit-post', timeout=10000, state="attached")
             except Exception:
                 pass
 
+            # 1. Extract Metrics directly from shreddit-post component attributes
+            shreddit_el = page.locator('shreddit-post').first
+            score = 0
+            num_comments = 0
+            upvote_ratio = 0.0
+
+            if await shreddit_el.count() > 0:
+                raw_score = await shreddit_el.get_attribute("score")
+                raw_comments = await shreddit_el.get_attribute("comment-count")
+                raw_ratio = await shreddit_el.get_attribute("upvote-ratio")
+
+                try:
+                    score = int(raw_score) if raw_score is not None else 0
+                except (ValueError, TypeError):
+                    score = 0
+
+                try:
+                    num_comments = int(raw_comments) if raw_comments is not None else 0
+                except (ValueError, TypeError):
+                    num_comments = 0
+
+                try:
+                    if raw_ratio is not None:
+                        upvote_ratio = round(float(raw_ratio), 3)
+                except (ValueError, TypeError):
+                    upvote_ratio = 0.0
+
+            # 2. Extract Title
             title = ""
             for selector in ['h1', '[post-title]', 'shreddit-title', 'title']:
                 loc = page.locator(selector).first
@@ -49,15 +78,14 @@ async def scrape_post_by_id(context, post_id: str, subreddit_name: str, ignored_
                 await update_queue_status(post_id, 'failed')
                 return None
 
-            body_loc = page.locator('shreddit-post-text-body').first
+            # 3. Extract Body & Timestamp
+            body_loc = page.locator('shreddit-post-text-body, div[data-test-id="post-content"]').first
             content = await body_loc.inner_text() if await body_loc.count() > 0 else ""
             
             time_loc = page.locator('time').first
             ts = await time_loc.get_attribute('datetime') if await time_loc.count() > 0 else ""
 
             combined_text = f"{title} {content}"
-
-            # Calculate sentiment details (returns label and probability distribution)
             sentiment_data = get_sentiment(combined_text)
 
             post_entry = {
@@ -65,8 +93,11 @@ async def scrape_post_by_id(context, post_id: str, subreddit_name: str, ignored_
                 "timestamp": ts, 
                 "title": title, 
                 "body": content,
-                "sentiment": sentiment_data["label"],           # "Positive", "Neutral", "Negative"
-                "sentiment_scores": sentiment_data["scores"],   # {"positive": 0.8521, "neutral": 0.1102, ...}
+                "score": score,
+                "upvote_ratio": upvote_ratio,
+                "num_comments": num_comments,
+                "sentiment": sentiment_data["label"],
+                "sentiment_scores": sentiment_data["scores"],
                 "keywords": extract_keywords(combined_text, ignored_words),
                 "entities": extract_entities(combined_text),
                 "topics": classify_topics(combined_text)
@@ -74,7 +105,10 @@ async def scrape_post_by_id(context, post_id: str, subreddit_name: str, ignored_
             
             await save_post_to_db(post_entry, subreddit_name)
             await update_queue_status(post_id, 'completed')
-            logging.info(f"Scraper: Successfully archived {post_id} with Zero-Shot categorization and sentiment scores.")
+            logging.info(
+                f"Scraper: Successfully archived {post_id} | "
+                f"Score: {score} | Comments: {num_comments} | Ratio: {upvote_ratio}"
+            )
             return post_entry
             
         except Exception as e:
@@ -102,7 +136,6 @@ async def run_discovery_scan(subreddit_name: str, mode: str = 'routine', headles
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=headless)
         
-        # Unified Production Stealth Context
         context = await browser.new_context(
             storage_state=AUTH_FILE if os.path.exists(AUTH_FILE) else None,
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
@@ -126,7 +159,6 @@ async def run_discovery_scan(subreddit_name: str, mode: str = 'routine', headles
                     pid, _ = await get_post_metadata(p_el)
                     if not pid: continue
                     
-                    # Core Unified Logic Boundaries
                     if mode == 'routine' and pid in archived_ids:
                         logging.info(f"Discovery: Hit archive boundary {pid}. Stopping.")
                         stop_scrolling = True
@@ -166,13 +198,11 @@ async def process_queue_batch(subreddit_name: str, limit: int = 15, status: str 
     if not tasks:
         return
 
-    # Fetch the exact list of ignored words at the moment this batch begins
     ignored_words = await get_all_ignored_words()
 
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=headless)
         
-        # Production Stealth Context Override
         context = await browser.new_context(
             storage_state=AUTH_FILE if os.path.exists(AUTH_FILE) else None,
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
@@ -182,7 +212,6 @@ async def process_queue_batch(subreddit_name: str, limit: int = 15, status: str 
         )
         try:
             for t in tasks:
-                # Pass the dynamically fetched ignored words down to the single post scraper
                 await scrape_post_by_id(context, t['post_id'], subreddit_name, ignored_words)
         finally:
             await browser.close()

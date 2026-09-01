@@ -37,21 +37,38 @@ async def save_post_to_db(post_entry: dict, subreddit_name: str):
         ts_obj = safe_parse_timestamp(post_entry.get('timestamp'))
         
         await conn.execute('''
-            INSERT INTO reddit_posts (id, subreddit_id, timestamp, title, body, sentiment, sentiment_scores, keywords, entities, topics)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
+            INSERT INTO reddit_posts (
+                id, subreddit_id, timestamp, title, body, sentiment, 
+                sentiment_scores, keywords, entities, topics,
+                score, upvote_ratio, num_comments
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) 
             ON CONFLICT (id) DO UPDATE SET
                 title = EXCLUDED.title,
                 body = EXCLUDED.body,
+                timestamp = EXCLUDED.timestamp,
                 sentiment = EXCLUDED.sentiment,
                 sentiment_scores = EXCLUDED.sentiment_scores,
                 keywords = EXCLUDED.keywords,
                 entities = EXCLUDED.entities,
-                topics = EXCLUDED.topics
-        ''', post_entry['id'], sub_id, ts_obj, post_entry['title'], 
-           post_entry['body'], post_entry['sentiment'], 
+                topics = EXCLUDED.topics,
+                score = EXCLUDED.score,
+                upvote_ratio = EXCLUDED.upvote_ratio,
+                num_comments = EXCLUDED.num_comments
+        ''', 
+           post_entry['id'], 
+           sub_id, 
+           ts_obj, 
+           post_entry['title'], 
+           post_entry['body'], 
+           post_entry['sentiment'], 
            json.dumps(post_entry.get('sentiment_scores', {})),
-           json.dumps(post_entry['keywords']), json.dumps(post_entry['entities']),
-           json.dumps(post_entry['topics']))
+           json.dumps(post_entry.get('keywords', {})), 
+           json.dumps(post_entry.get('entities', [])),
+           json.dumps(post_entry.get('topics', {})),
+           int(post_entry.get('score', 0)),
+           float(post_entry.get('upvote_ratio', 0.0)),
+           int(post_entry.get('num_comments', 0)))
 
 async def load_posts_from_db(subreddit_name: str, limit: int):
     pool = await get_db_pool()
@@ -124,6 +141,15 @@ async def db_update_post(post_id: str, updates: dict):
         if "topics" in updates:
             args.append(json.dumps(updates["topics"]))
             set_clauses.append(f"topics = ${len(args)}")
+        if "score" in updates:
+            args.append(int(updates["score"]))
+            set_clauses.append(f"score = ${len(args)}")
+        if "upvote_ratio" in updates:
+            args.append(float(updates["upvote_ratio"]))
+            set_clauses.append(f"upvote_ratio = ${len(args)}")
+        if "num_comments" in updates:
+            args.append(int(updates["num_comments"]))
+            set_clauses.append(f"num_comments = ${len(args)}")
 
         if not set_clauses:
             return False
@@ -152,7 +178,6 @@ async def get_post_content_for_reanalysis(subreddit_name: str):
         return [dict(row) for row in rows]
 
 async def get_post_keywords_for_cleaning(subreddit_name: str):
-    """Fetches ONLY the post IDs and pre-existing extracted keywords for lightning-fast purification."""
     pool = await get_db_pool()
     async with pool.acquire() as conn:
         rows = await conn.fetch('''
@@ -163,7 +188,6 @@ async def get_post_keywords_for_cleaning(subreddit_name: str):
         return [dict(row) for row in rows]
 
 async def update_post_nlp_data(post_id: str, sentiment: str, sentiment_scores: dict, keywords: list, entities: dict, topics: dict):
-    """Updates the complete suite including our new classification objects."""
     pool = await get_db_pool()
     async with pool.acquire() as conn:
         await conn.execute('''
@@ -182,15 +206,9 @@ async def update_post_keywords_only(post_id: str, keywords: dict):
         ''', json.dumps(keywords), post_id)
 
 async def get_all_posts_for_dynamic_reanalysis(subreddit: str, target_pipelines: list, only_null: bool, start_date: str = None, end_date: str = None):
-    """
-    Dynamically loads text records from PostgreSQL based on the requested features.
-    If only_null is True, it acts as an optimization fill.
-    If only_null is False, it fetches all records in the date window for a full overwrite.
-    """
     pool = await get_db_pool()
     
-    # Base extraction query mapping
-    query = "SELECT id, title, body, sentiment, sentiment_scores, keywords, entities, topics FROM public.reddit_posts WHERE subreddit_id = (SELECT id FROM public.subreddits WHERE name = $1)"
+    query = "SELECT id, title, body, sentiment, sentiment_scores, keywords, entities, topics, score, upvote_ratio, num_comments FROM public.reddit_posts WHERE subreddit_id = (SELECT id FROM public.subreddits WHERE name = $1)"
     args = [subreddit]
     
     if start_date:
@@ -201,7 +219,6 @@ async def get_all_posts_for_dynamic_reanalysis(subreddit: str, target_pipelines:
         args.append(safe_parse_timestamp(end_date))
         query += f" AND timestamp <= ${len(args)}::timestamp"
     
-    # Only append column filters if we are doing a targeted null-fill operation
     if target_pipelines and only_null:
         clauses = []
         for feature in target_pipelines:
