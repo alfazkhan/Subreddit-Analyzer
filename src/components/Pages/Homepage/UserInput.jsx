@@ -13,7 +13,10 @@ import { userInputAction } from "../../../store/userInput.js";
 
 import { useSelector, useDispatch } from "react-redux";
 
-export default function UserInput({ onFetchData, processingStatus }) {
+export default function UserInput({
+  onFetchData,
+  processingStatus,
+}) {
   const subreddit = useSelector((state) => state.userInputState.subredditName);
   const targetCount = useSelector(
     (state) => state.userInputState.targetPostCount,
@@ -122,7 +125,7 @@ export default function UserInput({ onFetchData, processingStatus }) {
             <Field.HelperText>
               Enter Number of Posts to be analyzed (Max=20,000)
             </Field.HelperText>
-          </Field.Root>
+          </Field.Root> 
 
           <Button
             size="sm"
@@ -130,7 +133,7 @@ export default function UserInput({ onFetchData, processingStatus }) {
             fontWeight="black"
             bg="orange.600"
             onClick={onFetchdataHandler}
-            disabled={processingStatus}
+            // disabled={processingStatus}
           >
             {processingStatus ? (
               <>
@@ -140,6 +143,7 @@ export default function UserInput({ onFetchData, processingStatus }) {
               "Fetch Posts"
             )}
           </Button>
+          
         </HStack>
       </HStack>
       <HStack
@@ -148,7 +152,7 @@ export default function UserInput({ onFetchData, processingStatus }) {
         justifyContent="flex-end"
         alignItems="center"
       >
-        {/* <Checkbox.Root
+         {/* <Checkbox.Root
           variant="solid"
           colorPalette="orange"
           checked={cacheOnly}

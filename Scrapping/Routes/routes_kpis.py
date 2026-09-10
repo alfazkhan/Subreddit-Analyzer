@@ -6,18 +6,18 @@ from database.kpis import calculate_db_kpis_timeseries
 router = APIRouter(prefix="/kpis", tags=["KPI Analytics Layer"])
 logger = logging.getLogger("API-SERVER")
 
+@router.get("")
 @router.get("/{subreddit_id}")
 async def get_city_kpis(
-    subreddit_id: int,
+    subreddit_id: Optional[int] = None,
     start_date: Optional[str] = Query(None, description="Start date filter (YYYY-MM-DD)"),
     end_date: Optional[str] = Query(None, description="End date filter (YYYY-MM-DD)"),
     granularity: Optional[str] = Query("daily", description="Time-series aggregation level: 'daily', 'weekly', or 'monthly'"),
     sma_window: Optional[int] = Query(7, ge=1, le=30, description="Simple Moving Average window size in days (1-30)")
 ):
     """
-    Calculates the 5 Core Net Sentiment Indices for a specified city ID.
-    Returns executive summary statistics (including Pearson r for hypotheses H1/H2)
-    and a bucketed time-series array (daily, weekly, monthly) with optional 7D SMA smoothing.
+    Computes Master's Thesis empirical hypothesis statistics (H1, H2, H3) and time-series metrics.
+    Works for a specific subreddit (via ID path param) or across all subreddits globally.
     """
     try:
         time_series, summary, subreddit_name = await calculate_db_kpis_timeseries(
@@ -28,10 +28,10 @@ async def get_city_kpis(
             sma_window=sma_window
         )
 
-        if subreddit_name is None:
+        if subreddit_id and subreddit_name is None:
             raise HTTPException(
                 status_code=404, 
-                detail=f"Subreddit ID '{subreddit_id}' not found in active database tracking tables."
+                detail=f"Subreddit ID '{subreddit_id}' not found in database."
             )
 
         return {
@@ -48,8 +48,8 @@ async def get_city_kpis(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to calculate time-series KPIs for subreddit ID '{subreddit_id}': {str(e)}")
+        logger.error(f"Failed to calculate KPIs: {str(e)}")
         raise HTTPException(
             status_code=500, 
-            detail="Internal Server Error during KPI time-series calculations."
+            detail=f"Internal Server Error during KPI calculations: {str(e)}"
         )

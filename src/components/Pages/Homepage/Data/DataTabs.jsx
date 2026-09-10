@@ -64,15 +64,15 @@ export default function DataTabs({ postsData, processingStatus }) {
     },
   ];
 
-  if (postsData.length === 0 && !processingStatus) {
-    return <></>;
-  }
+  // if (postsData.length === 0 && !processingStatus) {
+  //   return <></>;
+  // }
 
   return (
     <>
       <Box position="relative" aria-busy="true" userSelect="none">
         <Tabs.Root
-          defaultValue="Keyword Table"
+          defaultValue="KPIs"
           variant="enclosed"
           lazyMount
           unmountOnExit

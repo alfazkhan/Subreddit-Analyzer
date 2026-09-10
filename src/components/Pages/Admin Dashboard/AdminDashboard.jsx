@@ -7,12 +7,14 @@ import SubredditsSection from "./SubredditsSection";
 import LogoutButton from "./LogoutButton";
 import UsersSection from "./Users/UsersSection";
 import { useSelector } from "react-redux";
+import ProcessQueueSection from "./ProcessQueueSection";
 
 const tabsConfig = {
   Subreddits: ["Super Admin", "Admin", "Guest", "Developer"],
   "Ignored Words": ["Super Admin", "Admin", "Guest", "Developer"],
+  Processes: ["Super Admin", "Admin", "Developer"], // Renamed to cleanly match value="processes"
   Reanalyze: ["Super Admin", "Guest", "Developer"],
-  "Manage Users": ["Super Admin"],
+  "Manage Users": ["Super Admin"]
 };
 
 export default function AdminDashboard() {
@@ -32,7 +34,6 @@ export default function AdminDashboard() {
         orientation="horizontal"
         fitted
         lazyMount
-        // unmountOnExit    
         css={{
           "--tabs-indicator-bg": "colors.orange.600",
           "--tabs-indicator-color": "colors.orange.600",
@@ -42,10 +43,20 @@ export default function AdminDashboard() {
         }}
       >
         <Tabs.List>
-          {Object.keys(tabsConfig).map((tab)=>{
-            if(tabsConfig[tab].findIndex(e=> e===authState.role) !== -1){
-              return <Tabs.Trigger key={tab} fontWeight="bolder" color="gray.100" value={tab.toLowerCase()}>{tab}</Tabs.Trigger>
+          {Object.keys(tabsConfig).map((tab) => {
+            if (tabsConfig[tab].includes(authState.role)) {
+              return (
+                <Tabs.Trigger
+                  key={tab}
+                  fontWeight="bolder"
+                  color="gray.100"
+                  value={tab.toLowerCase()}
+                >
+                  {tab}
+                </Tabs.Trigger>
+              );
             }
+            return null;
           })}
           <Tabs.Indicator rounded="l2" />
         </Tabs.List>
@@ -55,6 +66,9 @@ export default function AdminDashboard() {
         </Tabs.Content>
         <Tabs.Content value="ignored words">
           <IgnoredWordsSection />
+        </Tabs.Content>
+        <Tabs.Content value="processes">
+          <ProcessQueueSection />
         </Tabs.Content>
         <Tabs.Content value="reanalyze">
           <ReanalyzeSection />

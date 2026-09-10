@@ -17,11 +17,14 @@ async def add_to_queue(conn, post_ids: list, subreddit_name: str):
         VALUES ($1, (SELECT id FROM subreddits WHERE name = $2))
         ON CONFLICT (post_id) DO NOTHING
     ''', [(pid, subreddit_name) for pid in post_ids])
+    await conn.execute("NOTIFY queue_updates;")
 
 async def update_queue_status(post_id: str, status: str):
     pool = await get_db_pool()
     async with pool.acquire() as conn:
         await conn.execute("UPDATE scraping_queue SET status = $1 WHERE post_id = $2", status, post_id)
+        # Notify connected websocket listeners immediately
+        await conn.execute("NOTIFY queue_updates;")
 
 async def get_queue_tasks_by_status(subreddit_name: str, status: str, limit: int):
     pool = await get_db_pool()
@@ -29,7 +32,9 @@ async def get_queue_tasks_by_status(subreddit_name: str, status: str, limit: int
         return await conn.fetch('''
             SELECT q.post_id FROM scraping_queue q
             JOIN subreddits s ON q.subreddit_id = s.id
-            WHERE s.name = $1 AND q.status = $2 LIMIT $3
+            WHERE s.name = $1 AND q.status = $2 
+            ORDER BY q.created_at ASC 
+            LIMIT $3
         ''', subreddit_name, status, limit)
 
 async def force_requeue_posts(post_ids: list, subreddit_name: str):
@@ -41,3 +46,4 @@ async def force_requeue_posts(post_ids: list, subreddit_name: str):
             VALUES ($1, (SELECT id FROM subreddits WHERE name = $2), 'pending')
             ON CONFLICT (post_id) DO UPDATE SET status = 'pending'
         ''', [(pid, subreddit_name) for pid in post_ids])
+        await conn.execute("NOTIFY queue_updates;")

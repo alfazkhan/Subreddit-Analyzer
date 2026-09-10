@@ -1,7 +1,7 @@
 import json
 from typing import List
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from database.queue import get_all_tasks, listen_to_queue_changes
+from database.queue import get_queue_state, listen_to_queue_changes
 
 router = APIRouter(tags=["Queue Endpoint Layer"])
 
@@ -18,7 +18,6 @@ class ConnectionManager:
             self.active_connections.remove(websocket)
 
     async def broadcast(self, message: dict):
-        # Serialize datetime and special types automatically
         payload = json.dumps(message, default=str)
         for connection in self.active_connections:
             try:
@@ -29,27 +28,36 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 async def broadcast_queue_update():
-    tasks = await get_all_tasks()
-    await manager.broadcast({"type": "QUEUE_UPDATED", "data": tasks})
+    counts, tasks = await get_queue_state()
+    await manager.broadcast({
+        "type": "QUEUE_UPDATED",
+        "counts": counts,
+        "data": tasks
+    })
 
 @router.on_event("startup")
 async def start_pg_listener():
-    # Start listening to PostgreSQL channel when FastAPI boots up
     await listen_to_queue_changes(broadcast_queue_update)
 
 @router.get("/queue")
 async def api_get_processes():
-    return await get_all_tasks()
+    counts, tasks = await get_queue_state()
+    return {
+        "counts": counts,
+        "tasks": tasks
+    }
 
 @router.websocket("/ws/queue")
 async def websocket_queue_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     try:
-        # Send initial state on connection
-        initial_tasks = await get_all_tasks()
-        await websocket.send_text(json.dumps({"type": "QUEUE_UPDATED", "data": initial_tasks}, default=str))
+        counts, tasks = await get_queue_state()
+        await websocket.send_text(json.dumps({
+            "type": "QUEUE_UPDATED",
+            "counts": counts,
+            "data": tasks
+        }, default=str))
         
-        # Keep connection open
         while True:
             await websocket.receive_text()
     except WebSocketDisconnect:

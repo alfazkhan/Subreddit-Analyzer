@@ -1,75 +1,58 @@
 import json
 import numpy as np
 import pandas as pd
-from typing import Optional
+from typing import Optional, Dict, Any, List
+from scipy.stats import pearsonr, spearmanr, ttest_ind
 from .core import get_db_pool, safe_parse_timestamp
-from scipy.stats import pearsonr
 
-# Comprehensive mapping from sub-topic candidate labels to the 5 Core KPI codes
-CANDIDATE_LABEL_MAP = {
-    # 1. Economic Sentiment Index (ESI)
-    "RENT PRICES & AFFORDABILITY": "ESI",
-    "UTILITY BILLS & ENERGY COSTS": "ESI",
-    "JOB POSTINGS & CAREER ADVICE": "ESI",
-    "SALARIES & COST OF LIVING RANTS": "ESI",
-    "SUPERMARKET PRICES & GROCERIES": "ESI",
-
-    # 2. Infrastructure & Services Index (ISI)
-    "SUBWAY, TRAM & TRAIN SCHEDULES": "ISI",
-    "BUS ROUTES & RELIABILITY": "ISI",
-    "TRANSIT PASSES & TICKET PRICING": "ISI",
-    "BICYCLE LANES & CYCLING SAFETY": "ISI",
-    "TRAFFIC CONGESTION & ROADWORK": "ISI",
-    "CITY PARKING & DRIVING PERMITS": "ISI",
-    "CITY REGISTRATION & PAPERWORK": "ISI",
-    "HOME MAINTENANCE & DAMAGE REPAIRS": "ISI",
-
-    # 3. Local Consumer Intent Index (CII)
-    "RESTAURANT & CAFE REVIEWS": "CII",
-    "BARS, NIGHTCLUBS & NIGHTLIFE": "CII",
-    "STREET FOOD & LOCAL CUISINES": "CII",
-    "FESTIVALS, CONCERTS & PUBLIC EVENTS": "CII",
-    "MUSEUMS, ART & THEATER": "CII",
-    "AMATEUR SPORTS & FITNESS GROUPS": "CII",
-    "TOURIST ATTRACTIONS & SIGHTSEEING": "CII",
-
-    # 4. Community Concern & Safety Index (CCI)
-    "NEIGHBORHOOD SAFETY & CRIME ALERTS": "CCI",
-    "PROTESTS, STRIKES & DEMONSTRATIONS": "CCI",
-    "CITY COUNCIL POLICIES & BUDGETS": "CCI",
-    "LOCAL ELECTIONS & CANDIDATES": "CCI",
-    "LOST ITEMS & FOUND BELONGINGS": "CCI",
-
-    # 5. Expat & Integration Index (EII)
-    "VISAS & RESIDENCE PERMITS": "EII",
-    "APARTMENT VIEWINGS & CONTRACTS": "EII",
-    "FLATMATE SEARCHES": "EII",
-    "FLATMATES & SHARED HOUSING": "EII",
-    "LANDLORD DISPUTES & EVICTIONS": "EII",
-    "STUDENT SHIFTS & PART-TIME WORK": "EII",
-    "STUDENT SHIFTS": "EII"
+# Defined Clusters for H2 Testing
+ADMIN_HOUSING_TOPICS = {
+    "RENT PRICES & AFFORDABILITY",
+    "UTILITY BILLS & ENERGY COSTS",
+    "CITY REGISTRATION & PAPERWORK",
+    "VISAS & RESIDENCE PERMITS",
+    "APARTMENT VIEWINGS & CONTRACTS",
+    "FLATMATES & SHARED HOUSING",
+    "LANDLORD DISPUTES & EVICTIONS",
+    "SALARIES & COST OF LIVING RANTS"
 }
 
-def calculate_pearson_with_pvalue(series_a, series_b):
-    """
-    Computes Pearson r correlation coefficient and p-value safely.
-    """
-    valid = pd.concat([series_a, series_b], axis=1).dropna()
-    if len(valid) < 3:
-        return 0.0, 1.0
-    r, p = pearsonr(valid.iloc[:, 0], valid.iloc[:, 1])
-    return round(float(r), 3), float(p)
+LIFESTYLE_CULTURE_TOPICS = {
+    "RESTAURANT & CAFE REVIEWS",
+    "BARS, NIGHTCLUBS & NIGHTLIFE",
+    "STREET FOOD & LOCAL CUISINES",
+    "FESTIVALS, CONCERTS & PUBLIC EVENTS",
+    "MUSEUMS, ART & THEATER",
+    "AMATEUR SPORTS & FITNESS GROUPS",
+    "TOURIST ATTRACTIONS & SIGHTSEEING"
+}
 
-def format_p_value(p):
-    """
-    Formats p-value for academic reporting.
-    """
+def format_p_value(p: float) -> str:
+    """Academic formatting for p-values."""
     if p < 0.001:
         return "< 0.001"
-    return f"= {round(p, 3)}"
+    return f"= {round(float(p), 4)}"
+
+def calculate_correlations(series_a: pd.Series, series_b: pd.Series) -> Dict[str, Any]:
+    """Computes both Pearson r and Spearman rho with sample validation."""
+    valid = pd.concat([series_a, series_b], axis=1).dropna()
+    n = len(valid)
+    if n < 5:
+        return {"n": n, "pearson_r": 0.0, "pearson_p": "= 1.0", "spearman_rho": 0.0, "spearman_p": "= 1.0"}
+    
+    pr_r, pr_p = pearsonr(valid.iloc[:, 0], valid.iloc[:, 1])
+    sp_r, sp_p = spearmanr(valid.iloc[:, 0], valid.iloc[:, 1])
+    
+    return {
+        "n": n,
+        "pearson_r": round(float(pr_r), 4),
+        "pearson_p": format_p_value(pr_p),
+        "spearman_rho": round(float(sp_r), 4),
+        "spearman_p": format_p_value(sp_p)
+    }
 
 async def calculate_db_kpis_timeseries(
-    subreddit_id: int, 
+    subreddit_id: Optional[int] = None, 
     start_date: Optional[str] = None, 
     end_date: Optional[str] = None,
     granularity: str = "daily",
@@ -77,18 +60,32 @@ async def calculate_db_kpis_timeseries(
 ):
     pool = await get_db_pool()
     
+    # 1. Excludes unpopulated records (where score=0, upvote_ratio=0, and num_comments=0 simultaneously)
+    # 2. Excludes moderator-removed and user-deleted placeholders
     query = """
         SELECT 
-            DATE_TRUNC('day', p.timestamp)::date as post_date,
             p.id,
+            DATE_TRUNC('day', p.timestamp)::date AS post_date,
+            p.score,
+            p.upvote_ratio,
+            p.num_comments,
+            p.sentiment,
             p.sentiment_scores,
             p.topics,
-            s.name as subreddit_name
+            s.name AS subreddit_name
         FROM reddit_posts p
         JOIN subreddits s ON p.subreddit_id = s.id
-        WHERE p.subreddit_id = $1
+        WHERE p.timestamp IS NOT NULL
+          AND NOT (COALESCE(p.score, 0) = 0 AND COALESCE(p.upvote_ratio, 0) = 0 AND COALESCE(p.num_comments, 0) = 0)
+          AND p.title NOT ILIKE '%[removed by moderator]%'
+          AND p.title NOT ILIKE '%[deleted by user]%'
+          AND p.title NOT ILIKE '%[deleted]%'
+          AND p.title NOT ILIKE '%[removed]%'
     """
-    args = [subreddit_id]
+    args = []
+    if subreddit_id:
+        args.append(subreddit_id)
+        query += f" AND p.subreddit_id = ${len(args)}"
     if start_date:
         args.append(safe_parse_timestamp(start_date))
         query += f" AND p.timestamp >= ${len(args)}::timestamp"
@@ -96,112 +93,169 @@ async def calculate_db_kpis_timeseries(
         args.append(safe_parse_timestamp(end_date))
         query += f" AND p.timestamp <= ${len(args)}::timestamp"
 
-    query += " ORDER BY post_date ASC;"
+    query += " ORDER BY p.timestamp ASC;"
 
     async with pool.acquire() as conn:
         rows = await conn.fetch(query, *args)
 
-    subreddit_name = rows[0]["subreddit_name"] if rows else None
-    if not subreddit_name:
+    subreddit_name = rows[0]["subreddit_name"] if (rows and subreddit_id) else ("All Subreddits" if not subreddit_id else None)
+    if subreddit_id and not subreddit_name:
         async with pool.acquire() as conn:
             subreddit_name = await conn.fetchval("SELECT name FROM subreddits WHERE id = $1", subreddit_id)
 
-    daily_raw = {}
-
-    for row in rows:
-        d_str = row['post_date'].isoformat()
-        if d_str not in daily_raw:
-            daily_raw[d_str] = {
-                "ESI": {"pos": 0.0, "neg": 0.0, "count": 0},
-                "ISI": {"pos": 0.0, "neg": 0.0, "count": 0},
-                "CII": {"pos": 0.0, "neg": 0.0, "count": 0},
-                "CCI": {"pos": 0.0, "neg": 0.0, "count": 0},
-                "EII": {"pos": 0.0, "neg": 0.0, "count": 0},
-                "total_daily_posts": 0
-            }
-        
-        daily_raw[d_str]["total_daily_posts"] += 1
-        
-        scores = json.loads(row['sentiment_scores']) if isinstance(row['sentiment_scores'], str) else (row['sentiment_scores'] or {})
-        topics = json.loads(row['topics']) if isinstance(row['topics'], str) else (row['topics'] or {})
-        
-        pos_p = float(scores.get('pos', 0.0) or scores.get('positive', 0.0))
-        neg_p = float(scores.get('neg', 0.0) or scores.get('negative', 0.0))
-
-        raw_label = None
-        if isinstance(topics, dict) and topics:
-            if "labels" in topics and isinstance(topics["labels"], list) and len(topics["labels"]) > 0:
-                raw_label = topics["labels"][0]
-            elif "primary_topic" in topics:
-                raw_label = topics["primary_topic"]
-        elif isinstance(topics, list) and len(topics) > 0:
-            raw_label = topics[0]
-
-        if raw_label:
-            target_kpi = CANDIDATE_LABEL_MAP.get(str(raw_label).strip().upper())
-            if target_kpi in daily_raw[d_str]:
-                daily_raw[d_str][target_kpi]["pos"] += pos_p
-                daily_raw[d_str][target_kpi]["neg"] += neg_p
-                daily_raw[d_str][target_kpi]["count"] += 1
-
-    if not daily_raw:
+    if not rows:
         return [], {}, subreddit_name
 
-    df_list = []
-    for d_str, kpis in daily_raw.items():
-        row_dict = {"date": d_str, "total_posts": kpis["total_daily_posts"]}
-        for code in ["ESI", "ISI", "CII", "CCI", "EII"]:
-            c = kpis[code]["count"]
-            score = 50.0 + 50.0 * ((kpis[code]["pos"] - kpis[code]["neg"]) / c) if c > 0 else 50.0
-            row_dict[code] = max(0.0, min(100.0, round(score, 2)))
-            row_dict[f"{code}_count"] = c
-            row_dict[f"{code}_pos"] = kpis[code]["pos"]
-            row_dict[f"{code}_neg"] = kpis[code]["neg"]
-        df_list.append(row_dict)
+    parsed_posts: List[Dict[str, Any]] = []
+    
+    for row in rows:
+        if not row["post_date"]:
+            continue
 
-    df = pd.DataFrame(df_list)
+        raw_scores = row['sentiment_scores']
+        scores = json.loads(raw_scores) if isinstance(raw_scores, str) else (raw_scores or {})
+        
+        pos_p = float(scores.get('pos', 0.0) or scores.get('positive', 0.0))
+        neu_p = float(scores.get('neu', 0.0) or scores.get('neutral', 0.0))
+        neg_p = float(scores.get('neg', 0.0) or scores.get('negative', 0.0))
+        
+        polarity_magnitude = abs(pos_p - neg_p)
+
+        raw_topics = row['topics']
+        topics = json.loads(raw_topics) if isinstance(raw_topics, str) else (raw_topics or {})
+        primary_topic = "Unclassified"
+        
+        if isinstance(topics, dict) and topics:
+            if "primary_topic" in topics and topics["primary_topic"]:
+                primary_topic = topics["primary_topic"]
+            elif "labels" in topics and isinstance(topics["labels"], list) and len(topics["labels"]) > 0:
+                primary_topic = topics["labels"][0]
+        elif isinstance(topics, list) and len(topics) > 0:
+            primary_topic = topics[0]
+
+        norm_topic = str(primary_topic).strip().upper()
+        
+        topic_cluster = "OTHER"
+        if norm_topic in ADMIN_HOUSING_TOPICS:
+            topic_cluster = "ADMIN_HOUSING"
+        elif norm_topic in LIFESTYLE_CULTURE_TOPICS:
+            topic_cluster = "LIFESTYLE_CULTURE"
+
+        parsed_posts.append({
+            "id": row["id"],
+            "date": row["post_date"].isoformat(),
+            "score": int(row["score"] or 0),
+            "upvote_ratio": float(row["upvote_ratio"] or 0.0),
+            "num_comments": int(row["num_comments"] or 0),
+            "sentiment": row["sentiment"],
+            "p_pos": pos_p,
+            "p_neu": neu_p,
+            "p_neg": neg_p,
+            "polarity_magnitude": polarity_magnitude,
+            "primary_topic": primary_topic,
+            "topic_cluster": topic_cluster
+        })
+
+    if not parsed_posts:
+        return [], {}, subreddit_name
+
+    df = pd.DataFrame(parsed_posts)
+
+    # ----------------------------------------------------
+    # HYPOTHESIS TESTING CALCULATIONS
+    # ----------------------------------------------------
+    h1_neg_vs_comments = calculate_correlations(df["p_neg"], df["num_comments"])
+    h1_neg_vs_upvote_ratio = calculate_correlations(df["p_neg"], df["upvote_ratio"])
+
+    admin_df = df[df["topic_cluster"] == "ADMIN_HOUSING"]
+    lifestyle_df = df[df["topic_cluster"] == "LIFESTYLE_CULTURE"]
+
+    h2_stats: Dict[str, Any] = {
+        "admin_housing_sample_size": len(admin_df),
+        "lifestyle_culture_sample_size": len(lifestyle_df)
+    }
+
+    if len(admin_df) >= 3 and len(lifestyle_df) >= 3:
+        t_neg, p_val_neg = ttest_ind(admin_df["p_neg"], lifestyle_df["p_neg"], equal_var=False)
+        t_upvote, p_val_upvote = ttest_ind(admin_df["upvote_ratio"], lifestyle_df["upvote_ratio"], equal_var=False)
+
+        h2_stats.update({
+            "mean_neg_admin_housing": round(float(admin_df["p_neg"].mean()), 4),
+            "mean_neg_lifestyle_culture": round(float(lifestyle_df["p_neg"].mean()), 4),
+            "t_stat_negative_sentiment": round(float(t_neg), 4),
+            "p_val_negative_sentiment": format_p_value(p_val_neg),
+            "mean_upvote_ratio_admin_housing": round(float(admin_df["upvote_ratio"].mean()), 4),
+            "mean_upvote_ratio_lifestyle_culture": round(float(lifestyle_df["upvote_ratio"].mean()), 4),
+            "t_stat_upvote_ratio": round(float(t_upvote), 4),
+            "p_val_upvote_ratio": format_p_value(p_val_upvote)
+        })
+    else:
+        h2_stats.update({
+            "status": "Insufficient samples in one or both topic clusters to conduct two-sample t-test."
+        })
+
+    h3_score_vs_polarity = calculate_correlations(df["score"], df["polarity_magnitude"])
+
+    hypothesis_results = {
+        "H1_controversy_dynamics": {
+            "hypothesis": "Negative sentiment (P_neg) increases discussion volume (num_comments) and lowers upvote approval (upvote_ratio).",
+            "p_neg_vs_num_comments": h1_neg_vs_comments,
+            "p_neg_vs_upvote_ratio": h1_neg_vs_upvote_ratio
+        },
+        "H2_civic_pain_points": {
+            "hypothesis": "Admin & Housing topics exhibit significantly higher negative sentiment and lower upvote ratios compared to Lifestyle & Culture.",
+            "statistics": h2_stats
+        },
+        "H3_echo_chamber_amplification": {
+            "hypothesis": "Extreme polar opinions (|P_pos - P_neg|) receive higher net engagement scores than moderate opinions.",
+            "score_vs_polarity_magnitude": h3_score_vs_polarity
+        }
+    }
+
+    # ----------------------------------------------------
+    # TIME-SERIES AGGREGATION
+    # ----------------------------------------------------
     df['date_dt'] = pd.to_datetime(df['date'])
     df = df.sort_values('date_dt').reset_index(drop=True)
 
-    if granularity in ["weekly", "monthly"]:
-        rule = "W-MON" if granularity == "weekly" else "MS"
-        grouped = df.groupby(pd.Grouper(key='date_dt', freq=rule))
-        
-        rolled_rows = []
-        for name, group in grouped:
-            if group.empty:
-                continue
-            r_dict = {"date": name.strftime('%Y-%m-%d'), "total_posts": int(group["total_posts"].sum())}
-            for code in ["ESI", "ISI", "CII", "CCI", "EII"]:
-                sum_c = group[f"{code}_count"].sum()
-                sum_pos = group[f"{code}_pos"].sum()
-                sum_neg = group[f"{code}_neg"].sum()
-                score = 50.0 + 50.0 * ((sum_pos - sum_neg) / sum_c) if sum_c > 0 else 50.0
-                r_dict[code] = max(0.0, min(100.0, round(score, 2)))
-                r_dict[f"{code}_count"] = int(sum_c)
-            rolled_rows.append(r_dict)
-        df = pd.DataFrame(rolled_rows)
-        df['date_dt'] = pd.to_datetime(df['date'])
+    rule = "D"
+    if granularity == "weekly":
+        rule = "W-MON"
+    elif granularity == "monthly":
+        rule = "MS"
 
-    for code in ["ESI", "ISI", "CII", "CCI", "EII"]:
-        df[f"{code}_SMA"] = df[code].rolling(window=sma_window, min_periods=1).mean().round(2)
+    grouped = df.groupby(pd.Grouper(key='date_dt', freq=rule))
+    ts_rows = []
+    
+    for name, group in grouped:
+        if group.empty:
+            continue
+        ts_rows.append({
+            "date": name.strftime('%Y-%m-%d'),
+            "post_count": int(len(group)),
+            "avg_score": round(float(group["score"].mean()), 2),
+            "avg_upvote_ratio": round(float(group["upvote_ratio"].mean()), 3),
+            "avg_num_comments": round(float(group["num_comments"].mean()), 2),
+            "avg_negative_sentiment": round(float(group["p_neg"].mean()), 4),
+            "avg_positive_sentiment": round(float(group["p_pos"].mean()), 4),
+            "admin_topic_count": int((group["topic_cluster"] == "ADMIN_HOUSING").sum()),
+            "lifestyle_topic_count": int((group["topic_cluster"] == "LIFESTYLE_CULTURE").sum())
+        })
 
-    time_series = df.drop(columns=['date_dt']).to_dict(orient="records")
-
-    # Compute overall Pearson r & p-values for hypotheses H1 and H2
-    r_h1, p_h1 = calculate_pearson_with_pvalue(df["ESI"], df["CCI"])
-    r_h2, p_h2 = calculate_pearson_with_pvalue(df["EII"], df["CII"])
+    ts_df = pd.DataFrame(ts_rows)
+    if not ts_df.empty:
+        ts_df["avg_neg_sentiment_SMA"] = ts_df["avg_negative_sentiment"].rolling(window=sma_window, min_periods=1).mean().round(4)
+        ts_df["avg_upvote_ratio_SMA"] = ts_df["avg_upvote_ratio"].rolling(window=sma_window, min_periods=1).mean().round(3)
+        time_series = ts_df.to_dict(orient="records")
+    else:
+        time_series = []
 
     summary = {
-        "mean_ESI": round(df["ESI"].mean(), 2),
-        "mean_CCI": round(df["CCI"].mean(), 2),
-        "mean_EII": round(df["EII"].mean(), 2),
-        "mean_CII": round(df["CII"].mean(), 2),
-        "overall_r_ESI_CCI": r_h1,
-        "overall_p_ESI_CCI": format_p_value(p_h1),
-        "overall_r_EII_CII": r_h2,
-        "overall_p_EII_CII": format_p_value(p_h2),
-        "total_analyzed_posts": int(df["total_posts"].sum())
+        "total_analyzed_posts": len(df),
+        "overall_mean_upvote_ratio": round(float(df["upvote_ratio"].mean()), 3),
+        "overall_mean_comments": round(float(df["num_comments"].mean()), 2),
+        "overall_mean_negative_sentiment": round(float(df["p_neg"].mean()), 4),
+        "hypothesis_tests": hypothesis_results
     }
 
     return time_series, summary, subreddit_name

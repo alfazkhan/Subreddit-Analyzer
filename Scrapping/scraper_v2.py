@@ -28,6 +28,7 @@ async def scrape_post_by_id(context, post_id: str, subreddit_name: str, ignored_
         page = None
         
         try:
+            await update_queue_status(post_id, 'processing')
             page = await context.new_page()
             logging.info(f"Scraper: Opening post {clean_id}...")
             await page.goto(url, wait_until="load", timeout=45000)

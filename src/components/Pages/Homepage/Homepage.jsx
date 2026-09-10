@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import { fetchingData } from "@/util/http.js";
 import LoadingAndError from "@/components/ui-components/LoadingAndError.jsx";
 import { useEffect, useState } from "react";
+import SubredditsSummary from "./SubredditsSummary.jsx";
 
 export default function Homepage() {
   const subreddit = useSelector((state) => state.userInputState.subredditName);
@@ -18,6 +19,7 @@ export default function Homepage() {
   );
 
   const [progress, setProgress] = useState(0);
+  const [showDashboard, setShowDashboard] = useState(false);
 
   const {
     mutate,
@@ -29,7 +31,9 @@ export default function Homepage() {
   } = useMutation({
     queryKey: ["posts", subreddit, targetCount],
     mutationFn: fetchingData,
-    onSuccess:()=>{setProgress(0)}
+    onSuccess: () => {
+      setProgress(0);
+    },
   });
 
   let errorContent;
@@ -40,13 +44,17 @@ export default function Homepage() {
     );
   }
 
-
   function fetchSubredditData(subredditName, currentCount) {
-    mutate({ 
+    mutate({
       endpoint: `posts/${subredditName}?limit=${currentCount}`,
       headers: { "Content-Type": "application/json" },
       progressCallBackFn: setProgress,
     });
+  }
+
+  function toggleDashboard() {
+    console.log("Working")
+    setShowDashboard((prev) => !prev);
   }
 
   return (
@@ -57,19 +65,19 @@ export default function Homepage() {
       </Flex>
 
       <Flex justifyContent="center" gap="2" margin="5" flexDirection="column">
-        <UserInput
-          onFetchData={fetchSubredditData}
-          processingStatus={isPending}
+        <SubredditsSummary
+          toggleDashboard={toggleDashboard}
+          showDashboard={showDashboard}
         />
-        <SubredditsSuggestions />
+        {/* User input is not needed anymore */}
+        {/* <UserInput onFetchData={fetchSubredditData} toggleDashboard={toggleDashboard} processingStatus={isPending} /> */}
       </Flex>
-      {/* <Flex justifyContent="center" gap="2" margin="5" flexDirection="column">
-        <Logs/>
-      </Flex> */}
       {errorContent && errorContent}
       <Flex justifyContent="center" gap="4" margin="5" flexDirection="column">
         {isPending && <ProgressBar progressValue={progress} />}
-        <DataTabs postsData={posts || []} processingStatus={isPending} />
+        {showDashboard && (
+          <DataTabs postsData={posts || []} processingStatus={isPending} />
+        )}
       </Flex>
     </Flex>
   );
@@ -87,7 +95,9 @@ function ProgressBar({ progressValue }) {
       animated
     >
       <HStack>
-        <Progress.Label>{progressValue < 100 ? "Downloading..." : "Downloaded"}</Progress.Label>
+        <Progress.Label>
+          {progressValue < 100 ? "Downloading..." : "Downloaded"}
+        </Progress.Label>
         <Progress.Track flex="1">
           <Progress.Range />
         </Progress.Track>
