@@ -19,13 +19,13 @@ import {
 } from "@chakra-ui/react";
 import { FaArrowDown, FaArrowUp, FaMinus } from "react-icons/fa";
 
-
 export default function TanStackDataTable({
   data,
   tableColumns,
   pageSize = 10,
   TableFiltersComponent = () => <></>,
-  TableToolbarComponent=()=><></>,
+  TableToolbarComponent = () => <></>,
+  manualPagination = false,
   ...props
 }) {
   const [pagination, setPagination] = useState({
@@ -49,7 +49,6 @@ export default function TanStackDataTable({
     columnResizeMode: "onChange",
     ...props,
   });
-
 
   return (
     <Stack>
@@ -124,7 +123,11 @@ export default function TanStackDataTable({
               {row.getVisibleCells().map((cell) => (
                 <Table.Cell
                   key={cell.id}
-                  backgroundColor={row.getIsSelected() ? "rgba(255, 255, 255, 0.1);" : "transparent"}
+                  backgroundColor={
+                    row.getIsSelected()
+                      ? "rgba(255, 255, 255, 0.1);"
+                      : "transparent"
+                  }
                 >
                   <div>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -135,7 +138,9 @@ export default function TanStackDataTable({
           ))}
         </Table.Body>
       </Table.Root>
-      <TablePagination table={table} setPagination={setPagination} />
+      {!manualPagination && (
+        <TablePagination table={table} setPagination={setPagination} />
+      )}
     </Stack>
   );
 }

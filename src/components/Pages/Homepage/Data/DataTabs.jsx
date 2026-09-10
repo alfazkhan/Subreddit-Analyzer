@@ -6,6 +6,7 @@ import {
   LuDonut,
   LuTable,
   LuChartSpline,
+  LuGitlab,
 } from "react-icons/lu";
 import { RiBubbleChartLine } from "react-icons/ri";
 import { VscSymbolKeyword } from "react-icons/vsc";
@@ -17,6 +18,7 @@ import PostsFrequency from "../Data/PostsFrequency";
 import EmotionsThroughoutDay from "../Data/EmotionsThroughoutDay";
 import KeywordsWordCloud from "./KeywordsWordCloud";
 import KPIAnalyticsChart from "./KPIAnalyticsChart";
+import PaginatedPostTable from "./PaginatatedPostTable";
 
 export default function DataTabs({ postsData, processingStatus }) {
 
@@ -24,7 +26,7 @@ export default function DataTabs({ postsData, processingStatus }) {
   const TabsListData = [
     {
       value: "KPIs",
-      icon: LuSmile,
+      icon: LuGitlab,
       render: () => <KPIAnalyticsChart />,
     },
     {
@@ -45,7 +47,7 @@ export default function DataTabs({ postsData, processingStatus }) {
     {
       value: "Posts Table",
       icon: LuTable,
-      render: () => <PostsTable data={postsData} />,
+      render: () => <PaginatedPostTable />,
     },
     {
       value: "Keyword Table",
@@ -72,7 +74,7 @@ export default function DataTabs({ postsData, processingStatus }) {
     <>
       <Box position="relative" aria-busy="true" userSelect="none">
         <Tabs.Root
-          defaultValue="KPIs"
+          defaultValue="Posts Table"
           variant="enclosed"
           lazyMount
           unmountOnExit

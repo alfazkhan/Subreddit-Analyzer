@@ -1,5 +1,157 @@
 import json
+import base64
+from typing import Optional, Tuple, List, Dict, Any
+from datetime import datetime
 from .core import get_db_pool, safe_parse_timestamp
+
+def encode_cursor(timestamp: datetime, post_id: str) -> str:
+    """Serializes a (timestamp, id) pair into a URL-safe Base64 string."""
+    payload = {
+        "ts": timestamp.isoformat(),
+        "id": post_id
+    }
+    raw_bytes = json.dumps(payload).encode("utf-8")
+    return base64.urlsafe_b64encode(raw_bytes).decode("utf-8")
+
+def decode_cursor(cursor_str: str) -> Optional[Tuple[datetime, str]]:
+    """Deserializes a URL-safe Base64 cursor string back into (timestamp, id)."""
+    try:
+        raw_bytes = base64.urlsafe_b64decode(cursor_str.encode("utf-8"))
+        payload = json.loads(raw_bytes.decode("utf-8"))
+        ts = safe_parse_timestamp(payload["ts"])
+        pid = str(payload["id"])
+        if ts and pid:
+            return ts, pid
+        return None
+    except Exception:
+        return None
+
+async def fetch_posts_cursor_paginated(
+    limit: int = 20,
+    cursor: Optional[str] = None,
+    direction: str = "next",
+    subreddit: Optional[str] = None
+) -> Dict[str, Any]:
+    pool = await get_db_pool()
+    
+    # 1. Total Count Query (Subreddit-specific or Global)
+    count_query = """
+        SELECT COUNT(p.id) 
+        FROM reddit_posts p
+    """
+    count_args = []
+    if subreddit:
+        count_query += " JOIN subreddits s ON p.subreddit_id = s.id WHERE s.name = $1"
+        count_args.append(subreddit)
+
+    async with pool.acquire() as conn:
+        total_count = await conn.fetchval(count_query, *count_args)
+
+    # 2. Decode cursor parameters
+    decoded = decode_cursor(cursor) if cursor else None
+    cursor_ts, cursor_id = decoded if decoded else (None, None)
+
+    # 3. Formulate Cursor Predicates
+    query = """
+        SELECT 
+            p.id,
+            p.subreddit_id,
+            s.name as subreddit_name,
+            p.timestamp,
+            p.title,
+            p.body,
+            p.sentiment,
+            p.sentiment_scores,
+            p.keywords,
+            p.entities,
+            p.topics,
+            p.score,
+            p.upvote_ratio,
+            p.num_comments
+        FROM reddit_posts p
+        JOIN subreddits s ON p.subreddit_id = s.id
+        WHERE p.timestamp IS NOT NULL
+    """
+    args = []
+
+    if subreddit:
+        args.append(subreddit)
+        query += f" AND s.name = ${len(args)}"
+
+    # Determine pagination comparison based on traversal direction
+    if cursor_ts and cursor_id:
+        args.append(cursor_ts)
+        args.append(cursor_id)
+        if direction == "next":
+            # Moving backwards in time (older items)
+            query += f" AND (p.timestamp, p.id) < (${len(args)-1}::timestamp, ${len(args)})"
+        else:
+            # Moving forwards in time (newer items)
+            query += f" AND (p.timestamp, p.id) > (${len(args)-1}::timestamp, ${len(args)})"
+
+    # Ordering Strategy:
+    # 'next' navigates newest to oldest.
+    # 'prev' navigates oldest to newest and is then reversed back in memory.
+    if direction == "prev":
+        query += " ORDER BY p.timestamp ASC, p.id ASC"
+    else:
+        query += " ORDER BY p.timestamp DESC, p.id DESC"
+
+    # Query limit + 1 to calculate has_more reliably
+    args.append(limit + 1)
+    query += f" LIMIT ${len(args)};"
+
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(query, *args)
+
+    records = []
+    for r in rows:
+        item = dict(r)
+        if item.get("timestamp"):
+            item["timestamp"] = item["timestamp"].isoformat()
+        
+        # Parse JSON fields safely if stored as strings
+        for json_col in ["sentiment_scores", "keywords", "entities", "topics"]:
+            val = item.get(json_col)
+            if isinstance(val, str):
+                try:
+                    item[json_col] = json.loads(val)
+                except Exception:
+                    pass
+        records.append(item)
+
+    has_more = len(records) > limit
+    if has_more:
+        # Discard the extra peek record
+        records = records[:limit]
+
+    # Normalize 'prev' order back to descending
+    if direction == "prev":
+        records.reverse()
+
+    # Generate cursors based on page bounds
+    next_cursor = None
+    prev_cursor = None
+
+    if records:
+        first_item = records[0]
+        last_item = records[-1]
+        
+        first_ts = safe_parse_timestamp(first_item["timestamp"])
+        last_ts = safe_parse_timestamp(last_item["timestamp"])
+
+        if first_ts:
+            prev_cursor = encode_cursor(first_ts, first_item["id"])
+        if last_ts:
+            next_cursor = encode_cursor(last_ts, last_item["id"])
+
+    return {
+        "items": records,
+        "next_cursor": next_cursor if has_more or direction == "prev" else None,
+        "prev_cursor": prev_cursor if cursor else None,
+        "has_more": has_more,
+        "total_count": int(total_count or 0)
+    }
 
 async def get_archived_ids(subreddit_name: str):
     pool = await get_db_pool()
@@ -110,7 +262,13 @@ async def get_cache_summary():
             WHERE s.is_active = TRUE
             GROUP BY s.id, s.name
         ''')
-        return {r['name']: {"id": r['id'], "count": r['count'], "last_updated": r['last_updated'].isoformat() if r['last_updated'] else None} for r in rows}
+        return {
+            r['name']: {
+                "id": r['id'], 
+                "count": r['count'], 
+                "last_updated": r['last_updated'].isoformat() if r['last_updated'] else None
+            } for r in rows
+        }
 
 async def db_update_post(post_id: str, updates: dict):
     if not updates:
@@ -234,8 +392,6 @@ async def get_all_posts_for_dynamic_reanalysis(subreddit: str, target_pipelines:
             query += " AND (" + " OR ".join(clauses) + ")"
 
     query += " ORDER BY timestamp DESC;"
-    
-    print(f"Executing reanalysis query: {query}")
     
     async with pool.acquire() as conn:
         rows = await conn.fetch(query, *args)

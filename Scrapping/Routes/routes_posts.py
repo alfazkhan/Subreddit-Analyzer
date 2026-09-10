@@ -1,19 +1,49 @@
-from typing import Optional
+from typing import Optional, Literal
 from fastapi import APIRouter, Query, Body, Depends, HTTPException
 import json
 
 from auth_guard import require_role
 from database.posts import (
-    get_db_pool, get_cache_summary, load_posts_from_db, load_all_posts_from_db,
-    db_update_post, db_delete_post
+    get_db_pool, 
+    get_cache_summary, 
+    load_posts_from_db, 
+    load_all_posts_from_db,
+    fetch_posts_cursor_paginated,
+    db_update_post, 
+    db_delete_post
 )
 
 router = APIRouter(tags=["Posts Endpoint Layer"])
+
+@router.get("/posts")
+async def api_get_posts_cursor(
+    limit: int = Query(20, ge=1, le=100, description="Items per page"),
+    cursor: Optional[str] = Query(None, description="Base64 compound cursor token"),
+    direction: Literal["next", "prev"] = Query("next", description="Pagination traversal direction"),
+    subreddit: Optional[str] = Query(None, description="Optional subreddit name filter (e.g. 'berlin')")
+):
+    """
+    Cursor-based paginated posts endpoint supporting global multi-city queries 
+    as well as individual municipal subreddit scoping.
+    """
+    try:
+        return await fetch_posts_cursor_paginated(
+            limit=limit,
+            cursor=cursor,
+            direction=direction,
+            subreddit=subreddit
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Cursor pagination query failed: {str(e)}"
+        )
 
 @router.get("/summary")
 async def api_get_summary():
     return await get_cache_summary()
 
+# Maintained for legacy compatibility with specific component callers
 @router.get("/posts/{subreddit}")
 async def api_get_posts(subreddit: str, limit: int = Query(10, ge=1, le=20000)):
     posts_dict = await load_posts_from_db(subreddit, limit)
@@ -28,7 +58,6 @@ async def api_get_all_posts(subreddit: str):
         return []
     return sorted(posts_dict.values(), key=lambda x: x.get('timestamp') or '', reverse=True)
 
-
 @router.put("/posts/{subreddit}/{post_id}")
 async def api_update_post(
     subreddit: str,
@@ -36,7 +65,7 @@ async def api_update_post(
     payload: dict = Body(...),
     super_admin: dict = Depends(require_role(["Super Admin"]))
 ):
-    allowed_fields = {"title", "body", "sentiment", "sentiment_scores", "keywords", "entities", "topics"}
+    allowed_fields = {"title", "body", "sentiment", "sentiment_scores", "keywords", "entities", "topics", "score", "upvote_ratio", "num_comments"}
     updates = {k: payload[k] for k in payload if k in allowed_fields}
 
     if not updates:
@@ -47,7 +76,6 @@ async def api_update_post(
         raise HTTPException(status_code=404, detail="Post not found")
 
     return {"message": "Post updated successfully", "id": post_id}
-
 
 @router.delete("/posts/{subreddit}/{post_id}")
 async def api_delete_post(
@@ -60,17 +88,12 @@ async def api_delete_post(
         raise HTTPException(status_code=404, detail="Post not found")
     return {"message": "Post deleted successfully", "id": post_id}
 
-
 @router.get("/keywords")
 async def api_get_keywords(
     subreddit: Optional[str] = Query(None, description="Optional subreddit name to filter keywords"),
     min_frequency: int = Query(1, ge=1, description="Minimum frequency threshold"),
     limit: int = Query(500, ge=1, le=5000, description="Max keywords to return")
 ):
-    """
-    Returns aggregated keyword list with frequencies, sentiment distributions,
-    and reported status from the ignored_words table.
-    """
     pool = await get_db_pool()
     
     if subreddit:
@@ -177,15 +200,11 @@ async def api_get_keywords(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database aggregation failed: {str(e)}")
 
-
 @router.get("/keywords/{word}")
 async def api_get_keyword_posts(
     word: str,
     subreddit: Optional[str] = Query(None, description="Optional subreddit name filter")
 ):
-    """
-    Fetches all post IDs containing a specific keyword using PostgreSQL JSON containment operators.
-    """
     clean_word = word.strip().lower()
     if not clean_word:
         raise HTTPException(status_code=400, detail="Invalid keyword provided.")
