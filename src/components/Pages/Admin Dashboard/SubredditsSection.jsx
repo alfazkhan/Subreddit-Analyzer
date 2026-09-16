@@ -30,7 +30,7 @@ export default function SubredditsSection() {
     <TanStackDataTable
       data={subreddits}
       TableFiltersComponent={TableFilters}
-      getRowId= {(row)=>row.id}
+      getRowId={(row) => row.id}
       tableColumns={[
         {
           accessorKey: "id",
@@ -44,7 +44,7 @@ export default function SubredditsSection() {
               <Checkbox.Control />
             </Checkbox.Root>
           ),
-          cell: ({ row }) => (
+          cell: ({ row, getValue }) => (
             <Checkbox.Root
               checked={row.getIsSelected()}
               disabled={!row.getCanSelect()}
@@ -52,10 +52,11 @@ export default function SubredditsSection() {
             >
               <Checkbox.HiddenInput />
               <Checkbox.Control />
+              {getValue()}
             </Checkbox.Root>
           ),
           size: 50,
-          enableSorting: false
+          enableSorting: false,
         },
         {
           accessorKey: "name",

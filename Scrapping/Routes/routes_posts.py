@@ -10,7 +10,7 @@ from database.posts import (
     load_all_posts_from_db,
     fetch_posts_cursor_paginated,
     db_update_post, 
-    db_delete_post
+    db_delete_post,
 )
 
 router = APIRouter(tags=["Posts Endpoint Layer"])
@@ -22,10 +22,6 @@ async def api_get_posts_cursor(
     direction: Literal["next", "prev"] = Query("next", description="Pagination traversal direction"),
     subreddit: Optional[str] = Query(None, description="Optional subreddit name filter (e.g. 'berlin')")
 ):
-    """
-    Cursor-based paginated posts endpoint supporting global multi-city queries 
-    as well as individual municipal subreddit scoping.
-    """
     try:
         return await fetch_posts_cursor_paginated(
             limit=limit,
@@ -43,7 +39,135 @@ async def api_get_posts_cursor(
 async def api_get_summary():
     return await get_cache_summary()
 
-# Maintained for legacy compatibility with specific component callers
+
+@router.get("/posts/keywords")
+async def api_get_keywords(
+    subreddit: Optional[str] = Query(None, description="Optional subreddit name to filter keywords"),
+    min_frequency: int = Query(1, ge=1, description="Minimum frequency threshold"),
+    limit: int = Query(500, ge=1, le=5000, description="Max keywords to return")
+):
+    pool = await get_db_pool()
+    
+    base_filter = "WHERE p.keywords IS NOT NULL AND p.keywords::text NOT IN ('{}', 'null', '[]')"
+    params = []
+    
+    if subreddit:
+        params.append(subreddit)
+        base_filter += f" AND s.name = ${len(params)}"
+
+    query = f"""
+        WITH parsed_keywords AS (
+            SELECT 
+                kw.key AS word,
+                CASE 
+                    WHEN kw.value ~ '^[0-9]+$' THEN CAST(kw.value AS INTEGER)
+                    ELSE 1
+                END AS freq,
+                LOWER(COALESCE(p.sentiment, 'neutral')) AS sentiment
+            FROM reddit_posts p
+            JOIN subreddits s ON p.subreddit_id = s.id
+            CROSS JOIN LATERAL jsonb_each_text(p.keywords::jsonb) AS kw
+            {base_filter}
+        ),
+        aggregated AS (
+            SELECT 
+                pk.word,
+                SUM(pk.freq) AS frequency,
+                COALESCE(SUM(pk.freq) FILTER (WHERE pk.sentiment = 'positive'), 0) AS positive_count,
+                COALESCE(SUM(pk.freq) FILTER (WHERE pk.sentiment = 'neutral'), 0) AS neutral_count,
+                COALESCE(SUM(pk.freq) FILTER (WHERE pk.sentiment = 'negative'), 0) AS negative_count
+            FROM parsed_keywords pk
+            GROUP BY pk.word
+        )
+        SELECT 
+            ak.word,
+            ak.frequency,
+            ak.positive_count,
+            ak.neutral_count,
+            ak.negative_count,
+            CASE 
+                WHEN iw.id IS NOT NULL THEN jsonb_build_object(
+                    'id', iw.id,
+                    'language', iw.language,
+                    'processed', iw.processed,
+                    'approved', iw.approved
+                )::text
+                ELSE NULL 
+            END AS reported_data
+        FROM aggregated ak
+        LEFT JOIN ignored_words iw ON TRIM(LOWER(ak.word)) = TRIM(LOWER(iw.word))
+        WHERE ak.frequency >= ${len(params) + 1}
+        ORDER BY ak.frequency DESC
+        LIMIT ${len(params) + 2};
+    """
+    params.extend([min_frequency, limit])
+
+    try:
+        async with pool.acquire() as conn:
+            rows = await conn.fetch(query, *params)
+            
+        results = []
+        for row in rows:
+            raw_rep = row["reported_data"]
+            reported_val = json.loads(raw_rep) if raw_rep else False
+
+            results.append({
+                "word": row["word"],
+                "frequency": int(row["frequency"]),
+                "sentiment_distribution": {
+                    "positive": int(row["positive_count"]),
+                    "neutral": int(row["neutral_count"]),
+                    "negative": int(row["negative_count"])
+                },
+                "reported": reported_val
+            })
+            
+        return results
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database aggregation failed: {str(e)}")
+
+@router.get("/posts/keywords/{word}")
+async def api_get_keyword_posts(
+    word: str,
+    subreddit: Optional[str] = Query(None, description="Optional subreddit name filter")
+):
+    clean_word = word.strip().lower()
+    if not clean_word:
+        raise HTTPException(status_code=400, detail="Invalid keyword provided.")
+
+    pool = await get_db_pool()
+    
+    if subreddit:
+        query = """
+            SELECT p.id
+            FROM reddit_posts p
+            JOIN subreddits s ON p.subreddit_id = s.id
+            WHERE s.name = $1
+              AND p.keywords::jsonb ? $2
+            ORDER BY p.timestamp DESC;
+        """
+        params = [subreddit, clean_word]
+    else:
+        query = """
+            SELECT p.id
+            FROM reddit_posts p
+            WHERE p.keywords::jsonb ? $1
+            ORDER BY p.timestamp DESC;
+        """
+        params = [clean_word]
+
+    try:
+        async with pool.acquire() as conn:
+            rows = await conn.fetch(query, *params)
+            
+        return {
+            "keyword": clean_word,
+            "posts": [row["id"] for row in rows]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database lookup failed: {str(e)}")
+
+# Legacy fallback endpoints
 @router.get("/posts/{subreddit}")
 async def api_get_posts(subreddit: str, limit: int = Query(10, ge=1, le=20000)):
     posts_dict = await load_posts_from_db(subreddit, limit)
@@ -87,156 +211,3 @@ async def api_delete_post(
     if not success:
         raise HTTPException(status_code=404, detail="Post not found")
     return {"message": "Post deleted successfully", "id": post_id}
-
-@router.get("/keywords")
-async def api_get_keywords(
-    subreddit: Optional[str] = Query(None, description="Optional subreddit name to filter keywords"),
-    min_frequency: int = Query(1, ge=1, description="Minimum frequency threshold"),
-    limit: int = Query(500, ge=1, le=5000, description="Max keywords to return")
-):
-    pool = await get_db_pool()
-    
-    if subreddit:
-        query = """
-            WITH aggregated_keywords AS (
-                SELECT 
-                    kw.key AS word,
-                    SUM(CAST(kw.value AS INTEGER)) AS frequency,
-                    COALESCE(SUM(CAST(kw.value AS INTEGER)) FILTER (WHERE LOWER(p.sentiment) = 'positive'), 0) AS positive_count,
-                    COALESCE(SUM(CAST(kw.value AS INTEGER)) FILTER (WHERE LOWER(p.sentiment) = 'neutral'), 0) AS neutral_count,
-                    COALESCE(SUM(CAST(kw.value AS INTEGER)) FILTER (WHERE LOWER(p.sentiment) = 'negative'), 0) AS negative_count
-                FROM reddit_posts p
-                JOIN subreddits s ON p.subreddit_id = s.id
-                CROSS JOIN LATERAL jsonb_each_text(p.keywords::jsonb) AS kw
-                WHERE s.name = $1 
-                  AND p.keywords IS NOT NULL 
-                  AND p.keywords::text != '{}'
-                GROUP BY kw.key
-                HAVING SUM(CAST(kw.value AS INTEGER)) >= $2
-                ORDER BY frequency DESC
-                LIMIT $3
-            )
-            SELECT 
-                ak.word,
-                ak.frequency,
-                ak.positive_count,
-                ak.neutral_count,
-                ak.negative_count,
-                CASE 
-                    WHEN iw.id IS NOT NULL THEN jsonb_build_object(
-                        'id', iw.id,
-                        'language', iw.language,
-                        'processed', iw.processed,
-                        'approved', iw.approved
-                    )::text
-                    ELSE NULL 
-                END AS reported_data
-            FROM aggregated_keywords ak
-            LEFT JOIN ignored_words iw ON TRIM(LOWER(ak.word)) = TRIM(LOWER(iw.word));
-        """
-        params = [subreddit, min_frequency, limit]
-    else:
-        query = """
-            WITH aggregated_keywords AS (
-                SELECT 
-                    kw.key AS word,
-                    SUM(CAST(kw.value AS INTEGER)) AS frequency,
-                    COALESCE(SUM(CAST(kw.value AS INTEGER)) FILTER (WHERE LOWER(p.sentiment) = 'positive'), 0) AS positive_count,
-                    COALESCE(SUM(CAST(kw.value AS INTEGER)) FILTER (WHERE LOWER(p.sentiment) = 'neutral'), 0) AS neutral_count,
-                    COALESCE(SUM(CAST(kw.value AS INTEGER)) FILTER (WHERE LOWER(p.sentiment) = 'negative'), 0) AS negative_count
-                FROM reddit_posts p
-                CROSS JOIN LATERAL jsonb_each_text(p.keywords::jsonb) AS kw
-                WHERE p.keywords IS NOT NULL 
-                  AND p.keywords::text != '{}'
-                GROUP BY kw.key
-                HAVING SUM(CAST(kw.value AS INTEGER)) >= $1
-                ORDER BY frequency DESC
-                LIMIT $2
-            )
-            SELECT 
-                ak.word,
-                ak.frequency,
-                ak.positive_count,
-                ak.neutral_count,
-                ak.negative_count,
-                CASE 
-                    WHEN iw.id IS NOT NULL THEN jsonb_build_object(
-                        'id', iw.id,
-                        'language', iw.language,
-                        'processed', iw.processed,
-                        'approved', iw.approved
-                    )::text
-                    ELSE NULL 
-                END AS reported_data
-            FROM aggregated_keywords ak
-            LEFT JOIN ignored_words iw ON TRIM(LOWER(ak.word)) = TRIM(LOWER(iw.word));
-        """
-        params = [min_frequency, limit]
-
-    try:
-        async with pool.acquire() as conn:
-            rows = await conn.fetch(query, *params)
-            
-        results = []
-        for row in rows:
-            raw_rep = row["reported_data"]
-            if raw_rep is not None:
-                reported_val = json.loads(raw_rep) if isinstance(raw_rep, str) else raw_rep
-            else:
-                reported_val = False
-
-            results.append({
-                "word": row["word"],
-                "frequency": row["frequency"],
-                "sentiment_distribution": {
-                    "positive": row["positive_count"],
-                    "neutral": row["neutral_count"],
-                    "negative": row["negative_count"]
-                },
-                "reported": reported_val
-            })
-            
-        return results
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Database aggregation failed: {str(e)}")
-
-@router.get("/keywords/{word}")
-async def api_get_keyword_posts(
-    word: str,
-    subreddit: Optional[str] = Query(None, description="Optional subreddit name filter")
-):
-    clean_word = word.strip().lower()
-    if not clean_word:
-        raise HTTPException(status_code=400, detail="Invalid keyword provided.")
-
-    pool = await get_db_pool()
-    
-    if subreddit:
-        query = """
-            SELECT p.id
-            FROM reddit_posts p
-            JOIN subreddits s ON p.subreddit_id = s.id
-            WHERE s.name = $1
-              AND p.keywords::jsonb ? $2
-            ORDER BY p.timestamp DESC;
-        """
-        params = [subreddit, clean_word]
-    else:
-        query = """
-            SELECT p.id
-            FROM reddit_posts p
-            WHERE p.keywords::jsonb ? $1
-            ORDER BY p.timestamp DESC;
-        """
-        params = [clean_word]
-
-    try:
-        async with pool.acquire() as conn:
-            rows = await conn.fetch(query, *params)
-            
-        return {
-            "keyword": clean_word,
-            "posts": [row["id"] for row in rows]
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Database lookup failed: {str(e)}")

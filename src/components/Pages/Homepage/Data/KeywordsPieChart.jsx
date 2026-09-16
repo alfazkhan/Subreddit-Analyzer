@@ -9,10 +9,14 @@ import {
   Box,
   Button,
   Input,
-  Text
+  Text,
+  Spinner,
+  Center,
 } from "@chakra-ui/react";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-import keywordCount from "../../../../util/keywordCount";
+import { fetchingData } from "@/util/http";
+import { useQuery } from "@tanstack/react-query";
+import LoadingAndError from "@/components/ui-components/LoadingAndError";
 
 // Adds padding between the legend and the chart
 const legendMarginPlugin = {
@@ -21,73 +25,77 @@ const legendMarginPlugin = {
     const originalFit = chart.legend.fit;
     chart.legend.fit = function fit() {
       originalFit.bind(chart.legend)();
-      this.height += 40; 
+      this.height += 40;
     };
   },
 };
 
-ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels, legendMarginPlugin);
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  ChartDataLabels,
+  legendMarginPlugin,
+);
 
-// ✓ FIXED: Deterministic color generator based on the keyword string.
-// This prevents the chart from violently flashing random colors on every re-render.
+// Deterministic color generator based on the keyword string
 function stringToColor(str) {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
   }
-  // Convert hash to an HSL color for bright, distinct slices
   const h = Math.abs(hash) % 360;
   return `hsl(${h}, 70%, 50%)`;
 }
 
-export default function KeywordsPieChart({ data }) {
+export default function KeywordsPieChart() {
+  const { data, isLoading, isPending, isError, error } = useQuery({
+    queryKey: ["keywords"],
+    queryFn: ({ signal }) =>
+      fetchingData({ endpoint: "posts/keywords", signal }),
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 5,
+  });
+
   // --- 1. Core Filter States ---
   const [minValue, setMinValue] = useState(20);
-  const [maxValue, setMaxValue] = useState(10000);
+  const [maxValue, setMaxValue] = useState(20000);
   const [stopWordsStr, setStopWordsStr] = useState("");
-  
+
   // --- 2. Interaction States ---
-  const [topLimit, setTopLimit] = useState(10); // Strict limit for pie chart slices
-  const [customTop, setCustomTop] = useState(15); 
+  const [topLimit, setTopLimit] = useState(10);
+  const [customTop, setCustomTop] = useState(15);
 
-  const keywordsCount = keywordCount(data);
-
-  // --- 3. Master Data Pipeline ---
+  // --- 3. Streamlined Data Pipeline ---
   const chartData = useMemo(() => {
+    if (!data || !Array.isArray(data)) {
+      return { labels: [], datasets: [] };
+    }
+
     const stopWords = stopWordsStr
       .split(",")
       .map((s) => s.trim().toLowerCase())
       .filter(Boolean);
 
-    const entries = [];
-    
-    // 1. Filter out boundaries and stop-words
-    for (const [keyword, count] of Object.entries(keywordsCount)) {
+    // 1. Direct filter using incoming schema: item.word and item.frequency
+    const filteredEntries = [];
+    for (let i = 0; i < data.length; i++) {
+      const item = data[i];
+      const count = item.frequency ?? 0;
+      const word = item.word;
+
       if (count < minValue || count > maxValue) continue;
-      if (stopWords.includes(keyword.toLowerCase())) continue;
-      entries.push({ keyword, count });
+      if (stopWords.includes(word.toLowerCase())) continue;
+
+      filteredEntries.push({ keyword: word, count: count });
     }
 
-    // 2. Sort descending
-    entries.sort((a, b) => b.count - a.count);
-
-    // 3. Slice for Top X
-    const topEntries = entries.slice(0, topLimit);
-    
-    // 4. ✓ FIXED: Aggregate everything else into an "Other" category
-    const otherEntries = entries.slice(topLimit);
-    const otherSum = otherEntries.reduce((sum, item) => sum + item.count, 0);
+    // 2. Slice top entries (incoming list is already pre-sorted from database)
+    const topEntries = filteredEntries.slice(0, topLimit);
 
     const labels = topEntries.map((e) => e.keyword);
     const dataValues = topEntries.map((e) => e.count);
     const colors = labels.map((label) => stringToColor(label));
-
-    // Append the "Other" slice if there is leftover data
-    if (otherSum > 0) {
-      labels.push("Other");
-      dataValues.push(otherSum);
-      colors.push("#4A5568"); // Consistent dark gray for the "Other" slice
-    }
 
     return {
       labels: labels,
@@ -96,48 +104,46 @@ export default function KeywordsPieChart({ data }) {
           label: "Keyword Weights",
           data: dataValues,
           backgroundColor: colors,
-          borderColor: "#1A202C", // Dark border to match your dark theme
-          borderWidth: 2,
-          hoverOffset: 15, // Smooth pop-out effect on hover
+          hoverOffset: 15,
         },
       ],
     };
-  }, [keywordsCount, minValue, maxValue, stopWordsStr, topLimit]);
+  }, [data, minValue, maxValue, stopWordsStr, topLimit]);
 
   // --- 4. Chart Options ---
   const options = {
     responsive: true,
     maintainAspectRatio: false,
-    cutout: "60%", // Makes it a modern Doughnut chart
+    cutout: "60%",
     plugins: {
       legend: {
-        labels: { color: "white", padding: 20 },
+        labels: { color: "white" },
       },
-      // ✓ FIXED: Upgraded tooltips to automatically calculate and display percentages
       tooltip: {
         callbacks: {
           label: (context) => {
             const value = context.parsed;
-            const total = context.dataset.data.reduce((acc, curr) => acc + curr, 0);
-            const percentage = ((value / total) * 100).toFixed(1) + "%";
-            return ` ${context.label}: ${value} (${percentage})`;
+            const total = context.dataset.data.reduce(
+              (acc, curr) => acc + curr,
+              0,
+            );
+            const percentage =
+              total > 0 ? ((value / total) * 100).toFixed(1) + "%" : "0%";
+            return ` ${context.label}: ${value.toLocaleString()} (${percentage})`;
           },
         },
       },
       datalabels: {
         color: "white",
         font: { weight: "bold", size: 12 },
-        textStrokeColor: "rgba(0,0,0,0.8)", // Adds outline so text is readable on any slice color
-        textStrokeWidth: 3,
         formatter: (value, context) => {
-          const label = context.chart.data.labels[context.dataIndex];
-          return `${label}`;
+          return context.chart.data.labels[context.dataIndex];
         },
         display: (context) => {
           const dataset = context.dataset.data;
           const total = dataset.reduce((a, b) => a + b, 0);
           const value = dataset[context.dataIndex];
-          return value / total > 0.03; // Hide labels on tiny slivers (<3%)
+          return total > 0 && value / total > 0.03; // Hide labels on tiny slivers (<3%)
         },
       },
     },
@@ -146,13 +152,32 @@ export default function KeywordsPieChart({ data }) {
     },
   };
 
+  if (isError || isPending || isLoading) {
+    return (
+      <LoadingAndError isLoading={isPending} isError={isError} error={error} />
+    );
+  }
+
   return (
-    <Flex direction="column" alignItems="center" p={4} bg="blackAlpha.400" borderRadius="xl" borderWidth="1px" borderColor="whiteAlpha.200">
-      
+    <Flex
+      direction="column"
+      alignItems="center"
+      p={4}
+      bg="blackAlpha.400"
+      borderRadius="xl"
+    >
       {/* Filters Row */}
-      <HStack mb={4} justifyContent="space-between" width="full" wrap="wrap" gap={4}>
+      <HStack
+        mb={4}
+        justifyContent="space-between"
+        width="full"
+        wrap="wrap"
+        gap={4}
+      >
         <Field.Root required width="auto">
-          <Field.Label fontSize="xs" color="whiteAlpha.700">Min Frequency</Field.Label>
+          <Field.Label fontSize="xs" color="whiteAlpha.700">
+            Min Frequency
+          </Field.Label>
           <NumberInput.Root
             value={minValue}
             allowMouseWheel
@@ -166,7 +191,9 @@ export default function KeywordsPieChart({ data }) {
         </Field.Root>
 
         <Field.Root required width="auto">
-          <Field.Label fontSize="xs" color="whiteAlpha.700">Max Frequency</Field.Label>
+          <Field.Label fontSize="xs" color="whiteAlpha.700">
+            Max Frequency
+          </Field.Label>
           <NumberInput.Root
             value={maxValue}
             allowMouseWheel
@@ -180,11 +207,13 @@ export default function KeywordsPieChart({ data }) {
         </Field.Root>
 
         <Field.Root flex="1" minW="200px">
-          <Field.Label fontSize="xs" color="whiteAlpha.700">Exclude Words (comma separated)</Field.Label>
-          <Input 
-            placeholder="e.g. http, www, post" 
-            value={stopWordsStr} 
-            onChange={(e) => setStopWordsStr(e.target.value)} 
+          <Field.Label fontSize="xs" color="whiteAlpha.700">
+            Exclude Words (comma separated)
+          </Field.Label>
+          <Input
+            placeholder="e.g. http, www, post"
+            value={stopWordsStr}
+            onChange={(e) => setStopWordsStr(e.target.value)}
             size="sm"
             color="white"
           />
@@ -192,24 +221,37 @@ export default function KeywordsPieChart({ data }) {
       </HStack>
 
       {/* Limits & Controls Row */}
-      <HStack width="full" justifyContent="flex-start" wrap="wrap" gap={4} mb={6}>
+      <HStack
+        width="full"
+        justifyContent="flex-start"
+        wrap="wrap"
+        gap={4}
+        mb={6}
+      >
         <HStack gap={2}>
-          <Button size="xs" colorPalette={topLimit === 10 ? "green" : "orange"} variant={topLimit === 10 ? "solid" : "outline"} onClick={() => setTopLimit(10)}>
-            Top 10
-          </Button>
-          <Button size="xs" colorPalette={topLimit === 50 ? "green" : "orange"} variant={topLimit === 50 ? "solid" : "outline"} onClick={() => setTopLimit(50)}>
-            Top 50
-          </Button>
-          <Button size="xs" colorPalette={topLimit === 100 ? "green" : "orange"} variant={topLimit === 100 ? "solid" : "outline"} onClick={() => setTopLimit(100)}>
-            Top 100
-          </Button>
-          <Button size="xs" colorPalette={topLimit === 500 ? "green" : "orange"} variant={topLimit === 500 ? "solid" : "outline"} onClick={() => setTopLimit(500)}>
-            Top 500
-          </Button>
+          {[10, 50, 100, 500].map((limitOption) => (
+            <Button
+              key={limitOption}
+              size="xs"
+              colorPalette={topLimit === limitOption ? "orange" : "gray"}
+              variant={topLimit === limitOption ? "solid" : "surface"}
+              onClick={() => setTopLimit(limitOption)}
+            >
+              Top {limitOption}
+            </Button>
+          ))}
         </HStack>
 
-        <Field.Root width="auto" display="flex" flexDirection="row" alignItems="center" gap={2}>
-          <Text fontSize="xs" color="whiteAlpha.700" whiteSpace="nowrap">Custom Limit:</Text>
+        <Field.Root
+          width="auto"
+          display="flex"
+          flexDirection="row"
+          alignItems="center"
+          gap={2}
+        >
+          <Text fontSize="xs" color="whiteAlpha.700" whiteSpace="nowrap">
+            Custom Limit:
+          </Text>
           <HStack gap={1}>
             <NumberInput.Root
               value={customTop}
@@ -217,14 +259,19 @@ export default function KeywordsPieChart({ data }) {
               onValueChange={(details) => setCustomTop(details.valueAsNumber)}
               size="xs"
               min={1}
-              max={30} // Hard cap so users don't freeze the browser rendering 100 slices
+              max={30}
               maxW="70px"
               color="white"
             >
               <NumberInput.Control />
               <NumberInput.Input />
             </NumberInput.Root>
-            <Button size="xs" colorPalette={topLimit === customTop ? "green" : "orange"} variant={topLimit === customTop ? "solid" : "outline"} onClick={() => setTopLimit(customTop)}>
+            <Button
+              size="xs"
+              colorPalette="orange"
+              variant={topLimit === customTop ? "solid" : "surface"}
+              onClick={() => setTopLimit(customTop)}
+            >
               Apply
             </Button>
           </HStack>

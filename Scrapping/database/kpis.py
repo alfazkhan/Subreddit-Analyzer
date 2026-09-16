@@ -2,10 +2,11 @@ import json
 import numpy as np
 import pandas as pd
 from typing import Optional, Dict, Any, List
-from scipy.stats import pearsonr, spearmanr, ttest_ind
+from scipy.stats import pearsonr, spearmanr, ttest_ind, f_oneway
+import statsmodels.api as sm
+from statsmodels.formula.api import ols
 from .core import get_db_pool, safe_parse_timestamp
 
-# Defined Clusters for H2 Testing
 ADMIN_HOUSING_TOPICS = {
     "RENT PRICES & AFFORDABILITY",
     "UTILITY BILLS & ENERGY COSTS",
@@ -27,14 +28,30 @@ LIFESTYLE_CULTURE_TOPICS = {
     "TOURIST ATTRACTIONS & SIGHTSEEING"
 }
 
+CITY_TIMEZONES = {
+    "munich": "Europe/Berlin",
+    "berlin": "Europe/Berlin",
+    "nyc": "America/New_York",
+    "london": "Europe/London",
+    "singapore": "Asia/Singapore",
+    "losangeles": "America/Los_Angeles",
+    "mumbai": "Asia/Kolkata",
+    "delhi": "Asia/Kolkata",
+    "amsterdam": "Europe/Amsterdam",
+    "paris": "Europe/Paris",
+    "hongkong": "Asia/Hong_Kong",
+    "toronto": "America/Toronto",
+    "reactjs": "UTC"
+}
+
 def format_p_value(p: float) -> str:
-    """Academic formatting for p-values."""
+    if pd.isna(p):
+        return "= 1.0"
     if p < 0.001:
         return "< 0.001"
     return f"= {round(float(p), 4)}"
 
 def calculate_correlations(series_a: pd.Series, series_b: pd.Series) -> Dict[str, Any]:
-    """Computes both Pearson r and Spearman rho with sample validation."""
     valid = pd.concat([series_a, series_b], axis=1).dropna()
     n = len(valid)
     if n < 5:
@@ -51,6 +68,21 @@ def calculate_correlations(series_a: pd.Series, series_b: pd.Series) -> Dict[str
         "spearman_p": format_p_value(sp_p)
     }
 
+def calculate_shannon_entropy(scores: list) -> float:
+    if not scores:
+        return np.nan
+    probs = np.array(scores, dtype=float)
+    probs = probs[probs > 0]
+    if len(probs) == 0:
+        return np.nan
+    probs = probs / np.sum(probs)
+    return float(-np.sum(probs * np.log(probs)))
+
+def calculate_ttr(keywords_dict: dict, word_count: int) -> float:
+    if not keywords_dict or word_count <= 0:
+        return 0.0
+    return min(1.0, float(len(keywords_dict)) / float(word_count))
+
 async def calculate_db_kpis_timeseries(
     subreddit_id: Optional[int] = None, 
     start_date: Optional[str] = None, 
@@ -60,19 +92,24 @@ async def calculate_db_kpis_timeseries(
 ):
     pool = await get_db_pool()
     
-    # 1. Excludes unpopulated records (where score=0, upvote_ratio=0, and num_comments=0 simultaneously)
-    # 2. Excludes moderator-removed and user-deleted placeholders
     query = """
         SELECT 
             p.id,
             DATE_TRUNC('day', p.timestamp)::date AS post_date,
+            p.timestamp,
+            p.title,
+            p.body,
             p.score,
             p.upvote_ratio,
             p.num_comments,
             p.sentiment,
             p.sentiment_scores,
             p.topics,
-            s.name AS subreddit_name
+            p.keywords,
+            p.entities,
+            s.name AS subreddit_name,
+            COALESCE(s.total_users, 1000) AS total_users,
+            COALESCE(s.timezone, 'UTC') AS timezone
         FROM reddit_posts p
         JOIN subreddits s ON p.subreddit_id = s.id
         WHERE p.timestamp IS NOT NULL
@@ -114,18 +151,18 @@ async def calculate_db_kpis_timeseries(
 
         raw_scores = row['sentiment_scores']
         scores = json.loads(raw_scores) if isinstance(raw_scores, str) else (raw_scores or {})
-        
         pos_p = float(scores.get('pos', 0.0) or scores.get('positive', 0.0))
         neu_p = float(scores.get('neu', 0.0) or scores.get('neutral', 0.0))
         neg_p = float(scores.get('neg', 0.0) or scores.get('negative', 0.0))
-        
         polarity_magnitude = abs(pos_p - neg_p)
 
         raw_topics = row['topics']
         topics = json.loads(raw_topics) if isinstance(raw_topics, str) else (raw_topics or {})
         primary_topic = "Unclassified"
-        
+        topic_scores = []
+
         if isinstance(topics, dict) and topics:
+            topic_scores = topics.get("scores", [])
             if "primary_topic" in topics and topics["primary_topic"]:
                 primary_topic = topics["primary_topic"]
             elif "labels" in topics and isinstance(topics["labels"], list) and len(topics["labels"]) > 0:
@@ -134,12 +171,49 @@ async def calculate_db_kpis_timeseries(
             primary_topic = topics[0]
 
         norm_topic = str(primary_topic).strip().upper()
-        
         topic_cluster = "OTHER"
         if norm_topic in ADMIN_HOUSING_TOPICS:
             topic_cluster = "ADMIN_HOUSING"
         elif norm_topic in LIFESTYLE_CULTURE_TOPICS:
             topic_cluster = "LIFESTYLE_CULTURE"
+
+        # Lexical Complexity (H7)
+        raw_kw = row['keywords']
+        keywords_dict = json.loads(raw_kw) if isinstance(raw_kw, str) else (raw_kw or {})
+        title_str = str(row['title'] or '')
+        body_str = str(row['body'] or '')
+        words = (title_str + " " + body_str).split()
+        word_count = max(len(words), 1)
+        ttr = calculate_ttr(keywords_dict, word_count)
+
+        # Entity Extraction Density (H4: MONEY, ORG, GPE, LOC)
+        raw_entities = row['entities']
+        entities_list = json.loads(raw_entities) if isinstance(raw_entities, str) else (raw_entities or [])
+        entity_count = 0
+        if isinstance(entities_list, list):
+            for ent in entities_list:
+                if isinstance(ent, dict) and ent.get("label") in ["MONEY", "ORG", "GPE", "LOC"]:
+                    entity_count += 1
+                elif isinstance(ent, str):
+                    entity_count += 1
+        entity_density = entity_count / float(word_count)
+
+        # Local Time Diurnal Windows (H6)
+        tz_name = row['timezone'] or CITY_TIMEZONES.get(str(row['subreddit_name']).lower(), 'UTC')
+        raw_ts = row['timestamp']
+        try:
+            ts_dt = pd.to_datetime(raw_ts, utc=True)
+            local_hour = ts_dt.tz_convert(tz_name).hour
+        except Exception:
+            local_hour = getattr(raw_ts, "hour", 12)
+
+        time_window = "Night (00-05)"
+        if 6 <= local_hour <= 12:
+            time_window = "Morning (06-12)"
+        elif 13 <= local_hour <= 18:
+            time_window = "Afternoon (13-18)"
+        elif 19 <= local_hour <= 23:
+            time_window = "Evening (19-23)"
 
         parsed_posts.append({
             "id": row["id"],
@@ -153,7 +227,14 @@ async def calculate_db_kpis_timeseries(
             "p_neg": neg_p,
             "polarity_magnitude": polarity_magnitude,
             "primary_topic": primary_topic,
-            "topic_cluster": topic_cluster
+            "topic_cluster": topic_cluster,
+            "entropy": calculate_shannon_entropy(topic_scores),
+            "word_count": word_count,
+            "ttr": ttr,
+            "entity_density": entity_density,
+            "total_users": max(int(row["total_users"] or 1000), 1000),
+            "local_hour": local_hour,
+            "time_window": time_window
         })
 
     if not parsed_posts:
@@ -162,24 +243,69 @@ async def calculate_db_kpis_timeseries(
     df = pd.DataFrame(parsed_posts)
 
     # ----------------------------------------------------
-    # HYPOTHESIS TESTING CALCULATIONS
+    # PILLAR 1: Affective & Behavioral Dynamics
     # ----------------------------------------------------
+    # H1: The Negativity-Engagement Dynamic
     h1_neg_vs_comments = calculate_correlations(df["p_neg"], df["num_comments"])
     h1_neg_vs_upvote_ratio = calculate_correlations(df["p_neg"], df["upvote_ratio"])
 
+    # H2: The Opinion Polarization & Virality Dynamic
+    h2_score_vs_polarity = calculate_correlations(df["score"], df["polarity_magnitude"])
+
+    # ----------------------------------------------------
+    # PILLAR 2: Semantic Structure & Information Theory
+    # ----------------------------------------------------
+    # H3: Topic Ambiguity vs. Information Clarity (Entropy vs log_score)
+    h3_stats = {}
+    h3_df = df.dropna(subset=["entropy"]).copy()
+    h3_df["log_score"] = np.log1p(h3_df["score"].clip(lower=0))
+    h3_df["log_comments"] = np.log1p(h3_df["num_comments"].clip(lower=0))
+    if len(h3_df) >= 10:
+        try:
+            h3_model = ols("log_score ~ entropy + log_comments", data=h3_df).fit()
+            entropy_coef = h3_model.params.get("entropy", 0.0)
+            entropy_p = h3_model.pvalues.get("entropy", 1.0)
+            h3_stats = {
+                "sample_size": len(h3_df),
+                "entropy_coef": round(float(entropy_coef), 4),
+                "entropy_p_val": format_p_value(entropy_p),
+                "r_squared": round(float(h3_model.rsquared), 4)
+            }
+        except Exception as e:
+            h3_stats = {"error": str(e), "sample_size": len(h3_df)}
+    else:
+        h3_stats = {"status": "Insufficient entropy records."}
+
+    # H4: Entity-Driven Specificity & Community Consensus
+    h4_stats = {}
+    try:
+        h4_model = ols("upvote_ratio ~ entity_density * p_neg", data=df).fit()
+        interaction_coef = h4_model.params.get("entity_density:p_neg", 0.0)
+        interaction_p = h4_model.pvalues.get("entity_density:p_neg", 1.0)
+        h4_stats = {
+            "sample_size": len(df),
+            "interaction_coef": round(float(interaction_coef), 4),
+            "interaction_p_val": format_p_value(interaction_p),
+            "r_squared": round(float(h4_model.rsquared), 4)
+        }
+    except Exception as e:
+        h4_stats = {"error": str(e), "sample_size": len(df)}
+
+    # ----------------------------------------------------
+    # PILLAR 3: Urban Civic Semantics & Domain Friction
+    # ----------------------------------------------------
+    # H5: Civic Friction vs. Lifestyle Consensus
     admin_df = df[df["topic_cluster"] == "ADMIN_HOUSING"]
     lifestyle_df = df[df["topic_cluster"] == "LIFESTYLE_CULTURE"]
 
-    h2_stats: Dict[str, Any] = {
+    h5_stats = {
         "admin_housing_sample_size": len(admin_df),
         "lifestyle_culture_sample_size": len(lifestyle_df)
     }
-
     if len(admin_df) >= 3 and len(lifestyle_df) >= 3:
         t_neg, p_val_neg = ttest_ind(admin_df["p_neg"], lifestyle_df["p_neg"], equal_var=False)
         t_upvote, p_val_upvote = ttest_ind(admin_df["upvote_ratio"], lifestyle_df["upvote_ratio"], equal_var=False)
-
-        h2_stats.update({
+        h5_stats.update({
             "mean_neg_admin_housing": round(float(admin_df["p_neg"].mean()), 4),
             "mean_neg_lifestyle_culture": round(float(lifestyle_df["p_neg"].mean()), 4),
             "t_stat_negative_sentiment": round(float(t_neg), 4),
@@ -190,25 +316,107 @@ async def calculate_db_kpis_timeseries(
             "p_val_upvote_ratio": format_p_value(p_val_upvote)
         })
     else:
-        h2_stats.update({
-            "status": "Insufficient samples in one or both topic clusters to conduct two-sample t-test."
-        })
+        h5_stats["status"] = "Insufficient samples in one or both topic clusters."
 
-    h3_score_vs_polarity = calculate_correlations(df["score"], df["polarity_magnitude"])
+    # ----------------------------------------------------
+    # PILLAR 4: Temporal Rhythms & Lexical Economics
+    # ----------------------------------------------------
+    # H6: Diurnal & Temporal Affect Cycles
+    h6_stats = {}
+    diurnal_groups = [group["p_neg"].values for _, group in df.groupby("time_window", observed=False) if len(group) > 2]
+    if len(diurnal_groups) >= 2:
+        try:
+            f_val, p_val = f_oneway(*diurnal_groups)
+            group_means = df.groupby("time_window", observed=False)["p_neg"].mean().round(4).to_dict()
+            h6_stats = {
+                "sample_size": len(df),
+                "f_stat": round(float(f_val), 4),
+                "p_val": format_p_value(p_val),
+                "group_means": group_means
+            }
+        except Exception as e:
+            h6_stats = {"error": str(e)}
+    else:
+        h6_stats = {"status": "Insufficient time bins."}
 
+    # H7: Scaled Community Virality & Lexical Diversity
+    h7_stats = {}
+    h7_df = df.copy()
+    h7_df["normalized_comments"] = (h7_df["num_comments"] / h7_df["total_users"]) * 10000.0
+    h7_df["log_users"] = np.log1p(h7_df["total_users"])
+    if len(h7_df) >= 10:
+        try:
+            h7_model = ols("normalized_comments ~ ttr + I(ttr**2) + log_users", data=h7_df).fit()
+            ttr_linear_coef = h7_model.params.get("ttr", 0.0)
+            ttr_linear_p = h7_model.pvalues.get("ttr", 1.0)
+            ttr_quad_coef = h7_model.params.get("I(ttr ** 2)", 0.0)
+            ttr_quad_p = h7_model.pvalues.get("I(ttr ** 2)", 1.0)
+            h7_stats = {
+                "sample_size": len(h7_df),
+                "linear_ttr_coef": round(float(ttr_linear_coef), 4),
+                "linear_ttr_p_val": format_p_value(ttr_linear_p),
+                "quadratic_ttr_coef": round(float(ttr_quad_coef), 4),
+                "quadratic_ttr_p_val": format_p_value(ttr_quad_p),
+                "inverted_u_shaped": bool(ttr_quad_coef < 0 and ttr_quad_p < 0.05)
+            }
+        except Exception as e:
+            h7_stats = {"error": str(e), "sample_size": len(h7_df)}
+    else:
+        h7_stats = {"status": "Insufficient observations for lexical diversity modeling."}
+
+    # Structured Pillar-Based Hypothesis Payload
     hypothesis_results = {
-        "H1_controversy_dynamics": {
-            "hypothesis": "Negative sentiment (P_neg) increases discussion volume (num_comments) and lowers upvote approval (upvote_ratio).",
-            "p_neg_vs_num_comments": h1_neg_vs_comments,
-            "p_neg_vs_upvote_ratio": h1_neg_vs_upvote_ratio
+        "pillar_1_affective_behavioral": {
+            "title": "Pillar 1: Affective & Behavioral Dynamics",
+            "description": "User Emotion vs. Community Action",
+            "H1": {
+                "id": "H1",
+                "name": "The Negativity-Engagement Dynamic",
+                "p_neg_vs_num_comments": h1_neg_vs_comments,
+                "p_neg_vs_upvote_ratio": h1_neg_vs_upvote_ratio
+            },
+            "H2": {
+                "id": "H2",
+                "name": "The Opinion Polarization & Virality Dynamic",
+                "score_vs_polarity_magnitude": h2_score_vs_polarity
+            }
         },
-        "H2_civic_pain_points": {
-            "hypothesis": "Admin & Housing topics exhibit significantly higher negative sentiment and lower upvote ratios compared to Lifestyle & Culture.",
-            "statistics": h2_stats
+        "pillar_2_semantic_structure": {
+            "title": "Pillar 2: Semantic Structure & Information Theory",
+            "description": "Text Organization vs. Algorithmic Reward",
+            "H3": {
+                "id": "H3",
+                "name": "Topic Ambiguity vs. Information Clarity",
+                "statistics": h3_stats
+            },
+            "H4": {
+                "id": "H4",
+                "name": "Entity-Driven Specificity & Community Consensus",
+                "statistics": h4_stats
+            }
         },
-        "H3_echo_chamber_amplification": {
-            "hypothesis": "Extreme polar opinions (|P_pos - P_neg|) receive higher net engagement scores than moderate opinions.",
-            "score_vs_polarity_magnitude": h3_score_vs_polarity
+        "pillar_3_urban_civic": {
+            "title": "Pillar 3: Urban Civic Semantics & Domain Friction",
+            "description": "Contextual Topic Disparity",
+            "H5": {
+                "id": "H5",
+                "name": "Civic Friction vs. Lifestyle Consensus",
+                "statistics": h5_stats
+            }
+        },
+        "pillar_4_temporal_lexical": {
+            "title": "Pillar 4: Temporal Rhythms & Lexical Economics",
+            "description": "Time Cycles & Textual Effort",
+            "H6": {
+                "id": "H6",
+                "name": "Diurnal & Temporal Affect Cycles",
+                "statistics": h6_stats
+            },
+            "H7": {
+                "id": "H7",
+                "name": "Scaled Community Virality & Lexical Diversity",
+                "statistics": h7_stats
+            }
         }
     }
 

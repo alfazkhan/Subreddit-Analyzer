@@ -74,10 +74,10 @@ export default function DataTabs({ postsData, processingStatus }) {
     <>
       <Box position="relative" aria-busy="true" userSelect="none">
         <Tabs.Root
-          defaultValue="Posts Table"
+          defaultValue="Pie Chart"
           variant="enclosed"
           lazyMount
-          unmountOnExit
+          // unmountOnExit
           fitted
           css={{
             "--tabs-indicator-bg": "colors.orange.600",

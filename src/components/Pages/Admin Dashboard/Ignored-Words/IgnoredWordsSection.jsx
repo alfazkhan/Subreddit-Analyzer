@@ -1,11 +1,11 @@
-import { Badge, Text } from "@chakra-ui/react";
+import { Badge, Text, VStack } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
 import { fetchingData } from "@/util/http.js";
 import LoadingAndError from "@/components/ui-components/LoadingAndError.jsx";
 import ApproveWord from "./ApproveWord";
-import DataTable from "@/components/ui-components/Data Table/DataTable";
 import TanStackDataTable from "@/components/ui-components/Data Table/TanstackDataTable";
+import { RangeFilter, TextSearch, ValueSearch } from "@/components/ui-components/Data Table/Filters";
 
 export default function IgnoredWordsSection() {
   const authState = useSelector((state) => state.authState);
@@ -38,6 +38,7 @@ export default function IgnoredWordsSection() {
     <>
       <TanStackDataTable
         data={words}
+        TableFiltersComponent={KeywordFilters}
         tableColumns={[
           {
             accessorKey: "id",
@@ -53,6 +54,7 @@ export default function IgnoredWordsSection() {
             accessorKey: "word",
             header: "Word",
             cell: (props) => props.getValue(),
+            filterFn: "includesString",
           },
           {
             accessorKey: "language",
@@ -82,3 +84,23 @@ export default function IgnoredWordsSection() {
     </>
   );
 }
+
+const KeywordFilters = ({ table }) => {
+  return (
+    <VStack>
+      <TextSearch
+        fieldName={"word"}
+        placeholder="Search Keyword..."
+        table={table}
+      />
+      <ValueSearch
+        table={table}
+        fieldName={"reported"}
+        options={[
+          { value: "true", text: "All" },
+          { value: "false", text: "Hide Reported Word" },
+        ]}
+      />
+    </VStack>
+  );
+};

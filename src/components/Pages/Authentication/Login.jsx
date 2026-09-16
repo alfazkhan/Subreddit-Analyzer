@@ -67,7 +67,6 @@ export default function Login() {
 
       setLoading(false);
       navigate("/dashboard");
-      console.log(dbUser);
     } catch (error) {
       setErrorMsg(error.message);
       setLoading(false);

@@ -2,7 +2,7 @@ import "./App.css";
 import AdminDashboard from "./components/Pages/Admin Dashboard/AdminDashboard";
 import Login from "./components/Pages/Authentication/Login";
 import Homepage from "./components/Pages/Homepage/Homepage";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import ProtectedRoute from "./components/Pages/ProtectedRoute";
 import { useEffect } from "react";
 
@@ -13,15 +13,31 @@ import { serverStatusActions } from "./store/serverStatus";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient, Unsubscribe } from "./util/http";
 
+import AboutProject from "./components/Pages/AboutProject/AboutProject";
+import Navbar from "./components/Pages/Homepage/NavBar";
+import ErrorElement from "./components/Pages/Homepage/ErrorElement";
+
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <Homepage />,
+    path: "",
+    element: <Navbar />,
+    errorElement: <ErrorElement />,
+    children: [
+      {
+        index: true,
+        element: <Homepage />,
+      },
+      {
+        path: "about",
+        element: <AboutProject />,
+      },
+    ],
   },
   {
     path: "/login",
     element: <Login />,
   },
+
   {
     path: "/dashboard",
     element: (
@@ -31,8 +47,6 @@ const router = createBrowserRouter([
     ),
   },
 ]);
-
-
 
 function App() {
   const dispatch = useDispatch();
@@ -49,7 +63,7 @@ function App() {
         }
 
         dispatch(serverStatusActions.serverStatusChange("online"));
-        dispatch(serverStatusActions.updateCacheSummary(resData)); 
+        dispatch(serverStatusActions.updateCacheSummary(resData));
       } catch (error) {
         console.error("Failed to fetch public summary data:", error);
       }
@@ -63,9 +77,11 @@ function App() {
   }, [dispatch]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
+    <>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    </>
   );
 }
 

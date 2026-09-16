@@ -1,15 +1,11 @@
-import ServerStatus from "../../ui-components/ServerStatus.jsx";
-import Header from "../../ui-components/Header.jsx";
 import { Flex, HStack, Progress } from "@chakra-ui/react";
-import UserInput from "./UserInput.jsx";
-import SubredditsSuggestions from "./SubredditsSuggestion.jsx";
 import DataTabs from "./Data/DataTabs.jsx";
 
 import { useMutation } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { fetchingData } from "@/util/http.js";
 import LoadingAndError from "@/components/ui-components/LoadingAndError.jsx";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import SubredditsSummary from "./SubredditsSummary.jsx";
 
 export default function Homepage() {
@@ -19,7 +15,7 @@ export default function Homepage() {
   );
 
   const [progress, setProgress] = useState(0);
-  const [showDashboard, setShowDashboard] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(true);
 
   const {
     mutate,
@@ -44,13 +40,6 @@ export default function Homepage() {
     );
   }
 
-  function fetchSubredditData(subredditName, currentCount) {
-    mutate({
-      endpoint: `posts/${subredditName}?limit=${currentCount}`,
-      headers: { "Content-Type": "application/json" },
-      progressCallBackFn: setProgress,
-    });
-  }
 
   function toggleDashboard() {
     console.log("Working")
@@ -59,11 +48,6 @@ export default function Homepage() {
 
   return (
     <Flex direction="column" justifyContent="center" width="full" margin="auto">
-      <Flex gap="4" align="anchor-center" justify="space-between" margin="5">
-        <Header text={"Subreddit Analyzer"} highlight="Analyzer" />
-        <ServerStatus />
-      </Flex>
-
       <Flex justifyContent="center" gap="2" margin="5" flexDirection="column">
         <SubredditsSummary
           toggleDashboard={toggleDashboard}

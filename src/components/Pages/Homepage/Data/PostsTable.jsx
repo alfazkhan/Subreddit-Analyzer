@@ -67,7 +67,6 @@ export default function PostsTable({ data: postsData }) {
       });
   }
 
-  console.log(filteredData);
 
   return (
     <Flex direction="column" width="full">

@@ -25,7 +25,7 @@ export default function ReanalyzeSection() {
   const [loading, setLoading] = useState(false);
   const [currentStatus, setCurrentStatus] = useState("");
   const cacheSummary = useSelector(
-    (state) => state.serverStatusState.cacheSummary,
+    (state) => state.serverStatusState.latestSummary,
   );
   const token = useSelector((state) => state.authState.token);
 

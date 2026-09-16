@@ -21,10 +21,12 @@ export default function KeywordTable() {
     error,
   } = useQuery({
     queryKey: ["keywords"],
-    queryFn: ({ signal }) => fetchingData({ endpoint: "keywords", signal }),
+    queryFn: ({ signal }) => fetchingData({ endpoint: "posts/keywords", signal }),
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 5,
   });
+
+  console.log(keywords)
 
   if (isError || isPending || isLoading) {
     return (
@@ -136,8 +138,6 @@ export default function KeywordTable() {
 }
 
 const ToolBar = ({ table }) => {
-  // console.log(Object.keys(table.getState().rowSelection));
-  // console.log(table.getSelectedRowModel().rows);
   if (table.getSelectedRowModel().rows.length !== 0) {
     return (
       <>

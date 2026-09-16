@@ -3,8 +3,6 @@ import { memo } from "react";
 import { CgShapeCircle } from "react-icons/cg";
 import { useSelector } from "react-redux";
 
-import { Link } from "react-router-dom";
-import LogoutButton from "../Pages/Admin Dashboard/LogoutButton";
 
 const config = {
   checking: {
@@ -32,7 +30,6 @@ function ServerStatus() {
 
   return (
     <Flex alignItems="center" gap={5}>
-      <Link to="/dashboard">
         <Badge
           variant={config[status].variant}
           colorPalette={config[status].colorPalette}
@@ -45,8 +42,6 @@ function ServerStatus() {
           )}
           {config[status].text.toUpperCase()}
         </Badge>
-      </Link>
-      <LogoutButton />
     </Flex>
   );
 }

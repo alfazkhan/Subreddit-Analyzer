@@ -38,7 +38,7 @@ export default function SubredditsSummary({ showDashboard, toggleDashboard }) {
             </Stat.ValueText>
             <Stat.HelpText>
               <VStack gap={0.5}>
-                <Badge>Last updated</Badge>
+                <Badge variant="solid">Last updated</Badge>
                 <Text color="white">{dateTimeFormatter(latestSummary[sub]?.last_updated)}</Text>
               </VStack>
             </Stat.HelpText>

@@ -36,7 +36,8 @@ async def get_queue_state(limit: int = 500):
                     WHEN p.status = 'failed' THEN 3
                     ELSE 4
                 END ASC,
-                p.created_at ASC
+                p.created_at ASC,
+                p.post_id ASC
             LIMIT $1;
         ''', limit)
         

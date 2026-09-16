@@ -5,17 +5,17 @@ torchvision
 torchaudio
 
 asyncpg
-# websockets
-playwright
+playwright 
 transformers
 uvicorn
 fastapi
 pandas
 scipy
+statsmodels
 
 # NLP & Text Processing
 nltk
-spacy
+spacy>=3.7.0
 collections-extended
 sentencepiece
 tiktoken
@@ -25,6 +25,6 @@ protobuf
 pytest
 pytest-asyncio
 
-#firebase
+# Firebase & Sockets
 firebase-admin
 websockets>=12.0

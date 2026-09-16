@@ -1,5 +1,4 @@
 import {
-  Table,
   Badge,
   Flex,
   Text,
@@ -12,14 +11,13 @@ import {
   VStack,
   HStack,
   ButtonGroup,
+  NativeSelect,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import TanStackDataTable from "@/components/ui-components/Data Table/TanstackDataTable";
-import LoadingAndError from "@/components/ui-components/LoadingAndError";
 import { useMutation } from "@tanstack/react-query";
 import { fetchingData } from "@/util/http";
 import { LuChevronDown } from "react-icons/lu";
-import { BiLeftArrow, BiRightArrow } from "react-icons/bi";
 import { FaChevronLeft } from "react-icons/fa6";
 import { FaChevronRight } from "react-icons/fa";
 
@@ -27,40 +25,55 @@ export default function PaginatedPostTable() {
   const [limit, setLimit] = useState(20);
   const [currentCursor, setCursor] = useState(null);
   const [subreddit, setSubreddit] = useState("");
+  const [posts, setPosts] = useState([]);
 
-  const {
-    mutate,
-    data: posts = [],
-    isPending,
-    isLoading,
-    isError,
-    error,
-  } = useMutation({
+  const { mutate, isPending, isLoading, isError, error } = useMutation({
     queryKey: ["posts", currentCursor],
     mutationFn: fetchingData,
+    onSuccess: (data) => {
+      setCursor(data.next_cursor);
+      setPosts(data);
+    },
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 5,
   });
 
   function fetchPostsData(cursor = null, direction = "next") {
+    let endpoint = `posts?limit=${limit}&subreddit=${subreddit}&direction=${direction}`;
+    if (cursor !== null) {
+      endpoint += `&cursor=${cursor}`;
+    }
     mutate({
-      endpoint: `posts?limit=${limit}&subreddit=${subreddit}&cursor=${cursor}&direction=${direction}`,
+      endpoint: endpoint,
       headers: { "Content-Type": "application/json" },
     });
   }
 
   useEffect(() => {
     fetchPostsData();
-  }, []);
+    console.log(limit);
+  }, [limit]);
 
-
-  if (isError || isPending || isLoading) {
-    return (
-      <LoadingAndError isLoading={isPending} isError={isError} error={error} />
-    );
-  }
+  // if (isError || isPending || isLoading) {
+  //   return (
+  //     <LoadingAndError isLoading={isPending} isError={isError} error={error} />
+  //   );
+  // }
 
   return (
     <Flex direction="column" width="full" gap={5} alignItems="center">
-      <PaginationButtons data={posts} onFetchPosts={fetchPostsData} />
+      <PaginationButtons
+        data={posts}
+        isPending={isPending}
+        onFetchPosts={fetchPostsData}
+        postPerPageChange={setLimit}
+        limit={limit}
+        defaultColumn={{
+          size: 30, 
+          minSize: 30, 
+          maxSize: 500, 
+        }}
+      />
       <TanStackDataTable
         data={posts?.items || []}
         manualPagination
@@ -75,11 +88,13 @@ export default function PaginatedPostTable() {
             accessorKey: "title",
             header: "Title",
             cell: PostTitle,
+            size: 200
           },
           {
             accessorKey: "body",
             header: "Body",
             cell: (props) => <PostBody bodyContent={props.getValue()} />,
+            size: 200
           },
           {
             accessorKey: "timestamp",
@@ -107,12 +122,24 @@ export default function PaginatedPostTable() {
           },
         ]}
       />
-      <PaginationButtons data={posts} onFetchPosts={fetchPostsData} />
+      <PaginationButtons
+        data={posts}
+        isPending={isPending}
+        onFetchPosts={fetchPostsData}
+        postPerPageChange={setLimit}
+        limit={limit}
+      />
     </Flex>
   );
 }
 
-function PaginationButtons({ data, onFetchPosts }) {
+function PaginationButtons({
+  data,
+  onFetchPosts,
+  isPending,
+  limit,
+  postPerPageChange,
+}) {
   return (
     <ButtonGroup size="sm" variant="outline">
       <Button
@@ -121,12 +148,31 @@ function PaginationButtons({ data, onFetchPosts }) {
       >
         <FaChevronLeft /> Previous
       </Button>
+      {isPending && <p>Loading...</p>}
       <Button
         onClick={() => onFetchPosts(data.next_cursor, "next")}
         disabled={!data.has_more}
       >
         Next <FaChevronRight />
       </Button>
+      <NativeSelect.Root
+        size="sm"
+        width="240px"
+        value={limit}
+        onChange={(e) => {
+          postPerPageChange(e.target.value);
+          console.log(e.target.value);
+        }}
+      >
+        <NativeSelect.Field>
+          <option value={10}>10</option>
+          <option value={15}>15</option>
+          <option value={25}>25</option>
+          <option value={50}>50</option>
+          <option value={100}>100</option>
+        </NativeSelect.Field>
+        <NativeSelect.Indicator />
+      </NativeSelect.Root>
     </ButtonGroup>
   );
 }
@@ -217,7 +263,7 @@ function TopicsCell({ topics }) {
   });
 
   return (
-    <VStack overflow="scroll">
+    <VStack>
       <Text>{topics.primary_topic}</Text>
       <Badge size="xs" colorPalette="yellow">
         {(topicsMap.get(topics.primary_topic) * 100).toFixed(2)}%

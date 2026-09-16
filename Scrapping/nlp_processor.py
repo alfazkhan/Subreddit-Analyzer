@@ -35,14 +35,31 @@ CLASSIFIER_MODEL_NAME = "MoritzLaurer/mDeBERTa-v3-base-mnli-xnli"
 _sentiment_pipeline = None
 _classifier_pipeline = None
 
-# Global lightweight NLP tools initialization
-try:
-    nlp = spacy.load("en_core_web_sm")
-except Exception:
-    nlp = spacy.blank("en")
+# Multilingual SpaCy NER Loader
+_nlp_en = None
+_nlp_multi = None
+
+def get_spacy_models():
+    global _nlp_en, _nlp_multi
+    if _nlp_en is None:
+        try:
+            _nlp_en = spacy.load("en_core_web_sm")
+        except Exception:
+            _nlp_en = None
+
+    if _nlp_multi is None:
+        try:
+            _nlp_multi = spacy.load("xx_ent_wiki_sm")
+        except Exception:
+            _nlp_multi = None
+
+    return _nlp_en, _nlp_multi
 
 lemmatizer = WordNetLemmatizer()
-ENGLISH_STOPWORDS = set(stopwords.words('english'))
+try:
+    ENGLISH_STOPWORDS = set(stopwords.words('english'))
+except Exception:
+    ENGLISH_STOPWORDS = set()
 
 CANDIDATE_LABELS = [
     "Rent Prices & Affordability",
@@ -77,9 +94,15 @@ CANDIDATE_LABELS = [
     "Student Shifts & Part-Time Work"
 ]
 
+# Complete set matching your frontend labelConfig
+SUPPORTED_ENTITY_LABELS = {
+    "PERSON", "NORP", "FAC", "ORG", "GPE", "LOC", 
+    "PRODUCT", "EVENT", "WORK_OF_ART", "LAW", 
+    "LANGUAGE", "DATE", "TIME", "MONEY", "QUANTITY", "PERCENT"
+}
+
 
 def _get_target_device():
-    """Determines whether to use GPU or CPU based on environment flags."""
     force_cpu = os.getenv("FORCE_CPU", "0") == "1"
     if force_cpu or not torch.cuda.is_available():
         return -1, torch.float32
@@ -87,60 +110,39 @@ def _get_target_device():
 
 
 def get_sentiment_pipeline():
-    """Lazy loader for sentiment analysis pipeline."""
     global _sentiment_pipeline
     if _sentiment_pipeline is None:
         device_id, dtype = _get_target_device()
+        kwargs = {
+            "model": SENTIMENT_MODEL_NAME,
+            "tokenizer": SENTIMENT_MODEL_NAME,
+            "truncation": True,
+            "max_length": 512,
+            "local_files_only": True
+        }
         if device_id == 0:
-            _sentiment_pipeline = pipeline(
-                "sentiment-analysis",
-                model=SENTIMENT_MODEL_NAME,
-                tokenizer=SENTIMENT_MODEL_NAME,
-                device=device_id,
-                dtype=dtype,
-                truncation=True,
-                max_length=512,
-                local_files_only=True,
-                model_kwargs={"low_cpu_mem_usage": True}
-            )
+            kwargs.update({"device": device_id, "dtype": dtype, "model_kwargs": {"low_cpu_mem_usage": True}})
         else:
-            _sentiment_pipeline = pipeline(
-                "sentiment-analysis",
-                model=SENTIMENT_MODEL_NAME,
-                tokenizer=SENTIMENT_MODEL_NAME,
-                device=-1,
-                truncation=True,
-                max_length=512,
-                local_files_only=True
-            )
+            kwargs["device"] = -1
+        _sentiment_pipeline = pipeline("sentiment-analysis", **kwargs)
     return _sentiment_pipeline
 
 
 def get_classifier_pipeline():
-    """Lazy loader for zero-shot classifier pipeline."""
     global _classifier_pipeline
     if _classifier_pipeline is None:
         device_id, dtype = _get_target_device()
+        kwargs = {
+            "model": CLASSIFIER_MODEL_NAME,
+            "truncation": True,
+            "max_length": 1024,
+            "local_files_only": True
+        }
         if device_id == 0:
-            _classifier_pipeline = pipeline(
-                "zero-shot-classification",
-                model=CLASSIFIER_MODEL_NAME,
-                device=device_id,
-                dtype=dtype,
-                truncation=True,
-                max_length=1024,
-                local_files_only=True,
-                model_kwargs={"low_cpu_mem_usage": True}
-            )
+            kwargs.update({"device": device_id, "dtype": dtype, "model_kwargs": {"low_cpu_mem_usage": True}})
         else:
-            _classifier_pipeline = pipeline(
-                "zero-shot-classification",
-                model=CLASSIFIER_MODEL_NAME,
-                device=-1,
-                truncation=True,
-                max_length=1024,
-                local_files_only=True
-            )
+            kwargs["device"] = -1
+        _classifier_pipeline = pipeline("zero-shot-classification", **kwargs)
     return _classifier_pipeline
 
 
@@ -171,9 +173,40 @@ def get_sentiment(text: str) -> dict:
 
 
 def extract_entities(text: str) -> list:
-    doc = nlp(text)
-    labels = ["PERSON", "ORG", "GPE", "LOC", "PRODUCT", "DATE", "MONEY"]
-    return [{"text": ent.text, "label": ent.label_} for ent in doc.ents if ent.label_ in labels]
+    """
+    Extracts named entities using en_core_web_sm or xx_ent_wiki_sm multilingual pipeline.
+    Matches all entity labels configured in labelConfig.
+    """
+    clean_text = text.strip() if text else ""
+    if not clean_text:
+        return []
+
+    nlp_en, nlp_multi = get_spacy_models()
+    nlp_model = nlp_en or nlp_multi
+    
+    if not nlp_model:
+        return []
+
+    # Limit text length to avoid memory spikes on oversized submissions
+    doc = nlp_model(clean_text[:10000])
+    
+    entities = []
+    seen = set()
+
+    for ent in doc.ents:
+        label = ent.label_.upper()
+        clean_entity_text = ent.text.strip()
+        
+        if label in SUPPORTED_ENTITY_LABELS and len(clean_entity_text) > 1:
+            key = (clean_entity_text.lower(), label)
+            if key not in seen:
+                seen.add(key)
+                entities.append({
+                    "text": clean_entity_text,
+                    "label": label
+                })
+
+    return entities
 
 
 def extract_keywords(text: str, dynamic_ignored_words: set = None) -> dict:
@@ -181,7 +214,7 @@ def extract_keywords(text: str, dynamic_ignored_words: set = None) -> dict:
         dynamic_ignored_words = set()
     words = word_tokenize(text.lower())
     sw = ENGLISH_STOPWORDS.union(dynamic_ignored_words)
-    clean = [lemmatizer.lemmatize(w) for w in words if w.isalnum() and w not in sw]
+    clean = [lemmatizer.lemmatize(w) for w in words if w.isalnum() and len(w) > 2 and w not in sw]
     return dict(Counter(clean))
 
 

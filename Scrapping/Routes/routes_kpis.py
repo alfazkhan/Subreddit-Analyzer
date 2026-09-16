@@ -16,8 +16,8 @@ async def get_city_kpis(
     sma_window: Optional[int] = Query(7, ge=1, le=30, description="Simple Moving Average window size in days (1-30)")
 ):
     """
-    Computes Master's Thesis empirical hypothesis statistics (H1, H2, H3) and time-series metrics.
-    Works for a specific subreddit (via ID path param) or across all subreddits globally.
+    Computes Master's Thesis empirical hypothesis statistics organized across the 4 Academic Pillars (H1-H7)
+    and time-series metrics globally or per municipal subreddit.
     """
     try:
         time_series, summary, subreddit_name = await calculate_db_kpis_timeseries(
