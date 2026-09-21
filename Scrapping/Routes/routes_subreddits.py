@@ -1,12 +1,16 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from pydantic import BaseModel
 from typing import Optional, List
 
 from auth_guard import require_role
-# New explicit database module imports
 from database.subreddits import (
-    db_create_subreddit, db_get_all_subreddits, db_get_subreddit,
-    db_update_subreddit, db_delete_subreddit
+    db_create_subreddit, 
+    db_get_all_subreddits, 
+    db_get_subreddit,
+    db_update_subreddit, 
+    db_delete_subreddit,
+    get_subreddits_sentiment_distribution,
+    get_subreddits_diurnal_frequency
 )
 
 router = APIRouter(prefix="/subreddits", tags=["Subreddits Control Layer"])
@@ -17,12 +21,62 @@ class SubredditBase(BaseModel):
     total_users: Optional[int] = None
     is_active: Optional[bool] = True
     keep_updated: Optional[bool] = False
+    timezone: Optional[str] = "UTC"
 
 class SubredditUpdate(BaseModel):
     description: Optional[str] = None
     total_users: Optional[int] = None
     is_active: Optional[bool] = True
     keep_updated: Optional[bool] = False
+    timezone: Optional[str] = None
+
+# ---------------------------------------------------------------------------
+# SENTIMENT & DIURNAL AGGREGATION ENDPOINTS
+# STATIC/SPECIFIC ROUTES MUST PRECEDE DYNAMIC /{name} PATH PARAMETER
+# ---------------------------------------------------------------------------
+
+@router.get("/sentiments")
+async def get_sentiments_distribution(
+    subreddit: Optional[str] = Query(None, description="Optional subreddit name filter (e.g., 'Berlin' or 'All')")
+):
+    """
+    Returns overall sentiment distribution (Positive, Neutral, Negative)
+    and per-subreddit breakdown.
+    """
+    try:
+        return await get_subreddits_sentiment_distribution(subreddit_name=subreddit)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to calculate subreddit sentiment distribution: {str(e)}"
+        )
+
+@router.get("/sentiments/frequency")
+async def get_sentiments_frequency(
+    subreddit: Optional[str] = Query(None, description="Optional subreddit name to filter"),
+    start_date: Optional[str] = Query(None, description="Filter start date (YYYY-MM-DD)"),
+    end_date: Optional[str] = Query(None, description="Filter end date (YYYY-MM-DD)")
+):
+    """
+    Returns localized 24-hour diurnal sentiment frequency (00:00 - 23:00).
+    Converts timestamps to each city's local timezone so that 12 PM in Berlin
+    and 12 PM in Amsterdam align synchronously on the same diurnal axis.
+    """
+    try:
+        return await get_subreddits_diurnal_frequency(
+            subreddit_name=subreddit,
+            start_date=start_date,
+            end_date=end_date
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to calculate diurnal sentiment frequency: {str(e)}"
+        )
+
+# ---------------------------------------------------------------------------
+# CRUD & TARGET CONFIGURATION ROUTES
+# ---------------------------------------------------------------------------
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 async def create_new_target(
@@ -34,7 +88,8 @@ async def create_new_target(
         description=payload.description,
         total_users=payload.total_users,
         is_active=payload.is_active,
-        keep_updated=payload.keep_updated
+        keep_updated=payload.keep_updated,
+        timezone=payload.timezone or "UTC"
     )
     return {"id": sub_id, "message": "Tracking registry generated successfully"}
 
@@ -64,7 +119,8 @@ async def modify_target_configuration(
         description=payload.description if payload.description is not None else existing.get('description'),
         total_users=payload.total_users if payload.total_users is not None else existing.get('total_users'),
         is_active=payload.is_active if payload.is_active is not None else existing.get('is_active'),
-        keep_updated=payload.keep_updated if payload.keep_updated is not None else existing.get('keep_updated')
+        keep_updated=payload.keep_updated if payload.keep_updated is not None else existing.get('keep_updated'),
+        timezone=payload.timezone if payload.timezone is not None else existing.get('timezone')
     )
     if not success:
         raise HTTPException(status_code=500, detail="Database write operation dropped downstream")

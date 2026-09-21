@@ -11,6 +11,7 @@ from database.posts import (
     fetch_posts_cursor_paginated,
     db_update_post, 
     db_delete_post,
+    get_posts_diurnal_frequency
 )
 
 router = APIRouter(tags=["Posts Endpoint Layer"])
@@ -39,6 +40,37 @@ async def api_get_posts_cursor(
 async def api_get_summary():
     return await get_cache_summary()
 
+# ---------------------------------------------------------------------------
+# DIURNAL LOCAL FREQUENCY ENDPOINTS
+# (Must precede wildcard path routes like /posts/{subreddit})
+# ---------------------------------------------------------------------------
+
+@router.get("/posts/frequency")
+@router.get("/posts/frequency/{subreddit}")
+async def api_get_posts_frequency(
+    subreddit: Optional[str] = None,
+    start_date: Optional[str] = Query(None, description="Start date filter (YYYY-MM-DD)"),
+    end_date: Optional[str] = Query(None, description="End date filter (YYYY-MM-DD)")
+):
+    """
+    Returns localized 24-hour diurnal post and emotion frequency (00:00 - 23:00).
+    Aggregates submissions using each subreddit's assigned local timezone.
+    """
+    try:
+        return await get_posts_diurnal_frequency(
+            subreddit_name=subreddit,
+            start_date=start_date,
+            end_date=end_date
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to calculate post diurnal frequency: {str(e)}"
+        )
+
+# ---------------------------------------------------------------------------
+# KEYWORDS & AGGREGATION ENDPOINTS
+# ---------------------------------------------------------------------------
 
 @router.get("/posts/keywords")
 async def api_get_keywords(
@@ -53,7 +85,7 @@ async def api_get_keywords(
     
     if subreddit:
         params.append(subreddit)
-        base_filter += f" AND s.name = ${len(params)}"
+        base_filter += f" AND LOWER(TRIM(s.name)) = LOWER(TRIM(${len(params)}))"
 
     query = f"""
         WITH parsed_keywords AS (
@@ -142,7 +174,7 @@ async def api_get_keyword_posts(
             SELECT p.id
             FROM reddit_posts p
             JOIN subreddits s ON p.subreddit_id = s.id
-            WHERE s.name = $1
+            WHERE LOWER(TRIM(s.name)) = LOWER(TRIM($1))
               AND p.keywords::jsonb ? $2
             ORDER BY p.timestamp DESC;
         """

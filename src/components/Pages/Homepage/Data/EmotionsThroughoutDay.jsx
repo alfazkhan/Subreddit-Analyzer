@@ -8,7 +8,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Box,
@@ -16,12 +16,14 @@ import {
   Text,
   Flex,
   HStack,
-  Field,
   Badge,
   Button,
+  Spinner,
+  Center,
 } from "@chakra-ui/react";
+import { useQuery } from "@tanstack/react-query";
+import { fetchingData } from "@/util/http";
 import DateSelector from "@/components/ui-components/DateSelector";
-import TimeZoneSelect from "@/components/ui-components/TimeZoneSelect"; 
 
 ChartJS.register(
   CategoryScale,
@@ -33,9 +35,7 @@ ChartJS.register(
   Legend,
 );
 
-export default function EmotionsThroughoutDay({ data: postsData }) {
-  const systemTimeZone = useMemo(() => Intl.DateTimeFormat().resolvedOptions().timeZone, []);
-  
+export default function EmotionsThroughoutDay({ subreddit = "All" }) {
   const defaultDates = useMemo(() => {
     const today = new Date();
     const currentYear = today.getFullYear();
@@ -44,77 +44,56 @@ export default function EmotionsThroughoutDay({ data: postsData }) {
     return { start: startStr, end: endStr };
   }, []);
 
-  const [activeTz, setActiveTz] = useState(systemTimeZone);
   const [activeStart, setActiveStart] = useState(defaultDates.start);
   const [activeEnd, setActiveEnd] = useState(defaultDates.end);
 
+  const endpoint = useMemo(() => {
+    const params = new URLSearchParams();
+    if (subreddit && subreddit !== "All") params.append("subreddit", subreddit);
+    if (activeStart) params.append("start_date", activeStart);
+    if (activeEnd) params.append("end_date", activeEnd);
+    return `subreddits/sentiments/frequency?${params.toString()}`;
+  }, [subreddit, activeStart, activeEnd]);
+
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["diurnal-sentiments", subreddit, activeStart, activeEnd],
+    queryFn: ({ signal }) => fetchingData({ endpoint, signal }),
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 5,
+  });
+
   const handleAllTime = () => {
-    if (!postsData || postsData.length === 0) return;
-
-    const timestamps = postsData
-      .map((p) => new Date(p.timestamp).getTime())
-      .filter((t) => !isNaN(t));
-
-    if (timestamps.length === 0) return;
-
-    const minDate = new Date(Math.min(...timestamps));
-    const maxDate = new Date(Math.max(...timestamps));
-
-    setActiveStart(minDate.toLocaleDateString("en-CA", { timeZone: activeTz }));
-    setActiveEnd(maxDate.toLocaleDateString("en-CA", { timeZone: activeTz }));
+    setActiveStart("");
+    setActiveEnd("");
   };
 
-  const hourlySentimentData = useMemo(() => {
-    const counts = {
-      Positive: Array(24).fill(0),
-      Neutral: Array(24).fill(0),
-      Negative: Array(24).fill(0),
-    };
+  const labels = data?.labels || Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, "0")}:00`);
+  const positiveData = data?.metrics?.positive_counts || Array(24).fill(0);
+  const negativeData = data?.metrics?.negative_counts || Array(24).fill(0);
+  const postVolumes = data?.metrics?.post_volumes || Array(24).fill(0);
 
-    if (!postsData) return counts;
-
-    postsData.forEach((post) => {
-      if (!post.timestamp || !post.sentiment) return;
-      if (counts[post.sentiment] === undefined) return; 
-
-      const dateObj = new Date(post.timestamp);
-      
-      const localDateStr = dateObj.toLocaleDateString("en-CA", { timeZone: activeTz });
-      const localHour = parseInt(
-        dateObj.toLocaleString("en-US", { hour: "numeric", hour12: false, timeZone: activeTz })
-      ) % 24;
-
-      const isAfterStart = !activeStart || localDateStr >= activeStart;
-      const isBeforeEnd = !activeEnd || localDateStr <= activeEnd;
-
-      if (isAfterStart && isBeforeEnd) {
-        counts[post.sentiment][localHour]++;
-      }
-    });
-
-    return counts;
-  }, [postsData, activeStart, activeEnd, activeTz]);
-
-  const labels = Array.from({ length: 24 }, (_, i) => `${i}:00`);
-  
   const chartData = {
     labels,
     datasets: [
       {
-        label: "Positive",
-        data: hourlySentimentData.Positive,
+        label: "Positive Emotion",
+        data: positiveData,
         borderColor: "#dd6b20",
-        backgroundColor: "rgba(221, 107, 32, 0.1)",
-        tension: 0.4,
-        pointRadius: 4,
+        backgroundColor: "rgba(221, 107, 32, 0.15)",
+        tension: 0.35,
+        borderWidth: 2.5,
+        pointRadius: 3,
+        pointHoverRadius: 6,
       },
       {
-        label: "Negative",
-        data: hourlySentimentData.Negative,
-        backgroundColor: "rgb(194, 36, 36)",
-        borderColor: "rgb(194, 36, 36)",
-        tension: 0.4,
-        pointRadius: 4,
+        label: "Negative Emotion",
+        data: negativeData,
+        borderColor: "rgb(239, 68, 68)",
+        backgroundColor: "rgba(239, 68, 68, 0.15)",
+        tension: 0.35,
+        borderWidth: 2.5,
+        pointRadius: 3,
+        pointHoverRadius: 6,
       },
     ],
   };
@@ -125,27 +104,36 @@ export default function EmotionsThroughoutDay({ data: postsData }) {
     plugins: {
       legend: {
         position: "top",
+        labels: {
+          color: "#E2E8F0",
+          font: { size: 12 },
+        },
       },
       title: {
-        display: false, 
+        display: false,
       },
       tooltip: {
         callbacks: {
-          title: (items) => `Time: ${items[0].label} (${activeTz})`,
+          title: (items) => `Local Civic Hour: ${items[0].label}`,
+          afterBody: (items) => {
+            const index = items[0].dataIndex;
+            const volume = postVolumes[index] || 0;
+            return `Total Submissions: ${volume.toLocaleString()}`;
+          },
         },
       },
     },
     scales: {
       x: {
-        border: { display: true },
-        grid: { display: true, drawOnChartArea: true, drawTicks: true },
-        ticks: { color: "rgba(255,255,255,0.5)" },
+        border: { display: true, color: "rgba(255,255,255,0.1)" },
+        grid: { display: true, color: "rgba(255,255,255,0.05)" },
+        ticks: { color: "rgba(255,255,255,0.6)", font: { size: 11 } },
       },
       y: {
         border: { display: false },
-        grid: { color: "rgba(255,255,255,0.1)" },
+        grid: { color: "rgba(255,255,255,0.08)" },
         beginAtZero: true,
-        ticks: { stepSize: 1, color: "rgba(255,255,255,0.5)" },
+        ticks: { color: "rgba(255,255,255,0.6)", font: { size: 11 } },
       },
     },
   };
@@ -154,19 +142,30 @@ export default function EmotionsThroughoutDay({ data: postsData }) {
     <Box p={6} bg="blackAlpha.400" borderRadius="xl" borderWidth="1px" borderColor="whiteAlpha.200">
       <Flex justifyContent="space-between" alignItems="flex-start" mb={6} wrap="wrap" gap={4}>
         <Box>
-          <Heading size="md" color="orange.600">Sentiments Throughout the day</Heading>
-          <Text fontSize="xs" color="whiteAlpha.500">Currently showing: {activeTz}</Text>
+          <HStack gap={3}>
+            <Heading size="md" color="orange.400">
+              Diurnal Affect Cycles
+            </Heading>
+            <Badge colorPalette="orange" variant="solid" fontSize="2xs">
+              Local Timezone Synchronized
+            </Badge>
+          </HStack>
+          <Text fontSize="xs" color="gray.400" mt={1}>
+            Combined average rhythms mapped to local city clocks (00:00–23:00)
+          </Text>
         </Box>
 
         <HStack gap={4} wrap="wrap" alignItems="flex-start">
-          <Button type="button" size="sm" mt={5} variant="outline" colorPalette="orange" onClick={handleAllTime}>
+          <Button
+            type="button"
+            size="sm"
+            mt={5}
+            variant={!activeStart && !activeEnd ? "solid" : "outline"}
+            colorPalette="orange"
+            onClick={handleAllTime}
+          >
             All Time
           </Button>
-
-          <Field.Root width="auto" mt={5}>
-            <Field.Label fontSize="xs">Timezone</Field.Label>
-            <TimeZoneSelect onTimeZoneChange={setActiveTz} currentTimeZone={activeTz} />
-          </Field.Root>
 
           <DateSelector 
             start={activeStart}
@@ -179,8 +178,20 @@ export default function EmotionsThroughoutDay({ data: postsData }) {
         </HStack>
       </Flex>
 
-      <Box height="350px">
-        <Line data={chartData} options={options} />
+      <Box height="360px" width="full">
+        {isLoading ? (
+          <Center height="100%">
+            <Spinner color="orange.500" size="xl" />
+          </Center>
+        ) : isError ? (
+          <Center height="100%">
+            <Text color="red.400" fontSize="sm">
+              Error loading diurnal frequency: {error?.message || "Internal Server Error"}
+            </Text>
+          </Center>
+        ) : (
+          <Line data={chartData} options={options} />
+        )}
       </Box>
 
       {activeStart && activeEnd && (

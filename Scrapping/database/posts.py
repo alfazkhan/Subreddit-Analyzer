@@ -34,24 +34,21 @@ async def fetch_posts_cursor_paginated(
 ) -> Dict[str, Any]:
     pool = await get_db_pool()
     
-    # 1. Total Count Query (Subreddit-specific or Global)
     count_query = """
         SELECT COUNT(p.id) 
         FROM reddit_posts p
     """
     count_args = []
     if subreddit:
-        count_query += " JOIN subreddits s ON p.subreddit_id = s.id WHERE s.name = $1"
+        count_query += " JOIN subreddits s ON p.subreddit_id = s.id WHERE LOWER(TRIM(s.name)) = LOWER(TRIM($1))"
         count_args.append(subreddit)
 
     async with pool.acquire() as conn:
         total_count = await conn.fetchval(count_query, *count_args)
 
-    # 2. Decode cursor parameters
     decoded = decode_cursor(cursor) if cursor else None
     cursor_ts, cursor_id = decoded if decoded else (None, None)
 
-    # 3. Formulate Cursor Predicates
     query = """
         SELECT 
             p.id,
@@ -76,28 +73,21 @@ async def fetch_posts_cursor_paginated(
 
     if subreddit:
         args.append(subreddit)
-        query += f" AND s.name = ${len(args)}"
+        query += f" AND LOWER(TRIM(s.name)) = LOWER(TRIM(${len(args)}))"
 
-    # Determine pagination comparison based on traversal direction
     if cursor_ts and cursor_id:
         args.append(cursor_ts)
         args.append(cursor_id)
         if direction == "next":
-            # Moving backwards in time (older items)
             query += f" AND (p.timestamp, p.id) < (${len(args)-1}::timestamp, ${len(args)})"
         else:
-            # Moving forwards in time (newer items)
             query += f" AND (p.timestamp, p.id) > (${len(args)-1}::timestamp, ${len(args)})"
 
-    # Ordering Strategy:
-    # 'next' navigates newest to oldest.
-    # 'prev' navigates oldest to newest and is then reversed back in memory.
     if direction == "prev":
         query += " ORDER BY p.timestamp ASC, p.id ASC"
     else:
         query += " ORDER BY p.timestamp DESC, p.id DESC"
 
-    # Query limit + 1 to calculate has_more reliably
     args.append(limit + 1)
     query += f" LIMIT ${len(args)};"
 
@@ -110,7 +100,6 @@ async def fetch_posts_cursor_paginated(
         if item.get("timestamp"):
             item["timestamp"] = item["timestamp"].isoformat()
         
-        # Parse JSON fields safely if stored as strings
         for json_col in ["sentiment_scores", "keywords", "entities", "topics"]:
             val = item.get(json_col)
             if isinstance(val, str):
@@ -122,14 +111,11 @@ async def fetch_posts_cursor_paginated(
 
     has_more = len(records) > limit
     if has_more:
-        # Discard the extra peek record
         records = records[:limit]
 
-    # Normalize 'prev' order back to descending
     if direction == "prev":
         records.reverse()
 
-    # Generate cursors based on page bounds
     next_cursor = None
     prev_cursor = None
 
@@ -153,13 +139,117 @@ async def fetch_posts_cursor_paginated(
         "total_count": int(total_count or 0)
     }
 
+async def get_posts_diurnal_frequency(
+    subreddit_name: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    Computes 24-hour localized diurnal post and emotion frequency.
+    Converts post timestamps using the subreddit's assigned timezone in subreddits.timezone.
+    """
+    pool = await get_db_pool()
+    args = []
+    where_clauses = [
+        "p.timestamp IS NOT NULL",
+        "p.title NOT ILIKE '%[removed by moderator]%'",
+        "p.title NOT ILIKE '%[deleted by user]%'",
+        "p.title NOT ILIKE '%[deleted]%'",
+        "p.title NOT ILIKE '%[removed]%'"
+    ]
+
+    if subreddit_name and subreddit_name.lower() != "all":
+        args.append(subreddit_name)
+        where_clauses.append(f"LOWER(TRIM(s.name)) = LOWER(TRIM(${len(args)}))")
+
+    if start_date:
+        args.append(safe_parse_timestamp(start_date))
+        where_clauses.append(f"p.timestamp >= ${len(args)}::timestamp")
+
+    if end_date:
+        args.append(safe_parse_timestamp(end_date))
+        where_clauses.append(f"p.timestamp <= ${len(args)}::timestamp")
+
+    where_stmt = " AND ".join(where_clauses)
+
+    query = f"""
+        WITH localized_posts AS (
+            SELECT 
+                p.id,
+                p.sentiment,
+                COALESCE((p.sentiment_scores->>'positive')::float, (p.sentiment_scores->>'pos')::float, 0.0) AS p_pos,
+                COALESCE((p.sentiment_scores->>'negative')::float, (p.sentiment_scores->>'neg')::float, 0.0) AS p_neg,
+                EXTRACT(HOUR FROM (p.timestamp AT TIME ZONE COALESCE(NULLIF(s.timezone, ''), 'UTC')))::int AS local_hour
+            FROM reddit_posts p
+            JOIN subreddits s ON p.subreddit_id = s.id
+            WHERE {where_stmt}
+        )
+        SELECT 
+            local_hour,
+            COUNT(id) AS post_volume,
+            COALESCE(COUNT(id) FILTER (WHERE LOWER(sentiment) = 'positive'), 0) AS positive_count,
+            COALESCE(COUNT(id) FILTER (WHERE LOWER(sentiment) = 'negative'), 0) AS negative_count,
+            COALESCE(COUNT(id) FILTER (WHERE LOWER(sentiment) = 'neutral'), 0) AS neutral_count,
+            ROUND(AVG(p_pos)::numeric, 4) AS avg_pos_score,
+            ROUND(AVG(p_neg)::numeric, 4) AS avg_neg_score
+        FROM localized_posts
+        GROUP BY local_hour
+        ORDER BY local_hour ASC;
+    """
+
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(query, *args)
+
+    hourly_map = {r["local_hour"]: r for r in rows}
+
+    hours = []
+    post_volumes = []
+    positive_counts = []
+    negative_counts = []
+    neutral_counts = []
+    avg_pos_scores = []
+    avg_neg_scores = []
+
+    for h in range(24):
+        hours.append(f"{h:02d}:00")
+        row = hourly_map.get(h)
+        if row:
+            post_volumes.append(int(row["post_volume"]))
+            positive_counts.append(int(row["positive_count"]))
+            negative_counts.append(int(row["negative_count"]))
+            neutral_counts.append(int(row["neutral_count"]))
+            avg_pos_scores.append(float(row["avg_pos_score"] or 0.0))
+            avg_neg_scores.append(float(row["avg_neg_score"] or 0.0))
+        else:
+            post_volumes.append(0)
+            positive_counts.append(0)
+            negative_counts.append(0)
+            neutral_counts.append(0)
+            avg_pos_scores.append(0.0)
+            avg_neg_scores.append(0.0)
+
+    return {
+        "subreddit": subreddit_name or "All",
+        "start_date": start_date,
+        "end_date": end_date,
+        "labels": hours,
+        "metrics": {
+            "post_volumes": post_volumes,
+            "positive_counts": positive_counts,
+            "negative_counts": negative_counts,
+            "neutral_counts": neutral_counts,
+            "avg_positive_scores": avg_pos_scores,
+            "avg_negative_scores": avg_neg_scores
+        }
+    }
+
 async def get_archived_ids(subreddit_name: str):
     pool = await get_db_pool()
     async with pool.acquire() as conn:
         rows = await conn.fetch('''
             SELECT p.id FROM reddit_posts p
             JOIN subreddits s ON p.subreddit_id = s.id
-            WHERE s.name = $1
+            WHERE LOWER(TRIM(s.name)) = LOWER(TRIM($1))
         ''', subreddit_name)
         return {row[0] for row in rows}
 
@@ -169,7 +259,7 @@ async def get_last_post_timestamp(subreddit_name: str):
         return await conn.fetchval('''
             SELECT MAX(p.timestamp) FROM reddit_posts p
             JOIN subreddits s ON p.subreddit_id = s.id
-            WHERE s.name = $1
+            WHERE LOWER(TRIM(s.name)) = LOWER(TRIM($1))
         ''', subreddit_name)
 
 async def get_oldest_post_id(subreddit_name: str):
@@ -178,13 +268,13 @@ async def get_oldest_post_id(subreddit_name: str):
         return await conn.fetchval('''
             SELECT p.id FROM reddit_posts p
             JOIN subreddits s ON p.subreddit_id = s.id
-            WHERE s.name = $1 ORDER BY p.timestamp ASC LIMIT 1
+            WHERE LOWER(TRIM(s.name)) = LOWER(TRIM($1)) ORDER BY p.timestamp ASC LIMIT 1
         ''', subreddit_name)
 
 async def save_post_to_db(post_entry: dict, subreddit_name: str):
     pool = await get_db_pool()
     async with pool.acquire() as conn:
-        row = await conn.fetchrow("SELECT id FROM subreddits WHERE name = $1", subreddit_name)
+        row = await conn.fetchrow("SELECT id FROM subreddits WHERE LOWER(TRIM(name)) = LOWER(TRIM($1))", subreddit_name)
         sub_id = row['id'] if row else await conn.fetchval("INSERT INTO subreddits (name) VALUES ($1) RETURNING id", subreddit_name)
         ts_obj = safe_parse_timestamp(post_entry.get('timestamp'))
         
@@ -228,7 +318,7 @@ async def load_posts_from_db(subreddit_name: str, limit: int):
         rows = await conn.fetch('''
             SELECT p.*, s.name as subreddit_name FROM reddit_posts p
             JOIN subreddits s ON p.subreddit_id = s.id
-            WHERE s.name = $1 ORDER BY p.timestamp DESC LIMIT $2
+            WHERE LOWER(TRIM(s.name)) = LOWER(TRIM($1)) ORDER BY p.timestamp DESC LIMIT $2
         ''', subreddit_name, limit)
         data_dict = {}
         for row in rows:
@@ -243,7 +333,7 @@ async def load_all_posts_from_db(subreddit_name: str):
         rows = await conn.fetch('''
             SELECT p.*, s.name as subreddit_name FROM reddit_posts p
             JOIN subreddits s ON p.subreddit_id = s.id
-            WHERE s.name = $1 ORDER BY p.timestamp DESC
+            WHERE LOWER(TRIM(s.name)) = LOWER(TRIM($1)) ORDER BY p.timestamp DESC
         ''', subreddit_name)
         data_dict = {}
         for row in rows:
@@ -325,76 +415,111 @@ async def db_delete_post(post_id: str):
         ''', post_id)
         return status == "DELETE 1"
 
+# ---------------------------------------------------------------------------
+# REANALYSIS & NLP CLEANING HELPER FUNCTIONS
+# ---------------------------------------------------------------------------
+
 async def get_post_content_for_reanalysis(subreddit_name: str):
+    """Fetches post title and body for running reanalysis pipelines."""
     pool = await get_db_pool()
     async with pool.acquire() as conn:
         rows = await conn.fetch('''
             SELECT p.id, p.title, p.body FROM reddit_posts p
             JOIN subreddits s ON p.subreddit_id = s.id
-            WHERE s.name = $1
+            WHERE LOWER(TRIM(s.name)) = LOWER(TRIM($1));
         ''', subreddit_name)
         return [dict(row) for row in rows]
 
 async def get_post_keywords_for_cleaning(subreddit_name: str):
+    """Fetches existing keywords for filtering against newly added ignored words."""
     pool = await get_db_pool()
     async with pool.acquire() as conn:
         rows = await conn.fetch('''
             SELECT p.id, p.keywords FROM reddit_posts p
             JOIN subreddits s ON p.subreddit_id = s.id
-            WHERE s.name = $1
+            WHERE LOWER(TRIM(s.name)) = LOWER(TRIM($1));
         ''', subreddit_name)
         return [dict(row) for row in rows]
 
-async def update_post_nlp_data(post_id: str, sentiment: str, sentiment_scores: dict, keywords: list, entities: dict, topics: dict):
+async def update_post_nlp_data(
+    post_id: str, 
+    sentiment: str, 
+    sentiment_scores: dict, 
+    keywords: dict, 
+    entities: list, 
+    topics: dict
+):
+    """Persists updated NLP extraction data back to a post record."""
     pool = await get_db_pool()
     async with pool.acquire() as conn:
         await conn.execute('''
             UPDATE reddit_posts
-            SET sentiment = $1, sentiment_scores = $2, keywords = $3, entities = $4, topics = $5
-            WHERE id = $6
-        ''', sentiment, json.dumps(sentiment_scores), json.dumps(keywords), json.dumps(entities), json.dumps(topics), post_id)
+            SET sentiment = $1, 
+                sentiment_scores = $2, 
+                keywords = $3, 
+                entities = $4, 
+                topics = $5
+            WHERE id = $6;
+        ''', 
+        sentiment, 
+        json.dumps(sentiment_scores or {}), 
+        json.dumps(keywords or {}), 
+        json.dumps(entities or []), 
+        json.dumps(topics or {}), 
+        post_id)
 
 async def update_post_keywords_only(post_id: str, keywords: dict):
+    """Updates only the keywords payload for a specific post."""
     pool = await get_db_pool()
     async with pool.acquire() as conn:
         await conn.execute('''
             UPDATE reddit_posts
             SET keywords = $1
-            WHERE id = $2
-        ''', json.dumps(keywords), post_id)
+            WHERE id = $2;
+        ''', json.dumps(keywords or {}), post_id)
 
-async def get_all_posts_for_dynamic_reanalysis(subreddit: str, target_pipelines: list, only_null: bool, start_date: str = None, end_date: str = None):
+async def get_all_posts_for_dynamic_reanalysis(
+    subreddit: str, 
+    target_pipelines: list, 
+    only_null: bool, 
+    start_date: str = None, 
+    end_date: str = None
+):
+    """Selects targeted posts for the WebSocket dynamic text reanalysis queue."""
     pool = await get_db_pool()
     
-    query = "SELECT id, title, body, sentiment, sentiment_scores, keywords, entities, topics, score, upvote_ratio, num_comments FROM public.reddit_posts WHERE subreddit_id = (SELECT id FROM public.subreddits WHERE name = $1)"
+    query = """
+        SELECT p.id, p.title, p.body, p.sentiment, p.sentiment_scores, p.keywords, p.entities, p.topics, p.score, p.upvote_ratio, p.num_comments 
+        FROM public.reddit_posts p
+        JOIN public.subreddits s ON p.subreddit_id = s.id
+        WHERE LOWER(TRIM(s.name)) = LOWER(TRIM($1))
+    """
     args = [subreddit]
     
     if start_date:
         args.append(safe_parse_timestamp(start_date))
-        query += f" AND timestamp >= ${len(args)}::timestamp"
+        query += f" AND p.timestamp >= ${len(args)}::timestamp"
         
     if end_date:
         args.append(safe_parse_timestamp(end_date))
-        query += f" AND timestamp <= ${len(args)}::timestamp"
+        query += f" AND p.timestamp <= ${len(args)}::timestamp"
     
     if target_pipelines and only_null:
         clauses = []
         for feature in target_pipelines:
             if feature == "sentiment":
-                clauses.append("(sentiment IS NULL OR sentiment_scores IS NULL)")
+                clauses.append("(p.sentiment IS NULL OR p.sentiment_scores IS NULL)")
             elif feature == "keywords":
-                clauses.append("keywords IS NULL")
+                clauses.append("p.keywords IS NULL")
             elif feature == "entities":
-                clauses.append("entities IS NULL")
+                clauses.append("p.entities IS NULL")
             elif feature == "topic":
-                clauses.append("(topics IS NULL OR topics::text = '[null]')")
+                clauses.append("(p.topics IS NULL OR p.topics::text = '[null]')")
         if clauses:
             query += " AND (" + " OR ".join(clauses) + ")"
 
-    query += " ORDER BY timestamp DESC;"
+    query += " ORDER BY p.timestamp DESC;"
     
     async with pool.acquire() as conn:
         rows = await conn.fetch(query, *args)
         return [dict(row) for row in rows]
-    
-    
