@@ -60,14 +60,18 @@ async def background_worker():
                     logging.info(f"Data gap of {int(gap_seconds/60)} mins detected for r/{sub}. Running routine scan.")
                     await run_discovery_scan(sub, mode='routine', headless=True)
 
-                # 2. Retry up to 5 previously failed tasks
+                # 2. Retry up to 5 previously failed tasks (also subject to 7-day maturity)
                 failed_processed = await process_queue_batch(sub, limit=5, status='failed', headless=True)
                 total_scraped_this_cycle += (failed_processed or 0)
 
-                # 3. Process FIFO pending queue tasks (oldest posts first)
+                # 3. Process FIFO pending queue tasks (oldest matured posts first)
                 pending_processed = await process_queue_batch(sub, limit=15, status='pending', headless=True)
                 total_scraped_this_cycle += (pending_processed or 0)
-                logging.info(f"r/{sub} progress: {pending_processed} pending items archived.")
+                
+                if pending_processed == 0:
+                    logging.info(f"r/{sub} progress: 0 items archived (No pending tasks older than 7 days).")
+                else:
+                    logging.info(f"r/{sub} progress: {pending_processed} matured items archived.")
 
             except Exception as e:
                 logging.error(f"Error processing subreddit r/{sub}: {e}")
@@ -80,7 +84,7 @@ async def background_worker():
             await asyncio.sleep(2)
             
         logging.info(
-            f"Cycle completed ({total_scraped_this_cycle} total posts archived across all cities). "
+            f"Cycle completed ({total_scraped_this_cycle} matured posts archived across all cities). "
             f"Worker cooling down for {SCRAPE_INTERVAL} seconds."
         )
         await asyncio.sleep(SCRAPE_INTERVAL)

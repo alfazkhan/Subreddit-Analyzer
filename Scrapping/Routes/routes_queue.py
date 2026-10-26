@@ -1,7 +1,10 @@
 import json
 from typing import List
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException
+
+from auth_guard import require_role
 from database.queue import get_queue_state, listen_to_queue_changes
+from database.queue_manager import force_requeue_posts
 
 router = APIRouter(tags=["Queue Endpoint Layer"])
 
@@ -46,6 +49,29 @@ async def api_get_processes():
         "counts": counts,
         "tasks": tasks
     }
+
+@router.put("/queue/{subreddit}/{post_id}")
+async def api_requeue_post(
+    subreddit: str,
+    post_id: str,
+    super_admin: dict = Depends(require_role(["Super Admin"]))
+):
+    """
+    Transitions a specific post back to 'pending' in the scraping queue.
+    If the post is not in the queue, it creates a new entry as 'pending'.
+    """
+    try:
+        # Wrap the single ID in a list since the database function expects a list
+        await force_requeue_posts([post_id], subreddit)
+        return {
+            "message": f"Task {post_id} successfully queued as 'pending' for r/{subreddit}", 
+            "post_id": post_id
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Failed to requeue task: {str(e)}"
+        )
 
 @router.websocket("/ws/queue")
 async def websocket_queue_endpoint(websocket: WebSocket):

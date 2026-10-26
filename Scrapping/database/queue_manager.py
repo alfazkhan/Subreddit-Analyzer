@@ -36,8 +36,10 @@ async def update_queue_status(post_id: str, status: str):
 
 async def get_queue_tasks_by_status(subreddit_name: str, status: str, limit: int):
     """
-    True FIFO queue task retrieval.
+    True FIFO queue task retrieval with a 7-Day Aging Delay.
     Orders strictly by created_at ASC, post_id ASC.
+    Only fetches tasks that were added to the queue more than 7 days ago,
+    ensuring upvotes and comments have matured.
     """
     pool = await get_db_pool()
     async with pool.acquire() as conn:
@@ -47,6 +49,7 @@ async def get_queue_tasks_by_status(subreddit_name: str, status: str, limit: int
             JOIN subreddits s ON q.subreddit_id = s.id
             WHERE LOWER(TRIM(s.name)) = LOWER(TRIM($1)) 
               AND q.status = $2 
+              AND q.created_at <= NOW() - INTERVAL '7 days'
             ORDER BY q.created_at ASC, q.post_id ASC 
             LIMIT $3;
         ''', subreddit_name, status, limit)
@@ -63,4 +66,6 @@ async def force_requeue_posts(post_ids: list, subreddit_name: str):
             VALUES ($1, (SELECT id FROM subreddits WHERE LOWER(TRIM(name)) = LOWER(TRIM($2))), 'pending', NOW())
             ON CONFLICT (post_id) DO UPDATE SET status = 'pending';
         ''', [(pid, subreddit_name) for pid in post_ids])
+        
+        # Fire a trigger to update WebSockets instantly
         await conn.execute("NOTIFY queue_updates;")

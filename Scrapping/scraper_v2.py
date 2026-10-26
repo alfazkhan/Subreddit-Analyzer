@@ -36,7 +36,7 @@ async def scrape_post_by_id(context, post_id: str, subreddit_name: str, ignored_
         try:
             await update_queue_status(post_id, 'processing')
             page = await context.new_page()
-            logging.info(f"Scraper: Opening post {clean_id} for r/{subreddit_name}...")
+            logging.info(f"Scraper: Opening matured post {clean_id} for r/{subreddit_name}...")
             await page.goto(url, wait_until="load", timeout=45000)
             
             try:
@@ -208,6 +208,7 @@ async def run_discovery_scan(subreddit_name: str, mode: str = 'routine', headles
 async def process_queue_batch(subreddit_name: str, limit: int = 15, status: str = 'pending', headless: bool = False) -> int:
     """
     Processes a FIFO batch of IDs from the queue.
+    Only pulls tasks older than 7 days.
     Returns the number of successfully archived items.
     """
     tasks = await get_queue_tasks_by_status(subreddit_name, status, limit)
