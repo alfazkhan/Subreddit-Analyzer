@@ -5,6 +5,7 @@ torchvision
 torchaudio
 
 asyncpg
+psycopg2-binary
 playwright 
 transformers
 uvicorn
@@ -24,6 +25,7 @@ protobuf
 # Testing
 pytest
 pytest-asyncio
+httpx
 
 # Firebase & Sockets
 firebase-admin

@@ -10,6 +10,9 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+playwright-report
+test-results
+coverage
 *.local
 
 # Editor directories and files
@@ -28,6 +31,7 @@ __pycache__
 /__pycache__/
 
 Scrapping/auth.json
+Scrapping/venv
 Scrapping/config.py
 Scrapping/firebase_creds.json
 Scrapping/Routes/__pycache__/
@@ -42,3 +46,5 @@ Scrapping/docker-compose.yml
 D:*
 *huggingface_cache*
 Reddit-Scrapper/
+Changelogs.md
+.github

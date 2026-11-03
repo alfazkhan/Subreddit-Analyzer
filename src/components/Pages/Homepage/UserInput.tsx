@@ -1,0 +1,174 @@
+import {
+  Field,
+  NumberInput,
+  HStack,
+  Button,
+  Portal,
+  Select,
+  createListCollection,
+  Spinner,
+} from "@chakra-ui/react";
+import { useEffect, useState, useMemo } from "react";
+import { userInputAction } from "../../../store/userInput.js";
+import type {
+  RootState,
+  UserInputComponentProps,
+} from "../../../util/Types";
+
+import { useSelector, useDispatch } from "react-redux";
+
+export default function UserInput({ onFetchData, processingStatus }: UserInputComponentProps) {
+  const subreddit = useSelector(
+    (state: RootState) => state.userInputState.subredditName,
+  );
+  const targetCount = useSelector(
+    (state: RootState) => state.userInputState.targetPostCount,
+  );
+  const cacheSummary = useSelector(
+    (state: RootState) => state.serverStatusState.cacheSummary,
+  );
+  const dispatch = useDispatch();
+
+  const [subredditName, setSubredditName] = useState(subreddit);
+  const [postCount, setPostCount] = useState(targetCount);
+
+  useEffect(() => {
+    setPostCount(targetCount);
+    if (Object.keys(cacheSummary).length !== 0) {
+      setSubredditName(Object.keys(cacheSummary)[0]);
+    }
+    setSubredditName(subreddit);
+  }, [subreddit, targetCount, cacheSummary]);
+
+  function onFetchdataHandler() {
+    const cacheKeys = Object.keys(cacheSummary || {});
+    let index = cacheKeys.findIndex(
+      (name: string) => name === subredditName,
+    );
+    if (index === -1) return;
+    
+    const subredditId: number | undefined = Object.values(cacheSummary)[index]?.id;
+    dispatch(userInputAction.handleIDChange(subredditId || 0));
+    dispatch(userInputAction.handleNameChange(subredditName));
+    dispatch(userInputAction.handleCountChange(postCount));
+    onFetchData(subredditName, postCount);
+  }
+
+  const selectCollection = useMemo(() => {
+    const keys = Object.keys(cacheSummary || {});
+    const items = keys.map((key) => ({
+      label: key,
+      value: key,
+    }));
+    return createListCollection({ items });
+  }, [cacheSummary]);
+
+  return (
+    <>
+      <HStack
+        width="full"
+        gap="1"
+        justifyContent="center"
+        alignItems="baseline"
+      >
+        <Field.Root flex={1} required>
+          <Select.Root
+            collection={selectCollection}
+            onValueChange={(e) => setSubredditName(e.value[0] || "")}
+            value={[subredditName]}
+          >
+            <Select.HiddenSelect required />
+            <Field.Label>
+              Select Subreddit <Field.RequiredIndicator />
+            </Field.Label>
+            <Select.Control>
+              <Select.Trigger>
+                <Select.ValueText placeholder="Select Subreddit" />
+              </Select.Trigger>
+              <Select.IndicatorGroup>
+                <Select.Indicator />
+              </Select.IndicatorGroup>
+            </Select.Control>
+            <Portal>
+              <Select.Positioner>
+                <Select.Content color="gray.900">
+                  {Object.keys(cacheSummary).map((subreddit, idx) => (
+                    <Select.Item
+                      item={subreddit}
+                      key={idx}
+                      onClick={() => {
+                        setSubredditName(subreddit);
+                      }}
+                    >
+                      {subreddit}
+                      <Select.ItemIndicator />
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Positioner>
+            </Portal>
+            <Field.HelperText>
+              Select the Subreddit you want to analyze
+            </Field.HelperText>
+          </Select.Root>
+        </Field.Root>
+        <HStack>
+          <Field.Root required>
+            <Field.Label>
+              Post Count <Field.RequiredIndicator />
+            </Field.Label>
+            <NumberInput.Root
+              value={String(postCount)}
+              onValueChange={(details) =>
+                setPostCount(details.valueAsNumber)
+              }
+              width="full"
+              allowMouseWheel
+            >
+              <NumberInput.Control />
+              <NumberInput.Input />
+            </NumberInput.Root>
+            <Field.HelperText>
+              Enter Number of Posts to be analyzed (Max=20,000)
+            </Field.HelperText>
+          </Field.Root> 
+
+          <Button
+            size="sm"
+            color="white"
+            fontWeight="black"
+            bg="orange.600"
+            onClick={onFetchdataHandler}
+            // disabled={processingStatus}
+          >
+            {processingStatus ? (
+              <>
+                <Spinner color="white" /> Fetching Posts...
+              </>
+            ) : (
+              "Fetch Posts"
+            )}
+          </Button>
+          
+        </HStack>
+      </HStack>
+      <HStack
+        width="full"
+        gap="1"
+        justifyContent="flex-end"
+        alignItems="center"
+      >
+         {/* <Checkbox.Root
+          variant="solid"
+          colorPalette="orange"
+          checked={cacheOnly}
+          onCheckedChange={(e) => dispatch(userInputAction.toggleCachingChange(e.checked))}
+        >
+          <Checkbox.HiddenInput />
+          <Checkbox.Control />
+          <Checkbox.Label>Use Only Cache</Checkbox.Label>
+        </Checkbox.Root> */}
+      </HStack>
+    </>
+  );
+}

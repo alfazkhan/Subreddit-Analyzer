@@ -168,9 +168,30 @@ npm run dev
 
 ### Notes
 
-- The frontend uses `BASE_URL` values in `src/App.jsx` and `src/components/ui/ReanalyzeButton.jsx`.
-- Adjust the hard-coded host if your backend runs on a different address.
+- The frontend API base URL is defined in `src/Constants.js`.
 - `Scrapping/config.py` controls database settings, `MAX_CONCURRENT_TABS`, and scrape interval.
+
+## Testing
+
+Run the frontend unit tests, strict TypeScript check, and browser E2E tests with:
+
+```bash
+npm test
+npm run typecheck
+npm run test:e2e
+```
+
+Playwright starts the Vite app on `http://127.0.0.1:4173`; the browser workflow mocks the public summary request. The API smoke suite checks read-only backend endpoints and is opt-in. Start the backend with its database and Firebase configuration, then run this in PowerShell:
+
+```powershell
+$env:RUN_API_INTEGRATION = "true"
+$env:API_BASE_URL = "http://127.0.0.1:8000"
+npm run test:api
+```
+
+Set `PLAYWRIGHT_BASE_URL` to use an already-running frontend instead of the configured local server.
+
+Run the backend unit tests from `Scrapping/` with `python -m pytest`. Tests use mocked PostgreSQL connections by default. To additionally verify writes against a real PostgreSQL server, set `REDDIT_TEST_DATABASE_URL` to a dedicated test database whose name contains `test`; the integration tests create and drop a unique temporary schema and never use the application database configuration.
 
 ## Frontend Usage
 
