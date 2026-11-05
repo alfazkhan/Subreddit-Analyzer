@@ -48,3 +48,14 @@ D:*
 Reddit-Scrapper/
 Changelogs.md
 .github
+
+# Python Virtual Environment
+.venv/
+venv/
+ENV/
+
+# Security & Credentials
+auth.json
+firebase_creds.json
+.env
+.env.local

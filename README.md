@@ -1,177 +1,169 @@
-# Reddit Data Scrapper
+<div align="center">
+<img src="./public/Logo.png" alt="Subreddit Input" width="100"/>
 
-A full-stack Reddit analysis platform that combines a React dashboard with a Python FastAPI backend, NLP pipelines, and PostgreSQL-backed storage.
+# Subreddit Analyzer
 
-## Live Demo
+A full-stack civic analytics dashboard designed to scrape, process, and visualize Reddit community data (sentiment, keywords, topics, and entities) across municipal subreddits.
 
-Access the live deployment at:
+<br>
 
-- https://subanalyzer.theonlyalfaz.com/
+<a href="https://subanalyzer.theonlyalfaz.com" target="_blank" rel="noopener noreferrer">
+  <img src="https://img.shields.io/badge/Live_Demo-subanalyzer.theonlyalfaz.com-orange?style=for-the-badge&logo=vercel" alt="Live Demo" />
+</a>
+
+</div>
+
+<br>
+
+<div align="center">
+
+## 🛠 Technology Stack
+
+### Frontend
+<br>
+<img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+<img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+<img src="https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E" alt="Vite" />
+<img src="https://img.shields.io/badge/Chakra--UI-319795?style=for-the-badge&logo=chakraui&logoColor=white" alt="Chakra UI" />
+<img src="https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chart.js&logoColor=white" alt="Chart.js" />
+
+### Backend
+<br>
+<img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
+<img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
+<img src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+<img src="https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright&logoColor=white" alt="Playwright" />
 
 
-## What the Project Does
+<img src="https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white" alt="PyTorch" />
+<img src="https://img.shields.io/badge/spaCy-09A3D5?style=for-the-badge&logo=spacy&logoColor=white" alt="spaCy" />
+<img src="https://img.shields.io/badge/Hugging_Face-FF9D00?style=for-the-badge&logo=huggingface&logoColor=white" alt="Hugging Face" />
+
+</div>
+
+<br>
+
+<div align="center">
+
+## 📊 Features & Analytics
 
 This project is built to discover and analyze Reddit data with a full-stack platform that combines scraping, database storage, NLP, and dashboard visualization.
 
-- #### Subreddit selection and post count input with Cache summary display of tracked subreddit statistics
-   ![Subreddit Input](./src/assets/Screenshots/UserInput.png)
+<details>
+<summary><b>🖼️ View Dashboard Screenshots (Click to Expand)</b></summary>
+<br>
 
-- KPI Analytics
-   ![KPI Analytics](./src/assets/Screenshots/KPI-Analytics.png)
+### Subreddit Selection & Cache Summary
+<img src="./src/assets/Screenshots/UserInput.png" alt="Subreddit Input" width="800"/>
 
-- Sentiment analysis views
-   ![Sentiment Analysis](./src/assets/Screenshots/Sentiments.png)
+### KPI Analytics
+<img src="./src/assets/Screenshots/KPI-Analytics.png" alt="KPI Analytics" width="800"/>
 
-- Keyword frequency and pie chart visualization
-  ![Keyword Chart](./src/assets/Screenshots/Keyword-Table.png)
+### Sentiment Analysis Breakdown
+<img src="./src/assets/Screenshots/Sentiments.png" alt="Sentiment Analysis" width="800"/>
 
-- Posts table with sortable/filterable results
-   ![Posts Table](./src/assets/Screenshots/Post-Table.png)
+### Keyword Frequency & Entity Recognition
+<img src="./src/assets/Screenshots/Keyword-Table.png" alt="Keyword Chart" width="800"/>
 
-- Post frequency analytics
-  ![Post Frequency](./src/assets/Screenshots/Post-Frequency.png)
+### Cursor-Paginated Data Tables
+<img src="./src/assets/Screenshots/Post-Table.png" alt="Posts Table" width="800"/>
 
-- Sentiment frequency analytics
-  ![Post Frequency](./src/assets/Screenshots/Sentiment-Frequency.png)
+### Diurnal Post Frequency
+<img src="./src/assets/Screenshots/Post-Frequency.png" alt="Post Frequency" width="800"/>
 
-<!-- - Dynamic reanalysis UI panel
-  - ![Reanalysis Panel](https://picsum.photos/seed/reanalysis-panel/800/450) -->
+### Local Timezone-Synchronized Sentiment Rhythms
+<img src="./src/assets/Screenshots/Sentiment-Frequency.png" alt="Sentiment Frequency" width="800"/>
 
-## Project Overview
+</details>
 
-This repository contains:
+</div>
 
-- `src/`: React frontend application built with Vite and Chakra UI.
-- `Scrapping/`: Python backend, data scraper, NLP processors, database modules, and FastAPI routing.
-- `Scrapping/requirements.txt`: Python dependencies.
-- `package.json`: frontend dependencies.
+---
 
-The application allows a user to select a subreddit, request a number of posts, and view analysis across sentiment, keywords, entities, and post frequency.
+<div align="center">
 
-## Architecture
+## 🚀 Setup & Installation
 
-### Frontend
+</div>
 
-- React 19
-- Vite
-- Chakra UI
-- Redux Toolkit
-- Chart.js / react-chartjs-2
-- Firebase
-- Recharts
-- PapaParse
+### 1. Database Configuration
+Ensure PostgreSQL is running locally or remotely. Create a new database for the analyzer.
 
-### Backend
-
-- Python 3
-- FastAPI
-- Uvicorn
-- Playwright
-- Transformers
-- PyTorch
-- spaCy
-- NLTK
-- PostgreSQL via `asyncpg`
-
-### Database
-
-<!-- - PostgreSQL connection configuration is in `Scrapping/config.py` -->
-- Tables and storage are managed by `Scrapping/database/`
-- Post, subreddit, ignored words, and queue state are handled by async DB helpers
-
-## Backend API Endpoints
-
-### Subreddits
-
-- `POST /subreddits` 
-  - body: `{ name, description?, total_users?, is_active?, keep_updated? }`
-  - Creates a new tracked subreddit configuration.
-- `GET /subreddits`
-  - Returns tracked subreddit entries.
-- `GET /subreddits/{name}`
-  - Returns details for one tracked subreddit.
-- `PUT /subreddits/{name}`
-  - Updates a subreddit tracking configuration.
-- `DELETE /subreddits/{name}`
-  - Removes a subreddit from active tracking.
-
-### Posts
-
-- `GET /summary`
-  - Returns cached summary data for all tracked subreddits.
-- `GET /posts/{subreddit}?limit={n}`
-  - Returns up to `n` posts for the requested subreddit.
-- `GET /posts/{subreddit}/all`
-  - Returns all cached posts for the requested subreddit.
-
-### Real-time Reanalysis 
-
-- `WS /ws/reanalyze` #Hidden
-  - WebSocket endpoint that receives actions such as:
-    - `start`
-    - `pause`
-    - `resume`
-    - `stop`
-  - Allows live progress updates for NLP reanalysis work.
-
-## Important Backend Behavior
-
-- `Scrapping/main_v2.py` starts the FastAPI app and a long-running background worker.
-- The background worker:
-  - loads active subreddits
-  - performs queue maintenance
-  - boots up missing subreddit caches
-  - performs routine updates if data gaps exist
-- `Scrapping/routes_reanalyze.py` supports live reanalysis over WebSocket.
-- `Scrapping/Routes/routes_posts.py` and `Scrapping/Routes/routes_subreddits.py` expose REST endpoints.
-
-## Installation
-
-### 1. Backend
+### 2. Backend Setup
+Navigate to the backend directory and set up your Python environment:
 
 ```bash
-cd "d:\React JS\Reddit-Data-Scrapper\Scrapping"
+cd Scraping
 python -m venv .venv
-# Activate the venv on PowerShell
-.\.venv\Scripts\Activate.ps1
+
+```
+
+Activate the virtual environment:
+
+* **Windows:** `.venv\Scripts\activate`
+* **macOS/Linux:** `source .venv/bin/activate`
+
+Install dependencies:
+
+```bash
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
+python -m spacy download xx_ent_wiki_sm
 python -m playwright install
+
 ```
 
-> If your system uses a different browser executable, update the scraping setup accordingly.
+#### Security & Authentication Files
 
-### 2. Frontend
+The backend requires two critical credential files in the `Scraping` directory. **Never commit these to version control.**
+
+1. **`firebase_creds.json`**: Generate a private key from your Firebase Console (Project Settings > Service Accounts) and save it here.
+2. **`auth.json` (Optional but recommended for scraping)**: Playwright uses this file to store a logged-in Reddit session state to avoid rate limits. Run the scraper interactively once to generate it, or manually place a valid Playwright session state JSON here.
+
+Run the API and Worker:
 
 ```bash
-cd "d:\React JS\Reddit-Data-Scrapper"
+# Terminal 1: Run the API Gateway
+python run_api.py
+
+# Terminal 2: Run the Background Scraper & NLP Engine
+python run_worker.py
+
+```
+
+*The API will be available at `http://localhost:8000`.*
+
+### 3. Frontend Setup
+
+Open a new terminal, navigate to the project root, and install the Node dependencies:
+
+```bash
 npm install
-```
-
-## Running Locally
-
-### Start the backend
-
-```bash
-cd "d:\React JS\Reddit-Data-Scrapper\Scrapping"
-python main_v2.py
-```
-
-The backend listens on `http://192.168.0.246:8000` in development mode.
-
-### Start the frontend
-
-```bash
-cd "d:\React JS\Reddit-Data-Scrapper"
 npm run dev
+
 ```
 
-### Notes
+*The React dashboard will be available at `http://localhost:5173`.*
 
-- The frontend API base URL is defined in `src/Constants.js`.
-- `Scrapping/config.py` controls database settings, `MAX_CONCURRENT_TABS`, and scrape interval.
+---
 
-## Testing
+## 🧪 Testing
+
+### Backend Testing
+
+The backend includes a comprehensive `pytest` suite testing database connections, NLP processing, routing, and pagination.
+
+To run the backend tests:
+
+```bash
+cd Scraping
+pytest tests/ -v
+
+```
+
+Tests use mocked PostgreSQL connections by default. To additionally verify writes against a real PostgreSQL server, set `REDDIT_TEST_DATABASE_URL` to a dedicated test database whose name contains `test`.
+
+### Frontend Testing
 
 Run the frontend unit tests, strict TypeScript check, and browser E2E tests with:
 
@@ -179,79 +171,34 @@ Run the frontend unit tests, strict TypeScript check, and browser E2E tests with
 npm test
 npm run typecheck
 npm run test:e2e
+
 ```
 
 Playwright starts the Vite app on `http://127.0.0.1:4173`; the browser workflow mocks the public summary request. The API smoke suite checks read-only backend endpoints and is opt-in. Start the backend with its database and Firebase configuration, then run this in PowerShell:
 
 ```powershell
 $env:RUN_API_INTEGRATION = "true"
-$env:API_BASE_URL = "http://127.0.0.1:8000"
+$env:API_BASE_URL = "[http://127.0.0.1:8000](http://127.0.0.1:8000)"
 npm run test:api
+
 ```
 
-Set `PLAYWRIGHT_BASE_URL` to use an already-running frontend instead of the configured local server.
+---
 
-Run the backend unit tests from `Scrapping/` with `python -m pytest`. Tests use mocked PostgreSQL connections by default. To additionally verify writes against a real PostgreSQL server, set `REDDIT_TEST_DATABASE_URL` to a dedicated test database whose name contains `test`; the integration tests create and drop a unique temporary schema and never use the application database configuration.
+## 🗂️ Project Structure
 
-## Frontend Usage
+* `src/` — React app source (Vite + TypeScript)
+* `src/components/ui-components/` — base Chakra UI components
+* `src/components/Pages/` — analytical panels and admin dashboard
+* `Scraping/` — backend app, scraper logic, NLP, database helpers
+* `Scraping/Routes/` — FastAPI route modules
+* `Scraping/database/` — PostgreSQL access and persistence logic
+* `Scraping/tests/` — Pytest suite
 
-1. Open the React app in the browser.
-2. Select a subreddit from the cached summary dropdown.
-3. Enter the number of posts to fetch.
-4. Click **Fetch Posts**.
-5. Explore sentiment, keyword, table, and frequency tabs.
-6. Use the reanalysis UI to trigger dynamic NLP pipelines if available.
+---
 
-## Project Structure
+## 📄 License
 
-- `src/` — React app source
-- `src/components/ui/` — dashboard UI components
-- `src/components/Data/` — chart and table components
-- `Scrapping/` — backend app, scraper logic, NLP, database helpers
-- `Scrapping/Routes/` — FastAPI route modules
-- `Scrapping/database/` — PostgreSQL access and persistence logic
-
-## Screenshots / Media
-
-<!-- Add screenshots here if available: UI dashboard, charts, tables, analytics panels -->
-
-## Dependencies
-
-### Python (backend)
-- `asyncpg`
-- `playwright`
-- `transformers`
-- `torch`
-- `uvicorn`
-- `fastapi`
-- `nltk`
-- `spacy`
-- `collections-extended`
-- `pytest`
-- `pytest-asyncio`
-
-### JavaScript (frontend)
-- `react`
-- `react-dom`
-- `@chakra-ui/react`
-- `@chakra-ui/charts`
-- `@reduxjs/toolkit`
-- `@tanstack/react-table`
-- `chart.js`
-- `chartjs-plugin-datalabels`
-- `firebase`
-- `next-themes`
-- `papaparse`
-- `react-chartjs-2`
-- `react-icons`
-- `react-redux`
-- `recharts`
-
-## Notes
-
-- `Scrapping/auth.json` may contain browser auth/session data and should be managed carefully.
-- The repository uses `FastAPI` for the backend API and WebSocket management.
-- The frontend includes a hidden reanalysis section powered by WebSocket controls.
-
-## License
 This repository is intended for learning, experimentation, and personal analytics. Modify as needed for your own deployment or research use case.
+
+```
