@@ -216,6 +216,42 @@ def test_kpi_route_returns_404_for_missing_subreddit(api_client, monkeypatch):
     assert response.status_code == 404
 
 
+def test_kpi_series_route_skips_hypothesis_tests(api_client, monkeypatch):
+    calculate_kpis = AsyncMock(
+        return_value=([{"post_count": 2}], {"total_analyzed_posts": 2}, "Berlin")
+    )
+    monkeypatch.setattr(routes_kpis, "_calculate_kpis", calculate_kpis)
+
+    response = api_client.get("/kpis/series/7?granularity=weekly")
+
+    assert response.status_code == 200
+    assert response.json()["time_series"] == [{"post_count": 2}]
+    assert response.headers["content-length"]
+    calculate_kpis.assert_awaited_once_with(7, None, None, "weekly", 7, False)
+
+
+def test_hypothesis_route_returns_only_requested_hypothesis(api_client, monkeypatch):
+    summary = {
+        "total_analyzed_posts": 2,
+        "hypothesis_tests": {
+            "pillar_1_affective_behavioral": {
+                "H1": {"id": "H1", "name": "Negativity"}
+            }
+        },
+    }
+    monkeypatch.setattr(
+        routes_kpis,
+        "_calculate_kpis",
+        AsyncMock(return_value=([{"post_count": 2}], summary, "Berlin")),
+    )
+
+    response = api_client.get("/kpis/h1?subreddit_id=7")
+
+    assert response.status_code == 200
+    assert response.json()["hypothesis"]["id"] == "H1"
+    assert response.json()["summary"] == {"total_analyzed_posts": 2}
+
+
 def test_queue_route_returns_counts_and_tasks(api_client, monkeypatch):
     get_queue = AsyncMock(
         return_value=(

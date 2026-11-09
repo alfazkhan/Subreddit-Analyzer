@@ -1,0 +1,37 @@
+{
+  "H1": {
+    "title": "Pillar 1 — Academic Formulation (H1: Negativity-Engagement Dynamic)",
+    "formulation": "Negative sentiment (P_neg) drives higher discussion depth (num_comments) and reduces post approval (upvote_ratio) across civic community discourse.",
+    "interpretation": "Negative grievance provokes expanded community comment threads, while community members demonstrate polarizing voting behaviors."
+  },
+  "H2": {
+    "title": "Pillar 1 — Academic Formulation (H2: Polarization & Virality Dynamic)",
+    "formulation": "Extreme opinion polarization, operationalized as emotional polarity magnitude |P_pos - P_neg|, correlates positively with net karma score amplification.",
+    "interpretation": "Decisive, emotionally charged stances accumulate higher net karma rewards than moderate, neutral submissions."
+  },
+  "H3": {
+    "title": "Pillar 2 — Academic Formulation (H3: Topic Ambiguity vs. Clarity)",
+    "formulation": "Informational Shannon entropy calculated across the topic distribution exhibits a negative relationship with log-transformed karma score, penalizing thematic ambiguity.",
+    "interpretation": "Posts that distribute probability flatly across candidate themes confuse audiences and receive lower community visibility."
+  },
+  "H4": {
+    "title": "Pillar 2 — Academic Formulation (H4: Entity Specificity & Consensus)",
+    "formulation": "Named entity density (MONEY, ORG, GPE, LOC via SpaCy NER) moderates the relationship between negative sentiment (P_neg) and approval.",
+    "interpretation": "Complaints that cite specific institutions, monetary figures, and locations mobilize consensus upvotes more effectively than vague rants."
+  },
+  "H5": {
+    "title": "Pillar 3 — Academic Formulation (H5: Civic Friction vs. Lifestyle Consensus)",
+    "formulation": "Administrative and housing topics exhibit significantly higher negative sentiment (P_neg) and lower approval ratios (upvote_ratio) compared to cultural and lifestyle topics.",
+    "interpretation": "Institutional friction provokes lower consensus approval than lifestyle and cultural discourse."
+  },
+  "H6": {
+    "title": "Pillar 4 — Academic Formulation (H6: Diurnal & Temporal Affect Cycles)",
+    "formulation": "Negative sentiment intensity (P_neg) and polarity follow significant local diurnal periodicities, with late-night submissions exhibiting higher grievance levels.",
+    "interpretation": "Daytime submissions emphasize informational exchange; late-night local time windows exhibit elevated emotional venting."
+  },
+  "H7": {
+    "title": "Pillar 4 — Academic Formulation (H7: Scaled Community Virality & Lexical Diversity)",
+    "formulation": "Controlling for community scale (total_users), Type-Token Ratio (TTR) exhibits an inverted U-shape relationship with scale-normalized comments.",
+    "interpretation": "Engagement optimizes within an accessible lexical sweet spot; repetitive or overly dense discourse incurs reading friction."
+  }
+}

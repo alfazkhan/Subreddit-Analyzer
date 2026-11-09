@@ -11,17 +11,12 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { fetchingData } from "@/util/http";
 import TanStackDataTable from "@/components/ui-components/Data Table/TanstackDataTable";
-import {
-  TextSearch,
-  ValueSearch,
-} from "@/components/ui-components/Data Table/Filters";
 import { BASE_URL } from "@/Constants";
 import type {
   ProcessQueueTask,
   QueueApiResponse,
   QueueCounts,
   QueueSocketMessage,
-  QueueTableFiltersProps,
 } from "@/util/Types";
 
 const stripeStyle = {
@@ -65,12 +60,21 @@ const tableColumns: ColumnDef<ProcessQueueTask>[] = [
   },
   {
     accessorKey: "post_id",
-    header: "Post ID",
-    cell: ({ getValue }) => (
-      <Text fontWeight="semibold" fontSize="xs">
-        {String(getValue() ?? "")}
-      </Text>
-    ),
+    header: "Post URL",
+    cell: ({ getValue, row }) => {
+      const postId = String(getValue() ?? "").substring(3);
+      return (
+        <Text fontWeight="semibold" fontSize="xs" color="blue.400">
+          <a
+            href={`https://www.reddit.com/r/${row.original.subreddit_name}/comments/${postId}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {postId}
+          </a>
+        </Text>
+      );
+    },
     filterFn: (row, columnID, filterValue) => {
       const query = String(filterValue ?? "");
       return (
@@ -134,7 +138,14 @@ const tableColumns: ColumnDef<ProcessQueueTask>[] = [
         </Badge>
       );
     },
-    filterFn: "equals",
+    filterFn: (row, columnID, filterValue) => {
+      const query = String(filterValue ?? "").trim().toLowerCase();
+      if (!query) return true;
+
+      const value = String(row.getValue(columnID) ?? "").trim().toLowerCase();
+      const normalizedValue = value === "running" ? "processing" : value;
+      return normalizedValue === query;
+    },
     size: 130,
   },
   {
@@ -176,6 +187,8 @@ export default function ProcessQueueSection() {
     queryFn: ({ signal }) =>
       fetchingData({ endpoint: "queue", signal, headers: {} }),
     refetchInterval: wsStatus !== "Connected" ? 5000 : false,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 5,
   });
 
   useEffect(() => {
@@ -186,9 +199,7 @@ export default function ProcessQueueSection() {
       return;
     }
     if (initialData.counts) {
-      setQueueCounts((previous) =>
-        mergeQueueCounts(previous, initialData.counts ?? {}),
-      );
+      setQueueCounts((previous) => mergeQueueCounts(previous, initialData.counts));
     }
     if (Array.isArray(initialData.tasks)) {
       setQueueTasks(initialData.tasks);
@@ -217,9 +228,9 @@ export default function ProcessQueueSection() {
             const payload = JSON.parse(event.data) as QueueSocketMessage;
             if (payload.type === "QUEUE_UPDATED") {
               if (payload.counts) {
-                setQueueCounts((previous) => ({
-                  ...mergeQueueCounts(previous, payload.counts ?? {}),
-                }));
+                setQueueCounts((previous) =>
+                  mergeQueueCounts(previous, payload.counts),
+                );
               }
               if (Array.isArray(payload.data)) {
                 setQueueTasks(payload.data);
@@ -253,8 +264,8 @@ export default function ProcessQueueSection() {
     return () => {
       isMounted = false;
       if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
-      if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-        socketRef.current.close();
+      if (socketRef.current?.readyState !== WebSocket.CLOSED) {
+        socketRef.current?.close();
       }
     };
   }, []);
@@ -312,20 +323,22 @@ export default function ProcessQueueSection() {
         </HStack>
 
         <HStack gap={3}>
-          <Badge variant="outline" colorPalette="gray" fontSize="xs">
+          <Badge variant="subtle" colorPalette="orange" fontSize="xs">
             Total Tasks: {queueCounts.total.toLocaleString()}
           </Badge>
           <Badge variant="subtle" colorPalette="yellow" fontSize="xs">
             Pending: {queueCounts.pending.toLocaleString()}
           </Badge>
-          <Badge
-            variant="solid"
-            colorPalette="blue"
-            fontSize="xs"
-            style={stripeStyle}
-          >
-            Processing: {queueCounts.processing.toLocaleString()}
-          </Badge>
+          {queueCounts.processing > 0 &&
+            <Badge
+              variant="solid"
+              colorPalette="blue"
+              fontSize="xs"
+              style={stripeStyle}
+            >
+              Processing: {queueCounts.processing.toLocaleString()}
+            </Badge>
+          }
           <Badge variant="subtle" colorPalette="green" fontSize="xs">
             Completed: {queueCounts.completed.toLocaleString()}
           </Badge>
@@ -340,40 +353,9 @@ export default function ProcessQueueSection() {
       <TanStackDataTable
         data={queueTasks}
         getRowId={(row: ProcessQueueTask) => String(row.id ?? row.post_id)}
-        TableFiltersComponent={QueueTableFilters}
         pageSize={15}
         tableColumns={tableColumns}
       />
     </VStack>
-  );
-}
-
-function QueueTableFilters({ table }: QueueTableFiltersProps = {}) {
-  if (!table) return <></>;
-
-  return (
-    <HStack gap={3} pb={2} wrap="wrap">
-      <TextSearch
-        table={table}
-        fieldName="post_id"
-        placeholder="Filter by Post ID..."
-      />
-      <TextSearch
-        table={table}
-        fieldName="subreddit_name"
-        placeholder="Filter by Subreddit..."
-      />
-      <ValueSearch
-        table={table}
-        fieldName="status"
-        options={[
-          { value: "", text: "All Statuses" },
-          { value: "pending", text: "Pending" },
-          { value: "processing", text: "Processing" },
-          { value: "completed", text: "Completed" },
-          { value: "failed", text: "Failed" },
-        ]}
-      />
-    </HStack>
   );
 }

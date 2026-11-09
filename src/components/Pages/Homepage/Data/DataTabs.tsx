@@ -15,7 +15,7 @@ import KeywordsPieChart from "../Data/KeywordsPieChart";
 import PostsFrequency from "../Data/PostsFrequency";
 import EmotionsThroughoutDay from "../Data/EmotionsThroughoutDay";
 import KeywordsWordCloud from "./KeywordsWordCloud";
-import KPIAnalyticsChart from "./KPIAnalyticsChart";
+import KPIAnalytics from "./Hypothesis/KPIAnalytics";
 import PaginatedPostTable from "./PaginatatedPostTable";
 import type { DataTabsProps } from "@/util/Types";
 
@@ -26,7 +26,7 @@ export default function DataTabs({ postsData, processingStatus }: DataTabsProps)
     {
       value: "KPIs",
       icon: LuGitlab,
-      render: () => <KPIAnalyticsChart />,
+      render: () => <KPIAnalytics />,
     },
     {
       value: "Sentiments",
@@ -73,7 +73,7 @@ export default function DataTabs({ postsData, processingStatus }: DataTabsProps)
     <>
       <Box position="relative" aria-busy="true" userSelect="none">
         <Tabs.Root
-          defaultValue="Pie Chart"
+          defaultValue="Posts Frequency"
           variant="enclosed"
           lazyMount
           // unmountOnExit

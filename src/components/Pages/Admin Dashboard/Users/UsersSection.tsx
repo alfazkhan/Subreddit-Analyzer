@@ -38,7 +38,10 @@ export default function UsersSection() {
         endpoint: "users",
         signal,
         headers: { Authorization: `Bearer ${token}` },
-      }),
+      },
+      ),
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 5,
   });
 
   const paginatedSlice: AdminUser[] = useMemo(

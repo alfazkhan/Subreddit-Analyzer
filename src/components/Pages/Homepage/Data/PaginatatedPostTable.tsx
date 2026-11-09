@@ -178,11 +178,11 @@ function PaginationButtons({
 }
 
 function PostTitle({ row }: PostTitleCellProps) {
-  const { id, title, subreddit } = row.original;
+  const { id, title, subreddit_name } = row.original;
   return (
     <Link
       color="blue.400"
-      href={`https://www.reddit.com/r/${subreddit}/comments/${id.substring(3)}`}
+      href={`https://www.reddit.com/r/${subreddit_name}/comments/${id.substring(3)}`}
     >
       {title}
     </Link>

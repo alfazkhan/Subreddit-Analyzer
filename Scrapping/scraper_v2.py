@@ -16,6 +16,7 @@ from database.queue_manager import (
 from database.subreddits import update_last_gap_scan
 from database.ignored_words import get_all_ignored_words
 from nlp_processor import get_sentiment, extract_keywords, extract_entities, classify_topics
+from shared_ui import ui_manager
 
 async def get_post_metadata(post):
     """Safely extracts post ID and timestamp from a feed element."""
@@ -35,6 +36,8 @@ async def scrape_post_by_id(context, post_id: str, subreddit_name: str, ignored_
         
         try:
             await update_queue_status(post_id, 'processing')
+            ui_manager.update(subreddit=f"r/{subreddit_name}", action="Scraping Post", current_post=clean_id)
+            await ui_manager.refresh_db_counts()
             page = await context.new_page()
             logging.info(f"Scraper: Opening matured post {clean_id} for r/{subreddit_name}...")
             await page.goto(url, wait_until="load", timeout=45000)
@@ -83,6 +86,8 @@ async def scrape_post_by_id(context, post_id: str, subreddit_name: str, ignored_
 
             if not title:
                 await update_queue_status(post_id, 'failed')
+                ui_manager.update(action="Post Failed", last_result=f"✗ {post_id} | No title")
+                await ui_manager.refresh_db_counts()
                 return None
 
             # 3. Extract Body & Timestamp
@@ -112,6 +117,11 @@ async def scrape_post_by_id(context, post_id: str, subreddit_name: str, ignored_
             
             await save_post_to_db(post_entry, subreddit_name)
             await update_queue_status(post_id, 'completed')
+            ui_manager.update(
+                action="Post Archived",
+                last_result=f"✓ {post_id} | Score: {score}"
+            )
+            await ui_manager.refresh_db_counts()
             logging.info(
                 f"Scraper: Successfully archived {post_id} | "
                 f"Score: {score} | Comments: {num_comments} | Ratio: {upvote_ratio}"
@@ -121,6 +131,11 @@ async def scrape_post_by_id(context, post_id: str, subreddit_name: str, ignored_
         except Exception as e:
             logging.error(f"Scraper: Error processing {post_id}: {e}")
             await update_queue_status(post_id, 'failed')
+            ui_manager.update(
+                action="Post Failed",
+                last_result=f"✗ {post_id} | Error"
+            )
+            await ui_manager.refresh_db_counts()
             return None
         finally:
             if page and not page.is_closed():
@@ -151,6 +166,7 @@ async def run_discovery_scan(subreddit_name: str, mode: str = 'routine', headles
         
         try:
             logging.info(f"Discovery: Scanning r/{subreddit_name} in '{mode.upper()}' mode...")
+            ui_manager.update(subreddit=f"r/{subreddit_name}", action=f"Discovery Scan ({mode.upper()})", current_post="-")
             await page.goto(f"https://www.reddit.com/r/{subreddit_name}/new", wait_until="load", timeout=45000)
             stop_scrolling = False
             total_discovered = 0
@@ -186,6 +202,11 @@ async def run_discovery_scan(subreddit_name: str, mode: str = 'routine', headles
                     pool = await get_db_pool()
                     async with pool.acquire() as conn:
                         await add_to_queue(conn, new_ids, subreddit_name)
+                    ui_manager.update(
+                        action=f"Discovery ({mode.upper()}) +{total_discovered}",
+                        last_result=f"Enqueued {len(new_ids)} new IDs"
+                    )
+                    await ui_manager.refresh_db_counts()
 
                 if stop_scrolling: 
                     break
@@ -198,6 +219,11 @@ async def run_discovery_scan(subreddit_name: str, mode: str = 'routine', headles
                     break
                     
             logging.info(f"Discovery: Scan complete for r/{subreddit_name}. Discovered {total_discovered} new tasks.")
+            ui_manager.update(
+                action="Discovery Complete",
+                last_result=f"Found {total_discovered} new posts"
+            )
+            await ui_manager.refresh_db_counts()
         except Exception as e:
             logging.error(f"Discovery error on r/{subreddit_name}: {e}")
         finally:

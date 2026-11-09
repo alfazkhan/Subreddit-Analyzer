@@ -49,7 +49,7 @@ const tableColumns: ColumnDef<AdminSubreddit>[] = [
     ),
     size: 50,
     enableSorting: false,
-  },
+  }, 
   {
     accessorKey: "name",
     header: "Name",

@@ -74,11 +74,18 @@ Modifies tracking settings or timezone. Requires `Super Admin`.
 ## 3. KPI Analytics Endpoints (`/Routes/routes_kpis.py`)
 
 ### `GET /kpis` or `GET /kpis/{subreddit_id}`
-Computes the 5 Core Net Sentiment Indices (ESI, ISI, CII, CCI, EII) organized by "Academic Pillars".
+Computes the complete KPI payload, including all seven hypothesis tests and the chart time series.
+
+### `GET /kpis/series` or `GET /kpis/series/{subreddit_id}`
+Returns the KPI chart time series and aggregate post metrics without running the seven hypothesis tests. The frontend uses this lightweight endpoint to keep the chart responsive.
+
+### `GET /kpis/h1` through `GET /kpis/h7`
+Computes and returns one academic hypothesis at a time. The selected hypothesis is available in the `hypothesis` field, with request metadata and the analyzed post count in the response.
 *   **Query Parameters**:
     *   `start_date`, `end_date`: ISO Date strings.
     *   `granularity`: `daily`, `weekly`, `monthly`.
     *   `sma_window`: Simple Moving Average window (1-30 days, default 7).
+    *   `subreddit_id`: Optional subreddit ID for `/kpis/series` and `/kpis/h1` through `/kpis/h7`.
 *   **Formula**: $50 + 50 \times \frac{\sum Pos - \sum Neg}{N}$
 
 ---

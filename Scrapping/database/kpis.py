@@ -83,12 +83,53 @@ def calculate_ttr(keywords_dict: dict, word_count: int) -> float:
         return 0.0
     return min(1.0, float(len(keywords_dict)) / float(word_count))
 
+def aggregate_kpi_time_series(
+    df: pd.DataFrame,
+    granularity: str,
+    sma_window: int,
+) -> List[Dict[str, Any]]:
+    df = df.copy()
+    df["date_dt"] = pd.to_datetime(df["date"])
+    df = df.sort_values("date_dt").reset_index(drop=True)
+
+    rule = {"weekly": "W-MON", "monthly": "MS"}.get(granularity, "D")
+    grouped = df.groupby(pd.Grouper(key="date_dt", freq=rule))
+    ts_rows = []
+
+    for name, group in grouped:
+        if group.empty:
+            continue
+        ts_rows.append({
+            "date": name.strftime("%Y-%m-%d"),
+            "post_count": int(len(group)),
+            "avg_score": round(float(group["score"].mean()), 2),
+            "avg_upvote_ratio": round(float(group["upvote_ratio"].mean()), 3),
+            "avg_num_comments": round(float(group["num_comments"].mean()), 2),
+            "avg_negative_sentiment": round(float(group["p_neg"].mean()), 4),
+            "avg_positive_sentiment": round(float(group["p_pos"].mean()), 4),
+            "admin_topic_count": int((group["topic_cluster"] == "ADMIN_HOUSING").sum()),
+            "lifestyle_topic_count": int((group["topic_cluster"] == "LIFESTYLE_CULTURE").sum()),
+        })
+
+    ts_df = pd.DataFrame(ts_rows)
+    if ts_df.empty:
+        return []
+
+    ts_df["avg_neg_sentiment_SMA"] = (
+        ts_df["avg_negative_sentiment"].rolling(window=sma_window, min_periods=1).mean().round(4)
+    )
+    ts_df["avg_upvote_ratio_SMA"] = (
+        ts_df["avg_upvote_ratio"].rolling(window=sma_window, min_periods=1).mean().round(3)
+    )
+    return ts_df.to_dict(orient="records")
+
 async def calculate_db_kpis_timeseries(
     subreddit_id: Optional[int] = None, 
     start_date: Optional[str] = None, 
     end_date: Optional[str] = None,
     granularity: str = "daily",
-    sma_window: int = 7
+    sma_window: int = 7,
+    include_hypothesis_tests: bool = True,
 ):
     pool = await get_db_pool()
     
@@ -241,6 +282,17 @@ async def calculate_db_kpis_timeseries(
         return [], {}, subreddit_name
 
     df = pd.DataFrame(parsed_posts)
+
+    if not include_hypothesis_tests:
+        time_series = aggregate_kpi_time_series(df, granularity, sma_window)
+        summary = {
+            "total_analyzed_posts": len(df),
+            "overall_mean_upvote_ratio": round(float(df["upvote_ratio"].mean()), 3),
+            "overall_mean_comments": round(float(df["num_comments"].mean()), 2),
+            "overall_mean_negative_sentiment": round(float(df["p_neg"].mean()), 4),
+            "hypothesis_tests": {},
+        }
+        return time_series, summary, subreddit_name
 
     # ----------------------------------------------------
     # PILLAR 1: Affective & Behavioral Dynamics

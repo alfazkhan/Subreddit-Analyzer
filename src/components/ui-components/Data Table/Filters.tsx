@@ -32,6 +32,8 @@ export function TextSearch<TData extends RowData>({
       placeholder={placeholder}
       variant="outline"
       onChange={(e) => columnName?.setFilterValue(e.target.value)}
+      style={{ color: "#fff" }}
+      _placeholder={{ color: "#fff" }}
       {...props}
     />
   );
@@ -44,20 +46,29 @@ export function ValueSearch<TData extends RowData>({
   ...props
 }: ValueSearchProps<TData>) {
   const columnName = table.getColumn(fieldName);
+  const booleanFilter = options
+    .filter(({ value }) => value !== "")
+    .every(({ value }) => value === "true" || value === "false");
+
   return (
     <NativeSelect.Root size="xs" {...props}>
       <NativeSelect.Field
+        defaultValue={
+          options.some(({ value }) => value === "") ? "" : undefined
+        }
         onChange={(e) => {
           const val = e.target.value;
           if (val === "") {
             columnName?.setFilterValue(undefined);
-          } else {
+          } else if (booleanFilter) {
             columnName?.setFilterValue(val === "true");
+          } else {
+            columnName?.setFilterValue(val);
           }
         }}
       >
         {options.map((o) => (
-          <option key={o.text} value={o.value}>
+          <option key={o.text} value={o.value} style={{ color: "#000" }}>
             {o.text}
           </option>
         ))}

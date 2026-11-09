@@ -101,3 +101,34 @@ async def test_kpi_calculation_resolves_name_when_requested_subreddit_has_no_pos
     fake_db.fetchval.assert_awaited_once_with(
         "SELECT name FROM subreddits WHERE id = $1", 3
     )
+
+
+@pytest.mark.asyncio
+async def test_kpi_calculation_can_skip_hypothesis_tests_for_chart_series(fake_db):
+    fake_db.fetch.return_value = [
+        {
+            "id": "post-1",
+            "post_date": date(2026, 10, 31),
+            "timestamp": datetime(2026, 10, 31, 12),
+            "title": "Rent increase",
+            "body": "Monthly rent increased",
+            "score": 12,
+            "upvote_ratio": 0.8,
+            "num_comments": 4,
+            "sentiment_scores": {"positive": 0.1, "neutral": 0.2, "negative": 0.7},
+            "topics": {"primary_topic": "Rent Prices & Affordability", "scores": [0.8, 0.2]},
+            "keywords": {"rent": 2},
+            "entities": [{"label": "MONEY"}],
+            "subreddit_name": "Berlin",
+            "total_users": 500,
+            "timezone": "UTC",
+        }
+    ]
+
+    time_series, summary, name = await kpis.calculate_db_kpis_timeseries(
+        include_hypothesis_tests=False
+    )
+
+    assert name == "All Subreddits"
+    assert time_series[0]["post_count"] == 1
+    assert summary["hypothesis_tests"] == {}

@@ -374,10 +374,6 @@ export interface SubredditsTableFiltersProps {
   table?: import("@tanstack/react-table").Table<AdminSubreddit>;
 }
 
-export interface QueueTableFiltersProps {
-  table?: import("@tanstack/react-table").Table<ProcessQueueTask>;
-}
-
 export interface IgnoredWordsTableFiltersProps {
   table?: import("@tanstack/react-table").Table<IgnoredWord>;
 }

@@ -40,6 +40,28 @@ describe("HTTP API helpers", () => {
     });
   });
 
+  it("reports download progress from the Content-Length response header", async () => {
+    const body = JSON.stringify({ items: [1, 2] });
+    const progress = vi.fn();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(body, {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+            "Content-Length": String(new TextEncoder().encode(body).length),
+          },
+        }),
+      ),
+    );
+
+    await expect(
+      fetchingData({ endpoint: "kpis/series", progressCallBackFn: progress }),
+    ).resolves.toEqual({ items: [1, 2] });
+    expect(progress).toHaveBeenLastCalledWith(100);
+  });
+
   it("sends JSON payloads with POST", async () => {
     const payload = [{ word: "example", language: "en" }];
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ accepted: true }));

@@ -37,9 +37,8 @@ async def update_queue_status(post_id: str, status: str):
 async def get_queue_tasks_by_status(subreddit_name: str, status: str, limit: int):
     """
     True FIFO queue task retrieval with a 7-Day Aging Delay.
-    Orders strictly by created_at ASC, post_id ASC.
-    Only fetches tasks that were added to the queue more than 7 days ago,
-    ensuring upvotes and comments have matured.
+    Orders strictly by created_at ASC (Oldest discovery date first).
+    Only fetches tasks that were added to the queue more than 7 days ago.
     """
     pool = await get_db_pool()
     async with pool.acquire() as conn:
