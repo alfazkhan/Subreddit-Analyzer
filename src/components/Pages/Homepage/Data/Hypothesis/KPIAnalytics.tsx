@@ -9,7 +9,8 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { useDownloadQuery } from "@/util/api";
+import { useQuery } from "@tanstack/react-query";
+import { fetchingData } from "@/util/api";
 import { CheckboxField, DateSelector } from "@/components/ui-components/FormControls";
 import { QueryStateView } from "@/components/ui-components/Feedback";
 import HypothesisTabs from "./HypothesisTabs";
@@ -25,7 +26,7 @@ const HYPOTHESIS_TABS: HypothesisTabDefinition<HypothesisResponse>[] =
     const hypothesisKey = `H${index + 1}`;
     return {
       value: hypothesisKey.toLowerCase(),
-      label: hypothesisKey,
+      label: `Hypothesis ${index + 1}`,
       getPassed: (response) =>
         isHypothesisPassed(hypothesisKey, getHypothesisStats(hypothesisKey, response)),
       render: (response) => (
@@ -53,15 +54,19 @@ export default function KPIAnalytics() {
     KPI_METRICS.map(({ rawKey }) => rawKey),
   );
   const endpoint = `kpis/series?start_date=${startDate}&end_date=${endDate}&granularity=${granularity}&sma_window=7`;
+  const hasDateRange = Boolean(startDate && endDate);
 
-  const { data, isLoading, isError, error, downloadProgress } =
-    useDownloadQuery<KpiResponse>({
-      queryKey: ["kpi-analytics", startDate, endDate, granularity, useSMA],
-      endpoint,
-      enabled: Boolean(startDate && endDate),
+  const { data, isLoading, isPending, isFetching, isError, error } =
+    useQuery<KpiResponse>({
+      queryKey: ["kpi-analytics", startDate, endDate, granularity],
+      queryFn: ({ signal }) => fetchingData({ endpoint, signal }),
+      enabled: hasDateRange,
+      refetchOnWindowFocus: false,
       refetchOnMount: false,
       refetchOnReconnect: false,
     });
+
+  const isChartSettled = hasDateRange && !isPending && !isFetching;
 
   const toggleMetric = (key: string) => {
     setSelectedMetrics((selected) =>
@@ -149,8 +154,7 @@ export default function KPIAnalytics() {
           isError={isError}
           error={error}
           errorPrefix="Error loading analytics"
-          loadingText="Downloading KPI chart..."
-          progress={downloadProgress}
+          loadingText="Calculating data points..."
           isEmpty={timeSeriesData.length === 0}
           emptyText="No analyzed posts found for the selected parameters."
         >
@@ -167,6 +171,8 @@ export default function KPIAnalytics() {
         tabs={HYPOTHESIS_TABS}
         query={`start_date=${startDate}&end_date=${endDate}`}
         queryKey={["kpi-hypothesis", startDate, endDate]}
+        enabled={hasDateRange}
+        canFetch={isChartSettled}
       />
     </VStack>
   );

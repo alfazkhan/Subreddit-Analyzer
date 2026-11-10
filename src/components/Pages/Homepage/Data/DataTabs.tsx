@@ -75,7 +75,7 @@ export default function DataTabs({ postsData, processingStatus }: DataTabsProps)
     <>
       <Box position="relative" aria-busy="true" userSelect="none">
         <Tabs.Root
-          defaultValue="Sentiments Frequency"
+          defaultValue="KPIs"
           variant="enclosed"
           lazyMount
           // unmountOnExit

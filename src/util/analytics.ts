@@ -137,9 +137,9 @@ export function formatStatValue(value: unknown): string | number {
  */
 export function getHypothesisStats(
   hypothesisKey: string,
-  response: HypothesisResponse,
+  response?: HypothesisResponse | null,
 ): ThesisStats {
-  const hypothesis = response.hypothesis ?? {};
+  const hypothesis = asRecord(response?.hypothesis);
   const statistics = asRecord(hypothesis.statistics);
   const correlation = (key: string) => asRecord(hypothesis[key]);
 

@@ -197,6 +197,27 @@ describe("hypothesis utilities", () => {
     });
     expect(isHypothesisPassed("H3", h3Stats)).toBe(true);
     expect(formatHypothesisResult("H3", h3Stats)).toContain("Model R2 = 0.25");
+
+    const missingStats = getHypothesisStats("H1", undefined);
+    expect(missingStats).toEqual({
+      n: 0,
+      rhoComments: 0,
+      pComments: "= 1.0",
+      rhoApproval: 0,
+      pApproval: "= 1.0",
+    });
+    expect(isHypothesisPassed("H1", missingStats)).toBe(false);
+    expect(getHypothesisStats("H2", null)).toEqual({
+      n: 0,
+      rho: 0,
+      pVal: "= 1.0",
+    });
+    expect(getHypothesisStats("H6", {} as { hypothesis: Record<string, unknown> })).toEqual({
+      n: 0,
+      fStat: 0,
+      pVal: "= 1.0",
+      means: "{}",
+    });
   });
 });
 
