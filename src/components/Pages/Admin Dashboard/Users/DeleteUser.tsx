@@ -1,11 +1,11 @@
 import { FiTrash2 } from "react-icons/fi";
 import { IconButton } from "@chakra-ui/react";
 import { useRef } from "react";
-import AlertDialog from "@/components/ui-components/AlertDialog";
+import { AlertDialog } from "@/components/ui-components/Dialogs";
 import { useMutation } from "@tanstack/react-query";
-import { deletingData, queryClient } from "@/util/http";
+import { createAuthHeaders, deletingData, queryClient } from "@/util/api";
 import { useSelector } from "react-redux";
-import LoadingAndError from "@/components/ui-components/LoadingAndError";
+import { LoadingAndError } from "@/components/ui-components/Feedback";
 import type {
   AlertDialogHandle,
   DeleteUserProps,
@@ -33,10 +33,7 @@ export default function DeleteUser({ user, onDeleteSuccess }: DeleteUserProps) {
     mutate({
       endpoint: `users/${user.id}`,
       signal: undefined,
-      headers: {
-        Authorization: `Bearer ${authState.token}`,
-        "Content-Type": "application/json",
-      },
+      headers: createAuthHeaders(authState.token),
     });
   }
 

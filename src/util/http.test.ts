@@ -1,11 +1,14 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { BASE_URL } from "@/Constants";
+import { BASE_URL } from "@/util/constants";
 import {
+  buildWebSocketUrl,
+  createAuthHeaders,
   deletingData,
   editingData,
   fetchingData,
+  fetchUserCredentials,
   sendingData,
-} from "./http";
+} from "./api";
 
 vi.mock("firebase/auth", () => ({ onAuthStateChanged: vi.fn() }));
 vi.mock("../../firebase_config", () => ({ auth: {} }));
@@ -93,5 +96,33 @@ describe("HTTP API helpers", () => {
       body: JSON.stringify({ is_active: false }),
     });
     expect(fetchMock.mock.calls[1][1]).toMatchObject({ method: "DELETE" });
+  });
+
+  it("builds auth headers, WebSocket URLs, and fetches user credentials", async () => {
+    expect(createAuthHeaders("abc")).toEqual({
+      "Content-Type": "application/json",
+      Authorization: "Bearer abc",
+    });
+    expect(createAuthHeaders("abc", false)).toEqual({
+      Authorization: "Bearer abc",
+    });
+    expect(buildWebSocketUrl("/ws/queue")).toMatch(/^wss?:\/\/.+\/ws\/queue$/);
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(jsonResponse({ name: "Alice", role: "Admin" })),
+    );
+
+    const creds = await fetchUserCredentials({
+      uid: "u1",
+      email: "alice@example.com",
+      getIdToken: async () => "tok-123",
+    });
+
+    expect(creds).toEqual({
+      user: { uid: "u1", email: "alice@example.com", name: "Alice" },
+      token: "tok-123",
+      role: "Admin",
+    });
   });
 });

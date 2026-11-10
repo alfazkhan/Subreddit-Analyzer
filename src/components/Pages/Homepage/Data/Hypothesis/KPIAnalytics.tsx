@@ -1,26 +1,41 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Badge,
   Box,
   Button,
-  Center,
-  Checkbox,
   Flex,
   HStack,
-  Progress,
-  Spinner,
   Switch,
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { useQuery } from "@tanstack/react-query";
-import { fetchingData } from "@/util/http.js";
-import DateSelector from "@/components/ui-components/DateSelector";
+import { useDownloadQuery } from "@/util/api";
+import { CheckboxField, DateSelector } from "@/components/ui-components/FormControls";
+import { QueryStateView } from "@/components/ui-components/Feedback";
 import HypothesisTabs from "./HypothesisTabs";
 import KPIAnalyticsChart from "./KPIAnalyticsChart";
-import { HYPOTHESIS_TABS } from "./definitions";
-import { getTodayISODate } from "./KPIHelpers";
-import { KPI_METRICS } from "./kpiMetrics";
+import { HypothesisContent } from "./HypothesisContent";
+import { getYearStartToToday } from "@/util/dateTime";
+import { getHypothesisStats, isHypothesisPassed } from "@/util/analytics";
+import { KPI_METRICS } from "./KPIHelpers";
+import type { HypothesisResponse, HypothesisTabDefinition } from "./KPIHelpers";
+
+const HYPOTHESIS_TABS: HypothesisTabDefinition<HypothesisResponse>[] =
+  Array.from({ length: 7 }, (_, index) => {
+    const hypothesisKey = `H${index + 1}`;
+    return {
+      value: hypothesisKey.toLowerCase(),
+      label: hypothesisKey,
+      getPassed: (response) =>
+        isHypothesisPassed(hypothesisKey, getHypothesisStats(hypothesisKey, response)),
+      render: (response) => (
+        <HypothesisContent
+          hypothesisKey={hypothesisKey}
+          stats={getHypothesisStats(hypothesisKey, response)}
+        />
+      ),
+    };
+  });
 
 interface KpiResponse {
   time_series?: Array<Record<string, unknown>>;
@@ -28,30 +43,25 @@ interface KpiResponse {
 }
 
 export default function KPIAnalytics() {
-  const [startDate, setStartDate] = useState("2026-01-01");
-  const [endDate, setEndDate] = useState(getTodayISODate());
+  const defaultDates = useMemo(() => getYearStartToToday(), []);
+  const [startDate, setStartDate] = useState(defaultDates.start);
+  const [endDate, setEndDate] = useState(defaultDates.end);
   const [granularity, setGranularity] = useState("weekly");
   const [useSMA, setUseSMA] = useState(true);
   const [dynamicYAxis, setDynamicYAxis] = useState(false);
   const [selectedMetrics, setSelectedMetrics] = useState(
     KPI_METRICS.map(({ rawKey }) => rawKey),
   );
-  const [downloadProgress, setDownloadProgress] = useState(0);
   const endpoint = `kpis/series?start_date=${startDate}&end_date=${endDate}&granularity=${granularity}&sma_window=7`;
 
-  const { data, isLoading, isError, error } = useQuery<KpiResponse>({
-    queryKey: ["kpi-analytics", startDate, endDate, granularity, useSMA],
-    queryFn: ({ signal }) => {
-      setDownloadProgress(0);
-      return fetchingData({ endpoint, signal, progressCallBackFn: setDownloadProgress });
-    },
-    enabled: Boolean(startDate && endDate),
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 5,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-  });
+  const { data, isLoading, isError, error, downloadProgress } =
+    useDownloadQuery<KpiResponse>({
+      queryKey: ["kpi-analytics", startDate, endDate, granularity, useSMA],
+      endpoint,
+      enabled: Boolean(startDate && endDate),
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+    });
 
   const toggleMetric = (key: string) => {
     setSelectedMetrics((selected) =>
@@ -115,55 +125,42 @@ export default function KPIAnalytics() {
         {KPI_METRICS.map((metric) => {
           const checked = selectedMetrics.includes(metric.rawKey);
           return (
-            <Checkbox.Root
+            <CheckboxField
               key={metric.rawKey}
               checked={checked}
               colorPalette="orange"
               onCheckedChange={() => toggleMetric(metric.rawKey)}
+              controlProps={{ borderColor: metric.color }}
+              labelProps={{
+                fontSize: "sm",
+                fontWeight: "semibold",
+                color: checked ? metric.color : "gray.400",
+              }}
             >
-              <Checkbox.HiddenInput />
-              <Checkbox.Control borderColor={metric.color} />
-              <Checkbox.Label fontSize="sm" fontWeight="semibold" color={checked ? metric.color : "gray.400"}>
-                {metric.label}
-              </Checkbox.Label>
-            </Checkbox.Root>
+              {metric.label}
+            </CheckboxField>
           );
         })}
       </Flex>
 
       <Box height="440px" width="100%" pt={2}>
-        {isLoading ? (
-          <Center height="100%">
-            <VStack gap={2}>
-              <Spinner color="orange.500" size="xl" />
-              <Text fontSize="sm" color="gray.400">
-                Downloading KPI chart... {downloadProgress}%
-              </Text>
-              <Progress.Root value={downloadProgress} width="min(100%, 360px)" colorPalette="orange">
-                <Progress.Track><Progress.Range /></Progress.Track>
-              </Progress.Root>
-            </VStack>
-          </Center>
-        ) : isError ? (
-          <Center height="100%">
-            <Text color="red.400" fontSize="sm">
-              Error loading analytics: {error?.message || "Internal Server Error"}
-            </Text>
-          </Center>
-        ) : timeSeriesData.length === 0 ? (
-          <Center height="100%">
-            <Text color="gray.500" fontSize="sm">
-              No analyzed posts found for the selected parameters.
-            </Text>
-          </Center>
-        ) : (
+        <QueryStateView
+          isLoading={isLoading}
+          isError={isError}
+          error={error}
+          errorPrefix="Error loading analytics"
+          loadingText="Downloading KPI chart..."
+          progress={downloadProgress}
+          isEmpty={timeSeriesData.length === 0}
+          emptyText="No analyzed posts found for the selected parameters."
+        >
           <KPIAnalyticsChart
             timeSeriesData={timeSeriesData}
             selectedMetrics={selectedMetrics}
             useSMA={useSMA}
             dynamicYAxis={dynamicYAxis}
           />
-        )}
+        </QueryStateView>
       </Box>
 
       <HypothesisTabs

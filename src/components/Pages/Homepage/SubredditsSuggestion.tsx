@@ -2,25 +2,7 @@ import { Button, VStack, Text, Flex } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { userInputAction } from "../../../store/userInput.js";
 import type { RootState } from "../../../util/Types";
-
-function dateTimeFormatter(rawTimestamp: string | undefined) {
-  if (!rawTimestamp) return "N/A";
-
-  const date = new Date(rawTimestamp);
-  const formattedDate = date
-    .toLocaleString("en-GB", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    })
-    .replace(",", "")
-    .toUpperCase();
-
-  return formattedDate;
-}
+import { dateTimeFormatter } from "@/util/dateTime";
 
 export default function SubredditsSuggestions() {
   const dispatch = useDispatch();

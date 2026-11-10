@@ -1,4 +1,6 @@
-import { Tabs, Box, Center, Spinner } from "@chakra-ui/react";
+import { Tabs, Box } from "@chakra-ui/react";
+import { CenteredSpinner } from "@/components/ui-components/Feedback";
+import { ORANGE_TABS_CSS, ORANGE_TABS_OPEN_ANIMATION } from "@/util/constants";
 import {
   LuCloud,
   LuSmile,
@@ -73,19 +75,14 @@ export default function DataTabs({ postsData, processingStatus }: DataTabsProps)
     <>
       <Box position="relative" aria-busy="true" userSelect="none">
         <Tabs.Root
-          defaultValue="Posts Frequency"
+          defaultValue="Sentiments Frequency"
           variant="enclosed"
           lazyMount
           // unmountOnExit
           fitted
-          css={{
-            "--tabs-indicator-bg": "colors.orange.600",
-            "--tabs-indicator-color": "colors.orange.600",
-          }}
+          css={ORANGE_TABS_CSS}
           data-state={postsData.length !== 0 ? "open" : "closed"}
-          _open={{
-            animation: "fade-in 800ms ease-out",
-          }}
+          _open={ORANGE_TABS_OPEN_ANIMATION}
         >
           <Tabs.List rounded="l3" p="1"  bg="transparent">
             {TabsListData.map((tab) => (
@@ -115,14 +112,12 @@ export default function DataTabs({ postsData, processingStatus }: DataTabsProps)
               bg="rgba(23, 23, 27, 0.6)"
               backdropFilter="blur(4px)"
             >
-              <Center h="full">
-                <Spinner
-                  borderWidth="4px"
-                  size="xl"
-                  color="orange.600"
-                  animationDuration="0.6s"
-                />
-              </Center>
+              <CenteredSpinner
+                borderWidth="4px"
+                size="xl"
+                color="orange.600"
+                animationDuration="0.6s"
+              />
             </Box>
           )}
         </Tabs.Root>

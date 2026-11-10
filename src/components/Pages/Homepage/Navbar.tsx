@@ -1,8 +1,12 @@
-import Header from "../../ui-components/Header";
-import ServerStatus from "../../ui-components/ServerStatus";
+import { Header, ServerStatus } from "../../ui-components/Layout";
 import { Flex, Button, HStack } from "@chakra-ui/react";
 import { NavLink, Outlet } from "react-router-dom";
 import LogoutButton from "../Admin Dashboard/LogoutButton";
+
+const NAV_LINKS = [
+  { to: "/about", label: "About Project" },
+  { to: "/dashboard", label: "Dashboard" },
+] as const;
 
 export default function Navbar() {
   return (
@@ -12,16 +16,19 @@ export default function Navbar() {
           <Header text={"Subreddit Analyzer"} highlight="Analyzer" />
         </NavLink>
         <HStack>
-          <NavLink to="/about">
-            <Button size="sm" variant="ghost" color="orange.500" colorPalette="orange" fontWeight="black">
-              About Project
-            </Button>
-          </NavLink>
-          <NavLink to="/dashboard">
-            <Button size="sm" variant="ghost" color="orange.500" colorPalette="orange" fontWeight="black">
-              Dashboard
-            </Button>
-          </NavLink>
+          {NAV_LINKS.map((link) => (
+            <NavLink key={link.to} to={link.to}>
+              <Button
+                size="sm"
+                variant="ghost"
+                color="orange.500"
+                colorPalette="orange"
+                fontWeight="black"
+              >
+                {link.label}
+              </Button>
+            </NavLink>
+          ))}
           <ServerStatus />
           <LogoutButton />
         </HStack>

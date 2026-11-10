@@ -1,6 +1,6 @@
 import { Table } from "@chakra-ui/react";
 import type { ComponentProps, ReactNode } from "react";
-import paginationDataSlicer from "@/util/paginationDataSlicer";
+import { paginationDataSlicer } from "@/util/data";
 
 type DataTableProps<TData> = {
   data: TData[];

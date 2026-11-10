@@ -1,16 +1,24 @@
 import {
+  KeywordBaseFilters,
   RangeFilter,
-  TextSearch,
-  ValueSearch,
 } from "@/components/ui-components/Data Table/Filters";
 import TanStackDataTable from "@/components/ui-components/Data Table/TanstackDataTable";
-import LoadingAndError from "@/components/ui-components/LoadingAndError";
-import { sendingData, fetchingData, queryClient } from "@/util/http";
-import { Button, HStack, Text, VStack, Checkbox } from "@chakra-ui/react";
+import { LoadingAndError } from "@/components/ui-components/Feedback";
+import {
+  CheckboxField,
+  getSelectionHeaderState,
+} from "@/components/ui-components/FormControls";
+import {
+  createAuthHeaders,
+  invalidateKeywordQueries,
+  keywordsQueryOptions,
+  sendingData,
+} from "@/util/api";
+import { Button, HStack, Text } from "@chakra-ui/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { ActionBar, Portal } from "@chakra-ui/react";
-import { LuShare, LuTrash2 } from "react-icons/lu";
+import { LuTrash2 } from "react-icons/lu";
 import type {
   KeywordItem,
   KeywordReportCellProps,
@@ -25,12 +33,7 @@ export default function KeywordTable() {
     isLoading,
     isError,
     error,
-  } = useQuery<KeywordItem[]>({
-    queryKey: ["keywords"],
-    queryFn: ({ signal }) => fetchingData({ endpoint: "posts/keywords", signal }),
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 5,
-  });
+  } = useQuery(keywordsQueryOptions);
 
   if (isError || isPending || isLoading) {
     return (
@@ -50,35 +53,19 @@ export default function KeywordTable() {
           {
             accessorFn: (originalRow) => originalRow.word,
             id: "select",
-            header: ({ table }) => {
-              let checked: boolean | "indeterminate" = false;
-              const someChecked = table.getIsSomeRowsSelected();
-              const allChecked = table.getIsAllRowsSelected();
-              if (someChecked && !allChecked) {
-                checked = "indeterminate";
-              } else if (allChecked) {
-                checked = true;
-              }
-              return (
-                <Checkbox.Root
-                  checked={checked}
-                  onChange={table.getToggleAllRowsSelectedHandler()}
-                >
-                  <Checkbox.HiddenInput />
-                  <Checkbox.Control />
-                </Checkbox.Root>
-              );
-            },
+            header: ({ table }) => (
+              <CheckboxField
+                checked={getSelectionHeaderState(table)}
+                onChange={table.getToggleAllRowsSelectedHandler()}
+              />
+            ),
             cell: ({ row }) => (
-              <Checkbox.Root
+              <CheckboxField
                 checked={row.getIsSelected()}
                 disabled={!row.getCanSelect()}
                 onCheckedChange={row.getToggleSelectedHandler()}
                 size="sm"
-              >
-                <Checkbox.HiddenInput />
-                <Checkbox.Control />
-              </Checkbox.Root>
+              />
             ),
             size: 50,
             enableSorting: false,
@@ -168,37 +155,20 @@ const ToolBar = ({ table }: KeywordTableControlProps) => {
 
 const KeywordFilters = ({ table }: KeywordTableControlProps) => {
   return (
-    <VStack>
-      <TextSearch
-        fieldName={"word"}
-        placeholder="Search Keyword..."
-        table={table}
-      />
+    <KeywordBaseFilters table={table}>
       <RangeFilter fieldName="frequency" table={table} />
-      <ValueSearch
-        table={table}
-        fieldName={"reported"}
-        options={[
-          { value: "true", text: "All" },
-          { value: "false", text: "Hide Reported Word" },
-        ]}
-      />
-    </VStack>
+    </KeywordBaseFilters>
   );
 };
 
 const ReportWord = ({ row }: KeywordReportCellProps) => {
-  const { word } = row.original;
-  const { reported } = row.original;
+  const { word, reported } = row.original;
 
   const authState = useSelector((state: RootState) => state.authState);
 
-  const { mutate, isPending, isError, error } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: sendingData,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ignored-words"] });
-      queryClient.invalidateQueries({ queryKey: ["keywords"] });
-    },
+    onSuccess: invalidateKeywordQueries,
   });
 
   function addIgnoredWord() {
@@ -210,10 +180,7 @@ const ReportWord = ({ row }: KeywordReportCellProps) => {
           language: "en",
         },
       ],
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authState.token}`,
-      },
+      headers: createAuthHeaders(authState.token),
     });
   }
 

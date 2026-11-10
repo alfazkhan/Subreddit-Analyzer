@@ -1,9 +1,8 @@
 import { useState } from "react";
-import type { ComponentType, Dispatch, SetStateAction } from "react";
+import type { ComponentType } from "react";
 import {
   type ColumnDef,
   type Header,
-  type PaginationState,
   type RowData,
   type Table as ReactTable,
   type TableOptions,
@@ -14,17 +13,14 @@ import {
   getFilteredRowModel,
   getSortedRowModel,
 } from "@tanstack/react-table";
-import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import {
   Table,
   Box,
-  Pagination,
-  ButtonGroup,
-  IconButton,
   Stack,
   Text,
 } from "@chakra-ui/react";
 import { FaArrowDown, FaArrowUp, FaMinus } from "react-icons/fa";
+import DataPagination from "./DataPagination";
 
 type TableComponentProps<TData extends RowData> = {
   table: ReactTable<TData>;
@@ -169,108 +165,59 @@ export default function TanStackDataTable<TData extends RowData>({
         </Table.Body>
       </Table.Root>
       {!manualPagination && (
-        <TablePagination table={table} setPagination={setPagination} />
+        <DataPagination
+          totalItems={table.getRowCount()}
+          pageSize={table.getState().pagination.pageSize}
+          currentPage={table.getState().pagination.pageIndex + 1}
+          onPageChange={(page) =>
+            setPagination((prev) => ({ ...prev, pageIndex: page - 1 }))
+          }
+          hideWhenSinglePage={false}
+        />
       )}
     </Stack>
   );
 }
 
-function TablePagination<TData extends RowData>({
-  table,
-  setPagination,
-}: {
-  table: ReactTable<TData>;
-  setPagination: Dispatch<SetStateAction<PaginationState>>;
-}) {
-  return (
-    <>
-      <Pagination.Root
-        count={table.getRowCount()}
-        pageSize={table.getState().pagination.pageSize}
-        page={table.getState().pagination.pageIndex + 1}
-        onPageChange={(e) => {
-          setPagination((prev) => ({ ...prev, pageIndex: e.page - 1 }));
-        }}
-      >
-        <ButtonGroup variant="ghost" size="sm" wrap="wrap" mt={3}>
-          <Pagination.PrevTrigger asChild color="gray.100">
-            <IconButton>
-              <LuChevronLeft />
-            </IconButton>
-          </Pagination.PrevTrigger>
-
-          <Pagination.Items
-            render={(page) => (
-              <IconButton
-                variant={{ base: "ghost", _selected: "outline" }}
-                color="gray.100"
-              >
-                {page.value}
-              </IconButton>
-            )}
-          />
-
-          <Pagination.NextTrigger asChild color="gray.100">
-            <IconButton>
-              <LuChevronRight />
-            </IconButton>
-          </Pagination.NextTrigger>
-        </ButtonGroup>
-      </Pagination.Root>
-    </>
-  );
-};
+const RESIZER_HANDLES = [
+  { right: 0, hideWhenIdle: true },
+  { right: -1, hideWhenIdle: false },
+] as const;
 
 function Resizer<TData extends RowData, TValue>({
   header,
 }: {
   header: Header<TData, TValue>;
 }) {
+  if (!header.column.getCanResize()) {
+    return <div />;
+  }
+
+  const isResizing = header.column.getIsResizing();
+
   return (
     <div>
-      {header.column.getCanResize() && (
+      {RESIZER_HANDLES.map(({ right, hideWhenIdle }) => (
         <Box
+          key={right}
           as="div"
           position="absolute"
-          right={0}
+          right={right}
           top="50%"
           transform="translateY(-50%)"
-          height={header.column.getIsResizing() ? "20px" : "20px"}
-          width={header.column.getIsResizing() ? "4px" : "10px"}
-          background={header.column.getIsResizing() ? "orange.600" : "gray.500"}
-          display={header.column.getIsResizing() ? "block" : "none"}
+          height="20px"
+          width={isResizing ? "4px" : "10px"}
+          background={isResizing ? "orange.600" : "gray.500"}
+          display={hideWhenIdle && !isResizing ? "none" : "block"}
           borderRadius={5}
           cursor="col-resize"
           userSelect="none"
           touchAction="none"
           onMouseDown={header.getResizeHandler()}
           onTouchStart={header.getResizeHandler()}
-          className={`resizer ${
-            header.column.getIsResizing() ? "isResizing" : ""
-          }`}
+          className={`resizer ${isResizing ? "isResizing" : ""}`}
         />
-      )}
-      {header.column.getCanResize() && (
-        <Box
-          as="div"
-          position="absolute"
-          right={-1}
-          top="50%"
-          transform="translateY(-50%)"
-          height={header.column.getIsResizing() ? "20px" : "20px"}
-          width={header.column.getIsResizing() ? "4px" : "10px"}
-          background={header.column.getIsResizing() ? "orange.600" : "gray.500"}
-          borderRadius={5}
-          cursor="col-resize"
-          userSelect="none"
-          touchAction="none"
-          onMouseDown={header.getResizeHandler()}
-          onTouchStart={header.getResizeHandler()}
-          className={`resizer ${
-            header.column.getIsResizing() ? "isResizing" : ""
-          }`}
-        />
-      )}
+      ))}
     </div>
   );
-};
+}

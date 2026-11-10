@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import EChartsReact from "react-echarts-library";
 import type { EChartsOption } from "echarts";
-import { KPI_METRICS } from "./kpiMetrics";
+import { KPI_METRICS } from "./KPIHelpers";
 
 export interface KPIAnalyticsChartProps {
   timeSeriesData: Array<Record<string, unknown>>;

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import Header from "../../ui-components/Header";
+import { Header } from "../../ui-components/Layout";
 import IgnoredWordsSection from "./Ignored-Words/IgnoredWordsSection";
 import ReanalyzeSection from "./ReanalyzeSection";
 import { Flex, Tabs } from "@chakra-ui/react";
@@ -8,6 +8,7 @@ import LogoutButton from "./LogoutButton";
 import UsersSection from "./Users/UsersSection";
 import { useSelector } from "react-redux";
 import ProcessQueueSection from "./ProcessQueueSection";
+import { ORANGE_TABS_CSS, ORANGE_TABS_OPEN_ANIMATION } from "@/util/constants";
 import type { RootState } from "@/util/Types";
 
 const tabsConfig = {
@@ -35,13 +36,8 @@ export default function AdminDashboard() {
         orientation="horizontal"
         fitted
         lazyMount
-        css={{
-          "--tabs-indicator-bg": "colors.orange.600",
-          "--tabs-indicator-color": "colors.orange.600",
-        }}
-        _open={{
-          animation: "fade-in 800ms ease-out",
-        }}
+        css={ORANGE_TABS_CSS}
+        _open={ORANGE_TABS_OPEN_ANIMATION}
       >
         <Tabs.List>
           {Object.entries(tabsConfig).map(([tab, allowedRoles]) => {

@@ -2,20 +2,17 @@ import { useMemo, useState } from "react";
 import {
   Table,
   HStack,
-  Alert,
-  CloseButton,
   Text,
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchingData } from "@/util/http";
-import LoadingAndError from "@/components/ui-components/LoadingAndError";
+import { createAuthHeaders, fetchingData } from "@/util/api";
+import { LoadingAndError, PortalAlert } from "@/components/ui-components/Feedback";
 import NewUser from "./NewUser";
 import DeleteUser from "./DeleteUser";
 import EditUser from "./EditUser";
 import GenerateAPIKey from "./GenerateAPIKey";
-import paginationDataSlicer from "@/util/paginationDataSlicer";
+import { paginationDataSlicer } from "@/util/data";
 import DataTable from "@/components/ui-components/Data Table/DataTable";
-import { createPortal } from "react-dom";
 import { useSelector } from "react-redux";
 import type { AdminUser, RootState } from "@/util/Types";
 
@@ -37,11 +34,8 @@ export default function UsersSection() {
       fetchingData({
         endpoint: "users",
         signal,
-        headers: { Authorization: `Bearer ${token}` },
-      },
-      ),
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 5,
+        headers: createAuthHeaders(token, false),
+      }),
   });
 
   const paginatedSlice: AdminUser[] = useMemo(
@@ -55,29 +49,17 @@ export default function UsersSection() {
     );
   }
 
-  const successMessageContainer = document.getElementById("success-message");
-
   return (
     <>
       <div id="success-message" />
-      {deletedUserInfo &&
-        successMessageContainer &&
-        createPortal(
-          <Alert.Root status="warning" variant="solid" my="3">
-            <Alert.Indicator />
-            <Alert.Content>
-              <Alert.Title>Deleted! (id: {deletedUserInfo.id})</Alert.Title>
-              <Alert.Description>{`${deletedUserInfo.name}'s account has been successfully deleted!`}</Alert.Description>
-            </Alert.Content>
-            <CloseButton
-              pos="relative"
-              top="-2"
-              insetEnd="-2"
-              onClick={() => setDeletedUserInfo(null)}
-            />
-          </Alert.Root>,
-          successMessageContainer,
-        )}
+      <PortalAlert
+        open={Boolean(deletedUserInfo)}
+        status="warning"
+        my="3"
+        title={`Deleted! (id: ${deletedUserInfo?.id})`}
+        description={`${deletedUserInfo?.name}'s account has been successfully deleted!`}
+        onClose={() => setDeletedUserInfo(null)}
+      />
 
       <NewUser />
       <DataTable

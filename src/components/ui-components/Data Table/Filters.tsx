@@ -1,6 +1,8 @@
-import { HStack, Input, NativeSelect, Slider } from "@chakra-ui/react";
-import type { ComponentProps } from "react";
+import { HStack, Input, NativeSelect, Slider, VStack } from "@chakra-ui/react";
+import type { ComponentProps, ReactNode } from "react";
 import type { RowData, Table } from "@tanstack/react-table";
+import { findMinMax } from "@/util/data";
+import { REPORTED_WORD_FILTER_OPTIONS } from "@/util/constants";
 
 type TextSearchProps<TData extends RowData> = {
   table: Table<TData>;
@@ -78,27 +80,6 @@ export function ValueSearch<TData extends RowData>({
   );
 }
 
-function findMinMax(keywords: readonly { frequency?: unknown }[] | undefined) {
-  if (!keywords || keywords.length === 0) {
-    return [0, 100];
-  }
-
-  let min = Infinity;
-  let max = 0;
-
-  keywords.forEach((word) => {
-    const freq = Number(word.frequency) || 0;
-    if (freq < min) min = freq;
-    if (freq > max) max = freq;
-  });
-
-  if (min === max) {
-    return [0, max || 100];
-  }
-
-  return [min, max];
-}
-
 export function RangeFilter<TData extends { frequency?: unknown }>({
   table,
   fieldName,
@@ -132,5 +113,34 @@ export function RangeFilter<TData extends { frequency?: unknown }>({
         <Slider.Thumb index={1} />
       </Slider.Control>
     </Slider.Root>
+  );
+}
+
+/**
+ * Shared keyword search + reported status filter group used across keyword tables.
+ */
+export function KeywordBaseFilters<TData extends RowData>({
+  table,
+  children,
+}: {
+  table?: Table<TData>;
+  children?: ReactNode;
+}) {
+  if (!table) return <></>;
+
+  return (
+    <VStack>
+      <TextSearch
+        fieldName="word"
+        placeholder="Search Keyword..."
+        table={table}
+      />
+      {children}
+      <ValueSearch
+        table={table}
+        fieldName="reported"
+        options={REPORTED_WORD_FILTER_OPTIONS}
+      />
+    </VStack>
   );
 }

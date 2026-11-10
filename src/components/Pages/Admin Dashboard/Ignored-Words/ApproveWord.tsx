@@ -1,4 +1,8 @@
-import { queryClient, editingData } from "@/util/http";
+import {
+  createAuthHeaders,
+  editingData,
+  invalidateKeywordQueries,
+} from "@/util/api";
 import { Button } from "@chakra-ui/react";
 import type { CellContext } from "@tanstack/react-table";
 import { useMutation } from "@tanstack/react-query";
@@ -13,10 +17,7 @@ export default function ApproveWord({
 
   const { mutate, isPending } = useMutation({
     mutationFn: editingData,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ignored-words"] });
-      queryClient.invalidateQueries({ queryKey: ["keywords"] });
-    },
+    onSuccess: invalidateKeywordQueries,
   });
 
   function ignoredWordApprovalHandler(
@@ -27,10 +28,7 @@ export default function ApproveWord({
       endpoint: `ignored-words/${encodeURIComponent(ignoredWord.word)}`,
       signal: undefined,
       body: { approved },
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: createAuthHeaders(token),
     });
   }
 

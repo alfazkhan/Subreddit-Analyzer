@@ -12,6 +12,7 @@ import {
 } from '@chakra-ui/react'
 import * as React from 'react'
 import { LuEye, LuEyeOff } from 'react-icons/lu'
+import { getColorPalette } from '@/util/data'
 import type {
   PasswordInputProps,
   PasswordStrengthMeterProps,
@@ -113,14 +114,3 @@ export const PasswordStrengthMeter = React.forwardRef<HTMLDivElement, PasswordSt
     )
   },
 )
-
-function getColorPalette(percent: number): { label: string; colorPalette: string } {
-  switch (true) {
-    case percent < 33:
-      return { label: 'Low', colorPalette: 'red' }
-    case percent < 66:
-      return { label: 'Medium', colorPalette: 'orange' }
-    default:
-      return { label: 'High', colorPalette: 'green' }
-  }
-}

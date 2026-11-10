@@ -1,18 +1,13 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   Flex,
   Box,
   Text,
-  HStack,
-  Field,
-  NumberInput,
-  Input,
   Heading,
 } from "@chakra-ui/react";
-import LoadingAndError from "@/components/ui-components/LoadingAndError";
-import { fetchingData } from "@/util/http";
+import { LoadingAndError } from "@/components/ui-components/Feedback";
+import { keywordsQueryOptions } from "@/util/api";
 import { useQuery } from "@tanstack/react-query";
-import type { KeywordItem } from "@/util/Types";
 
 export default function KeywordsWordCloud() {
   const {
@@ -21,13 +16,7 @@ export default function KeywordsWordCloud() {
     isLoading,
     isError,
     error,
-  } = useQuery<KeywordItem[]>({
-    queryKey: ["keywords"],
-    queryFn: ({ signal }) =>
-      fetchingData({ endpoint: "posts/keywords", signal }),
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 5,
-  });
+  } = useQuery(keywordsQueryOptions);
 
 
   const currentMaxValue = useMemo(() => {

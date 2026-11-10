@@ -4,21 +4,25 @@ import {
   VStack,
   Blockquote,
   Text,
-  Checkbox,
   Flex,
-  Center,
-  Spinner,
   Highlight,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
-import ProgressBar from "../../ui-components/ProgressBar";
-import formatTime from "../../../util/formatTime";
+import { CenteredSpinner, ProgressBar } from "../../ui-components/Feedback";
+import { CheckboxField, DateSelector } from "@/components/ui-components/FormControls";
+import { formatTime, getYearStartToToday } from "@/util/dateTime";
+import { createAuthHeaders } from "@/util/api";
+import { toggleArrayItem } from "@/util/data";
 import { useSelector } from "react-redux";
-import DateSelector from "../../ui-components/DateSelector";
-import { BASE_URL, wsUrl } from "../../../Constants";
+import { BASE_URL, wsUrl } from "@/util/constants";
 import type { ReanalyzeSocketMessage, RootState } from "@/util/Types";
 
 const analysisTypesValues = ["Keywords", "Sentiment", "Entities", "Topic"];
+const controlActions = [
+  { action: "pause", label: "Pause" },
+  { action: "resume", label: "Resume" },
+  { action: "stop", label: "Stop" },
+] as const;
 
 export default function ReanalyzeSection() {
   const [progress, setProgress] = useState(0);
@@ -34,13 +38,9 @@ export default function ReanalyzeSection() {
   const [subredditIDS, setSubredditIDS] = useState<number[]>([]);
   const [analysisTypes, setAnalysisTypes] = useState<string[]>([]);
   const [onlyNull, setOnlyNull] = useState(false);
-  const date = new Date();
-
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const currentDate = `${date.getFullYear()}-${month}-${day}`;
+  const { start: defaultStart, end: currentDate } = getYearStartToToday();
   const [dateRange, setDateRange] = useState<[string, string]>([
-    "2026-01-01",
+    defaultStart,
     currentDate,
   ]);
 
@@ -65,9 +65,7 @@ export default function ReanalyzeSection() {
 
         const response = await fetch(`${BASE_URL}/ws/ticket`, {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: createAuthHeaders(token, false),
         });
 
         if (!response.ok) {
@@ -181,42 +179,26 @@ export default function ReanalyzeSection() {
     if (type === "Keywords") {
       selectAllSubreddits();
     }
-
-    const currentTypes = [...analysisTypes];
-    const index = currentTypes.findIndex((value) => value === type.toLowerCase());
-    if (index === -1 && checked) {
-      currentTypes.push(type.toLowerCase());
-      setAnalysisTypes(currentTypes);
-    } else if (index !== -1) {
-      currentTypes.splice(index, 1);
-      setAnalysisTypes(currentTypes);
-    }
+    setAnalysisTypes((prev) => toggleArrayItem(prev, type.toLowerCase(), checked));
   }
 
   function handleSubredditIDS(
     id: number,
     checked: boolean | "indeterminate",
   ) {
-    const currentIDS = [...subredditIDS];
-    const index = currentIDS.findIndex((value) => value === id);
-    if (index === -1 && checked) {
-      currentIDS.push(id);
-      setSubredditIDS(currentIDS);
-    } else if (index !== -1) {
-      currentIDS.splice(index, 1);
-      setSubredditIDS(currentIDS);
-    }
+    setSubredditIDS((prev) => toggleArrayItem(prev, id, checked));
   }
 
-  const sendAction = (actionName: "start" | "pause" | "stop") => {
+  const preparePauseOrStop = (actionName: "start" | "pause" | "resume" | "stop") => {
     if (actionName === "pause" || actionName === "stop") {
       setLoading(true);
-    }
-
-    if (actionName === "stop" || actionName === "pause") {
       lastTimeRef.current = null;
       setTimeRemaining("");
     }
+  };
+
+  const sendAction = (actionName: "start" | "pause" | "stop") => {
+    preparePauseOrStop(actionName);
 
     if (analysisTypes.includes("keywords")) {
       selectAllSubreddits();
@@ -249,11 +231,7 @@ export default function ReanalyzeSection() {
   const sendControlAction = (
     actionName: "pause" | "resume" | "stop",
   ) => {
-    if (actionName === "pause" || actionName === "stop") setLoading(true);
-    if (actionName === "stop" || actionName === "pause") {
-      lastTimeRef.current = null;
-      setTimeRemaining("");
-    }
+    preparePauseOrStop(actionName);
     if (socketRef.current?.readyState === WebSocket.OPEN) {
       socketRef.current.send(JSON.stringify({ action: actionName }));
     }
@@ -285,17 +263,15 @@ export default function ReanalyzeSection() {
 
       <HStack gap={4} borderWidth={0.5} p={5} borderColor="orange.400">
         {analysisTypesValues.map((type) => (
-          <Checkbox.Root
+          <CheckboxField
             checked={analysisTypes.includes(type.toLowerCase())}
             onCheckedChange={(event) =>
               handleAnalysisTypes(type, event.checked)
             }
             key={type}
           >
-            <Checkbox.HiddenInput />
-            <Checkbox.Control />
-            <Checkbox.Label>{type}</Checkbox.Label>
-          </Checkbox.Root>
+            {type}
+          </CheckboxField>
         ))}
       </HStack>
 
@@ -308,27 +284,23 @@ export default function ReanalyzeSection() {
         gap={4}
       >
         {loadingData ? (
-          <Center h="full">
-            <Spinner
-              borderWidth="4px"
-              size="xl"
-              color="orange.600"
-              animationDuration="0.6s"
-            />
-          </Center>
+          <CenteredSpinner
+            borderWidth="4px"
+            size="xl"
+            color="orange.600"
+            animationDuration="0.6s"
+          />
         ) : (
           Object.keys(cacheSummary).map((subreddit) => (
-            <Checkbox.Root
+            <CheckboxField
               checked={subredditIDS.includes(cacheSummary[subreddit].id)}
               onCheckedChange={(event) =>
                 handleSubredditIDS(cacheSummary[subreddit].id, event.checked)
               }
               key={cacheSummary[subreddit].id}
             >
-              <Checkbox.HiddenInput />
-              <Checkbox.Control />
-              <Checkbox.Label>{subreddit}</Checkbox.Label>
-            </Checkbox.Root>
+              {subreddit}
+            </CheckboxField>
           ))
         )}
       </Flex>
@@ -344,14 +316,12 @@ export default function ReanalyzeSection() {
       </HStack>
 
       <HStack>
-        <Checkbox.Root
+        <CheckboxField
           checked={onlyNull}
           onCheckedChange={(event) => setOnlyNull(!!event.checked)}
         >
-          <Checkbox.HiddenInput />
-          <Checkbox.Control />
-          <Checkbox.Label>Only Null Fields</Checkbox.Label>
-        </Checkbox.Root>
+          Only Null Fields
+        </CheckboxField>
       </HStack>
 
       <HStack>
@@ -365,36 +335,19 @@ export default function ReanalyzeSection() {
         >
           Start Analysis
         </Button>
-        <Button
-          size="xs"
-          color="white"
-          fontWeight="black"
-          bg="orange.600"
-          disabled={loading || loadingData}
-          onClick={() => sendControlAction("pause")}
-        >
-          Pause
-        </Button>
-        <Button
-          size="xs"
-          color="white"
-          fontWeight="black"
-          bg="orange.600"
-          disabled={loading || loadingData}
-          onClick={() => sendControlAction("resume")}
-        >
-          Resume
-        </Button>
-        <Button
-          size="xs"
-          color="white"
-          fontWeight="black"
-          bg="orange.600"
-          disabled={loading || loadingData}
-          onClick={() => sendControlAction("stop")}
-        >
-          Stop
-        </Button>
+        {controlActions.map(({ action, label }) => (
+          <Button
+            key={action}
+            size="xs"
+            color="white"
+            fontWeight="black"
+            bg="orange.600"
+            disabled={loading || loadingData}
+            onClick={() => sendControlAction(action)}
+          >
+            {label}
+          </Button>
+        ))}
       </HStack>
 
       <HStack mt={5}>

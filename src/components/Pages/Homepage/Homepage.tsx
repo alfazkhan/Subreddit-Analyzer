@@ -1,13 +1,13 @@
-import { Flex, HStack, Progress } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import DataTabs from "./Data/DataTabs";
 
 import { useMutation } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
-import { fetchingData } from "@/util/http.js";
-import LoadingAndError from "@/components/ui-components/LoadingAndError";
+import { fetchingData } from "@/util/api";
+import { LoadingAndError, ProgressBar } from "@/components/ui-components/Feedback";
 import { useState } from "react";
 import SubredditsSummary from "./SubredditsSummary";
-import type { ProgressBarProps, RootState } from "@/util/Types";
+import type { RootState } from "@/util/Types";
 
 export default function Homepage() {
   const subreddit = useSelector(
@@ -57,32 +57,18 @@ export default function Homepage() {
       </Flex>
       {errorContent && errorContent}
       <Flex justifyContent="center" gap="4" margin="5" flexDirection="column">
-        {isPending && <ProgressBar progressValue={progress} />}
+        {isPending && (
+          <ProgressBar
+            value={progress}
+            processingStatus={progress < 100 ? "Downloading..." : "Downloaded"}
+            indeterminateWhenZero
+            inline
+          />
+        )}
         {showDashboard && (
           <DataTabs postsData={posts || []} processingStatus={isPending} />
         )}
       </Flex>
     </Flex>
-  );
-}
-
-function ProgressBar({ progressValue }: ProgressBarProps) {
-  return (
-    <Progress.Root
-      value={progressValue > 0 ? progressValue : null}
-      colorPalette="orange"
-      striped={progressValue > 0 && progressValue < 100}
-      animated
-    >
-      <HStack>
-        <Progress.Label>
-          {progressValue < 100 ? "Downloading..." : "Downloaded"}
-        </Progress.Label>
-        <Progress.Track flex="1">
-          <Progress.Range />
-        </Progress.Track>
-        <Progress.ValueText>{progressValue}%</Progress.ValueText>
-      </HStack>
-    </Progress.Root>
   );
 }

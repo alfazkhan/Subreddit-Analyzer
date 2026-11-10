@@ -1,9 +1,14 @@
-import { Badge, HStack, Checkbox } from "@chakra-ui/react";
+import { HStack } from "@chakra-ui/react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
-import { fetchingData } from "@/util/http";
-import LoadingAndError from "@/components/ui-components/LoadingAndError";
+import { fetchingData } from "@/util/api";
+import { createMinLengthFilterFn } from "@/util/data";
+import { LoadingAndError, StatusBadge } from "@/components/ui-components/Feedback";
 import TanStackDataTable from "@/components/ui-components/Data Table/TanstackDataTable";
+import {
+  CheckboxField,
+  getSelectionHeaderState,
+} from "@/components/ui-components/FormControls";
 import {
   TextSearch,
   ValueSearch,
@@ -16,49 +21,33 @@ import type {
 const tableColumns: ColumnDef<AdminSubreddit>[] = [
   {
     accessorKey: "id",
-    header: ({ table }) => {
-      const checked = table.getIsAllRowsSelected()
-        ? true
-        : table.getIsSomeRowsSelected()
-          ? "indeterminate"
-          : false;
-      return (
-        <Checkbox.Root
-          checked={checked}
-          onCheckedChange={(details) =>
-            table.toggleAllRowsSelected(details.checked === true)
-          }
-        >
-          <Checkbox.HiddenInput />
-          <Checkbox.Control />
-        </Checkbox.Root>
-      );
-    },
+    header: ({ table }) => (
+      <CheckboxField
+        checked={getSelectionHeaderState(table)}
+        onCheckedChange={(details) =>
+          table.toggleAllRowsSelected(details.checked === true)
+        }
+      />
+    ),
     cell: ({ row, getValue }) => (
-      <Checkbox.Root
+      <CheckboxField
         checked={row.getIsSelected()}
         disabled={!row.getCanSelect()}
         onCheckedChange={(details) =>
           row.toggleSelected(details.checked === true)
         }
       >
-        <Checkbox.HiddenInput />
-        <Checkbox.Control />
         {String(getValue())}
-      </Checkbox.Root>
+      </CheckboxField>
     ),
     size: 50,
     enableSorting: false,
-  }, 
+  },
   {
     accessorKey: "name",
     header: "Name",
     cell: ({ getValue }) => String(getValue() ?? ""),
-    filterFn: (row, columnID, filterValue) => {
-      const value = row.getValue<string>(columnID);
-      const query = String(filterValue ?? "");
-      return query.length < 3 || value.toLowerCase().includes(query.toLowerCase());
-    },
+    filterFn: createMinLengthFilterFn<AdminSubreddit>(3),
   },
   {
     accessorKey: "description",
@@ -73,27 +62,27 @@ const tableColumns: ColumnDef<AdminSubreddit>[] = [
   {
     accessorKey: "is_active",
     header: "Active",
-    cell: ({ getValue }) => {
-      const isActive = Boolean(getValue());
-      return (
-        <Badge variant="solid" colorPalette={isActive ? "green" : "gray"}>
-          {isActive ? "Active" : "Not Active"}
-        </Badge>
-      );
-    },
+    cell: ({ getValue }) => (
+      <StatusBadge
+        active={Boolean(getValue())}
+        trueLabel="Active"
+        falseLabel="Not Active"
+        trueColorPalette="green"
+      />
+    ),
     filterFn: "equals",
   },
   {
     accessorKey: "keep_updated",
     header: "Updated",
-    cell: ({ getValue }) => {
-      const isUpdated = Boolean(getValue());
-      return (
-        <Badge variant="solid" colorPalette={isUpdated ? "blue" : "gray"}>
-          {isUpdated ? "Updated" : "Not Updated"}
-        </Badge>
-      );
-    },
+    cell: ({ getValue }) => (
+      <StatusBadge
+        active={Boolean(getValue())}
+        trueLabel="Updated"
+        falseLabel="Not Updated"
+        trueColorPalette="blue"
+      />
+    ),
     filterFn: "equals",
   },
   {
@@ -114,8 +103,6 @@ export default function SubredditsSection() {
     queryKey: ["subreddits"],
     queryFn: ({ signal }) =>
       fetchingData({ endpoint: "subreddits", signal, headers: {} }),
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 5,
   });
 
   if (isError || isPending || isLoading) {

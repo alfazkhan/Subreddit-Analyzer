@@ -10,15 +10,14 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import Header from "@/components/ui-components/Header";
+import { Header } from "@/components/ui-components/Layout";
 import { PasswordInput } from "@/components/ui/password-input";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { BASE_URL } from "@/Constants";
+import { fetchUserCredentials } from "@/util/api";
 import { useDispatch, useSelector } from "react-redux";
 import { authSliceActions } from "@/store/authSlice";
 import { useNavigate } from "react-router-dom";
-import Loading from "@/components/ui-components/LoadingAndError";
-import type { AuthCredentials, RootState } from "@/util/Types";
+import type { RootState } from "@/util/Types";
 
 export default function Login() {
   const [email, setEmail] = useState<string>("");
@@ -47,21 +46,7 @@ export default function Login() {
         password,
       );
 
-      const token = await userCredentials.user.getIdToken();
-
-      const response = await fetch(`${BASE_URL}/users/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!response.ok) throw new Error("Database profile sync failed."); //Throwing error if there's a user mismatch
-
-      const dbUser = await response.json();
-
-      const credentials: AuthCredentials = {
-        user: { uid: userCredentials.user.uid, email, name: dbUser.name },
-        token: token,
-        role: dbUser.role,
-      };
+      const credentials = await fetchUserCredentials(userCredentials.user);
 
       dispatch(authSliceActions.setCredentials(credentials));
 

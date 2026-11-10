@@ -16,7 +16,9 @@ import {
 import { useEffect, useState } from "react";
 import TanStackDataTable from "@/components/ui-components/Data Table/TanstackDataTable";
 import { useMutation } from "@tanstack/react-query";
-import { fetchingData } from "@/util/http";
+import { fetchingData } from "@/util/api";
+import { getRedditPostUrl } from "@/util/data";
+import { SENTIMENT_FILTER_CONFIG } from "@/util/constants";
 import { LuChevronDown } from "react-icons/lu";
 import { FaChevronLeft } from "react-icons/fa6";
 import { FaChevronRight } from "react-icons/fa";
@@ -28,7 +30,6 @@ import type {
   PostTableCellProps,
   PostTitleCellProps,
   PostTimestampProps,
-  RedditPost,
   TopicsCellProps,
 } from "@/util/Types";
 
@@ -113,7 +114,9 @@ export default function PaginatedPostTable() {
             cell: (props) => (
               <Text
                 color={
-                    config.find((element) => props.getValue<string>() === element.label)?.color ?? "gray.400"
+                  SENTIMENT_FILTER_CONFIG.find(
+                    (element) => props.getValue<string>() === element.label,
+                  )?.color ?? "gray.400"
                 }
               >
                 {props.getValue<string>()}
@@ -182,7 +185,7 @@ function PostTitle({ row }: PostTitleCellProps) {
   return (
     <Link
       color="blue.400"
-      href={`https://www.reddit.com/r/${subreddit_name}/comments/${id.substring(3)}`}
+      href={getRedditPostUrl(subreddit_name, id)}
     >
       {title}
     </Link>
@@ -389,54 +392,3 @@ const labelConfig = {
   //   color: "gray",
   // },
 };
-
-const config = [
-  { emoji: "", color: "#009637", label: "All" },
-  { emoji: "😊", color: "#009637", label: "Positive" },
-  { emoji: "😐", color: "#52719c", label: "Neutral" },
-  { emoji: "😠", color: "#aa0505", label: "Negative" },
-];
-
-const topicsConfig = [
-  // # Housing & Living Accommodations
-  "Rent Prices & Affordability",
-  "Apartment Viewings & Contracts",
-  "Flatmates & Shared Housing",
-  "Landlord Disputes & Evictions",
-  "Utility Bills & Energy Costs",
-  "Home Maintenance & Damage Repairs",
-
-  // # Public Transit & Urban Mobility
-  "Subway, Tram & Train Schedules",
-  "Bus Routes & Reliability",
-  "Transit Passes & Ticket Pricing",
-  "Bicycle Lanes & Cycling Safety",
-  "Traffic Congestion & Roadwork",
-  "City Parking & Driving Permits",
-
-  // # Local Administration, Law & Politics
-  "City Registration & Paperwork",
-  "Visas & Residence Permits",
-  "Local Elections & Candidates",
-  "City Council Policies & Budgets",
-  "Protests, Strikes & Demonstrations",
-
-  // # Jobs & Daily Economy
-  "Job Postings & Career Advice",
-  "Student Shifts & Part-Time Work",
-  "Supermarket Prices & Groceries",
-  "Salaries & Cost of Living Rants",
-
-  // # Social Life, Culture & Recreation
-  "Restaurant & Cafe Reviews",
-  "Bars, Nightclubs & Nightlife",
-  "Street Food & Local Cuisines",
-  "Festivals, Concerts & Public Events",
-  "Museums, Art & Theater",
-  "Amateur Sports & Fitness Groups",
-
-  // # Public Safety & Travel
-  "Tourist Attractions & Sightseeing",
-  "Neighborhood Safety & Crime Alerts",
-  "Lost Items & Found Belongings",
-];

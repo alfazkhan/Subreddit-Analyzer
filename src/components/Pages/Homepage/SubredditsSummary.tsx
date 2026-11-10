@@ -9,6 +9,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
+import { dateTimeFormatter } from "@/util/dateTime";
 import type { RootState, SubredditsSummaryProps } from "@/util/Types";
 
 export default function SubredditsSummary({
@@ -66,44 +67,4 @@ export default function SubredditsSummary({
       </Button>
     </VStack>
   );
-}
-
-function dateTimeFormatter(rawTimestamp: string | undefined) {
-  if (!rawTimestamp) return "N/A";
-
-  const targetDate = new Date(rawTimestamp);
-  if (isNaN(targetDate.getTime())) return "Invalid Date";
-
-  const timeString = targetDate
-    .toLocaleTimeString("en-GB", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    })
-    .toUpperCase();
-
-  const targetDay = new Date(targetDate);
-  targetDay.setHours(0, 0, 0, 0);
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
-
-  if (targetDay.getTime() === today.getTime()) {
-    return `Today at ${timeString}`;
-  }
-
-  if (targetDay.getTime() === yesterday.getTime()) {
-    return `Yesterday at ${timeString}`;
-  }
-
-  const fullDateString = targetDate.toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-
-  return `${fullDateString} ${timeString}`;
 }

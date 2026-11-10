@@ -11,14 +11,18 @@ import {
   Button,
   Input,
   Text,
-  Spinner,
-  Center,
 } from "@chakra-ui/react";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-import { fetchingData } from "@/util/http";
+import { stringToColor } from "@/util/data";
+import { keywordsQueryOptions } from "@/util/api";
 import { useQuery } from "@tanstack/react-query";
-import LoadingAndError from "@/components/ui-components/LoadingAndError";
-import type { KeywordItem } from "@/util/Types";
+import { LoadingAndError } from "@/components/ui-components/Feedback";
+
+const sumNumericData = (datasetData: readonly unknown[]) =>
+  datasetData.reduce<number>(
+    (acc, curr) => acc + (typeof curr === "number" ? curr : 0),
+    0,
+  );
 
 // Adds padding between the legend and the chart
 const legendMarginPlugin = {
@@ -42,24 +46,8 @@ ChartJS.register(
   legendMarginPlugin,
 );
 
-// Deterministic color generator based on the keyword string
-function stringToColor(str: string): string {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const h = Math.abs(hash) % 360;
-  return `hsl(${h}, 70%, 50%)`;
-}
-
 export default function KeywordsPieChart() {
-  const { data, isLoading, isPending, isError, error } = useQuery<KeywordItem[]>({
-    queryKey: ["keywords"],
-    queryFn: ({ signal }) =>
-      fetchingData({ endpoint: "posts/keywords", signal }),
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 5,
-  });
+  const { data, isLoading, isPending, isError, error } = useQuery(keywordsQueryOptions);
 
   // --- 1. Core Filter States ---
   const [minValue, setMinValue] = useState(20);
@@ -127,10 +115,7 @@ export default function KeywordsPieChart() {
         callbacks: {
           label: (context) => {
             const value = typeof context.parsed === "number" ? context.parsed : 0;
-            const total = context.dataset.data.reduce<number>(
-              (acc, curr) => acc + (typeof curr === "number" ? curr : 0),
-              0,
-            );
+            const total = sumNumericData(context.dataset.data);
             const percentage =
               total > 0 ? ((value / total) * 100).toFixed(1) + "%" : "0%";
             return ` ${context.label ?? ""}: ${value.toLocaleString()} (${percentage})`;
@@ -140,15 +125,12 @@ export default function KeywordsPieChart() {
       datalabels: {
         color: "white",
         font: { weight: "bold", size: 12 },
-        formatter: (value, context) => {
+        formatter: (_value, context) => {
           return context.chart.data.labels?.[context.dataIndex] ?? "";
         },
         display: (context) => {
           const dataset = context.dataset.data;
-          const total = dataset.reduce<number>(
-            (sum, item) => sum + (typeof item === "number" ? item : 0),
-            0,
-          );
+          const total = sumNumericData(dataset);
           const value = Number(dataset[context.dataIndex] ?? 0);
           return total > 0 && value / total > 0.03; // Hide labels on tiny slivers (<3%)
         },
@@ -181,37 +163,26 @@ export default function KeywordsPieChart() {
         wrap="wrap"
         gap={4}
       >
-        <Field.Root required width="auto">
-          <Field.Label fontSize="xs" color="whiteAlpha.700">
-            Min Frequency
-          </Field.Label>
-          <NumberInput.Root
-            value={String(minValue)}
-            allowMouseWheel
-            onValueChange={(details) => setMinValue(details.valueAsNumber)}
-            size="sm"
-            color="white"
-          >
-            <NumberInput.Control />
-            <NumberInput.Input />
-          </NumberInput.Root>
-        </Field.Root>
-
-        <Field.Root required width="auto">
-          <Field.Label fontSize="xs" color="whiteAlpha.700">
-            Max Frequency
-          </Field.Label>
-          <NumberInput.Root
-            value={String(maxValue)}
-            allowMouseWheel
-            onValueChange={(details) => setMaxValue(details.valueAsNumber)}
-            size="sm"
-            color="white"
-          >
-            <NumberInput.Control />
-            <NumberInput.Input />
-          </NumberInput.Root>
-        </Field.Root>
+        {[
+          { label: "Min Frequency", value: minValue, onChange: setMinValue },
+          { label: "Max Frequency", value: maxValue, onChange: setMaxValue },
+        ].map((bound) => (
+          <Field.Root key={bound.label} required width="auto">
+            <Field.Label fontSize="xs" color="whiteAlpha.700">
+              {bound.label}
+            </Field.Label>
+            <NumberInput.Root
+              value={String(bound.value)}
+              allowMouseWheel
+              onValueChange={(details) => bound.onChange(details.valueAsNumber)}
+              size="sm"
+              color="white"
+            >
+              <NumberInput.Control />
+              <NumberInput.Input />
+            </NumberInput.Root>
+          </Field.Root>
+        ))}
 
         <Field.Root flex="1" minW="200px">
           <Field.Label fontSize="xs" color="whiteAlpha.700">

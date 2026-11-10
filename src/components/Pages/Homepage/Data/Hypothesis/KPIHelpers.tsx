@@ -1,4 +1,9 @@
 import type { ReactNode } from "react";
+import type { HypothesisResponse } from "@/util/Types";
+
+export type { HypothesisResponse };
+
+// ── KPI Metric definitions (merged from kpiMetrics.tsx) ──────────────
 
 export interface KpiMetric {
   rawKey: string;
@@ -24,3 +29,13 @@ export const KPI_METRICS: KpiMetric[] = [
   { rawKey: "avg_score", smaKey: "avg_score", label: "Avg Score (Karma)", color: "#FF9900", axis: "right" },
   { rawKey: "avg_num_comments", smaKey: "avg_num_comments", label: "Avg Comments", color: "#3182CE", axis: "right" },
 ];
+
+/**
+ * Definition for a hypothesis tab that can be rendered conditionally based on response data.
+ */
+export interface HypothesisTabDefinition<TResponse> {
+  value: string;
+  label: string;
+  render: (response: TResponse) => ReactNode;
+  getPassed?: (response: TResponse) => boolean;
+}

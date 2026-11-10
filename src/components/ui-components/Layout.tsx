@@ -1,8 +1,24 @@
-import { Badge, Flex, Spinner } from "@chakra-ui/react";
 import { memo } from "react";
+import { Badge, Flex, Heading, Highlight, HStack, Spinner } from "@chakra-ui/react";
 import { CgShapeCircle } from "react-icons/cg";
 import { useSelector } from "react-redux";
-import type { RootState, ServerStatusConfig } from "@/util/Types";
+import type { HeaderProps, RootState, ServerStatusConfig } from "@/util/Types";
+
+// ── Header ─────────────────────────────────────────────────────────
+
+export function Header({ text, highlight }: HeaderProps) {
+  return (
+    <HStack gap={10}>
+      <Heading size="5xl">
+        <Highlight query={highlight ?? ""} styles={{ color: "orange.600" }}>
+          {text}
+        </Highlight>
+      </Heading>
+    </HStack>
+  );
+}
+
+// ── ServerStatus ───────────────────────────────────────────────────
 
 const config: ServerStatusConfig = {
   checking: {
@@ -25,7 +41,7 @@ const config: ServerStatusConfig = {
   },
 };
 
-function ServerStatus() {
+function ServerStatusComponent() {
   const status = useSelector(
     (state: RootState) => state.serverStatusState.serverStatus,
   );
@@ -48,4 +64,4 @@ function ServerStatus() {
   );
 }
 
-export default memo(ServerStatus);
+export const ServerStatus = memo(ServerStatusComponent);

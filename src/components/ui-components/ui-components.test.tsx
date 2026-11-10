@@ -1,10 +1,20 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { ChakraUIProvider } from "./provider";
-import DateSelector from "./DateSelector";
-import Header from "./Header";
-import LoadingAndError from "./LoadingAndError";
-import ProgressBar from "./ProgressBar";
+import { ChakraUIProvider } from "./ChakraPrimitives";
+import DataPagination from "./Data Table/DataPagination";
+import {
+  LoadingAndError,
+  PortalAlert,
+  ProgressBar,
+  QueryStateView,
+  StatusBadge,
+} from "./Feedback";
+import {
+  CheckboxField,
+  DateSelector,
+  FilterChipRow,
+} from "./FormControls";
+import { Header } from "./Layout";
 import { PasswordInput } from "../ui/password-input";
 
 function renderWithChakra(ui: React.ReactNode) {
@@ -64,5 +74,58 @@ describe("shared UI components", () => {
     expect(input).toHaveAttribute("type", "password");
     fireEvent.pointerDown(toggle, { button: 0 });
     expect(input).toHaveAttribute("type", "text");
+  });
+
+  it("renders StatusBadge, FilterChipRow, CheckboxField, QueryStateView, PortalAlert, and DataPagination", () => {
+    const onSelect = vi.fn();
+    const onClose = vi.fn();
+
+    renderWithChakra(
+      <>
+        <div id="test-alert-portal" />
+        <StatusBadge active={false} trueLabel="Active" falseLabel="Not Active" />
+        <FilterChipRow
+          title="Filter Posts By"
+          options={[
+            { value: "All", label: "All" },
+            { value: "Positive", label: "Positive", emoji: "😊" },
+          ]}
+          selectedValue="All"
+          onSelect={onSelect}
+        />
+        <CheckboxField checked>Keywords</CheckboxField>
+        <QueryStateView
+          isLoading
+          loadingText="Downloading KPI..."
+          progress={55}
+        >
+          <div>Loaded content</div>
+        </QueryStateView>
+        <PortalAlert
+          open
+          status="success"
+          title="Saved!"
+          description="User created"
+          onClose={onClose}
+          portalTargetId="test-alert-portal"
+        />
+        <DataPagination
+          totalItems={5}
+          currentPage={1}
+          pageSize={10}
+          onPageChange={vi.fn()}
+          hideWhenSinglePage={false}
+        />
+      </>,
+    );
+
+    expect(screen.getByText("Not Active")).toBeVisible();
+    fireEvent.click(screen.getByText("Positive"));
+    expect(onSelect).toHaveBeenCalledWith("Positive");
+    expect(screen.getByText("Keywords")).toBeVisible();
+    expect(screen.getByText("Downloading KPI... 55%")).toBeVisible();
+    expect(screen.getByText("Saved!")).toBeVisible();
+    expect(screen.getByText("User created")).toBeVisible();
+    expect(screen.getByRole("button", { name: "page 1" })).toBeVisible();
   });
 });

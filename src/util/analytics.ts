@@ -1,21 +1,117 @@
-import type { ThesisStats } from "@/util/Types";
-import type { ReactNode } from "react";
+import type { EChartsOption, LineSeriesOption } from "echarts";
+import type { HypothesisResponse, ThesisStats } from "@/util/Types";
 
-/**
- * Represents the structure of statistical data for hypothesis testing.
- */
-export interface HypothesisResponse {
-  hypothesis: Record<string, unknown>;
+// ── ECharts Configuration Helpers ──────────────────────────────────
+
+export const AXIS_LABEL_STYLE = {
+  color: "#ffffff",
+  fontSize: 11,
+} as const;
+
+export function getDefaultHourlyLabels(): string[] {
+  return Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, "0")}:00`);
 }
 
 /**
- * Definition for a hypothesis tab that can be rendered conditionally based on response data.
+ * Computes a clean integer Y-axis tick interval from a set of plotted values.
  */
-export interface HypothesisTabDefinition<TResponse> {
-  value: string;
-  label: string;
-  render: (response: TResponse) => ReactNode;
-  getPassed?: (response: TResponse) => boolean;
+export function calculateDynamicGridInterval(
+  values: readonly number[],
+  desiredGridLines = 15,
+): number {
+  const maxDataValue = values.length > 0 ? Math.max(...values) : 1;
+  return Math.ceil(maxDataValue / desiredGridLines);
+}
+
+/**
+ * Creates a standardized smooth ECharts line series with top value labels.
+ */
+export function createHourlyLineSeries({
+  name,
+  data,
+  color,
+}: {
+  name: string;
+  data: number[];
+  color: string;
+}): LineSeriesOption {
+  return {
+    name,
+    type: "line",
+    data,
+    color,
+    smooth: true,
+    label: {
+      show: true,
+      position: "top",
+      color: "#ffffff",
+      fontSize: 10,
+    },
+  };
+}
+
+/**
+ * Builds the shared ECharts configuration used by hourly analytics charts.
+ */
+export function createHourlyLineChartOption({
+  labels,
+  interval,
+  series,
+  tooltip,
+  legend = { show: false },
+}: {
+  labels: string[];
+  interval: number;
+  series: LineSeriesOption[];
+  tooltip: EChartsOption["tooltip"];
+  legend?: EChartsOption["legend"];
+}): EChartsOption {
+  return {
+    tooltip,
+    animation: true,
+    animationDuration: 1500,
+    animationEasing: "cubicOut",
+    animationDurationUpdate: 1500,
+    legend,
+    xAxis: {
+      type: "category",
+      data: labels,
+      splitLine: {
+        show: true,
+        lineStyle: { width: 0.1 },
+      },
+      axisTick: {
+        alignWithLabel: true,
+      },
+      axisLabel: AXIS_LABEL_STYLE,
+    },
+    yAxis: {
+      type: "value",
+      splitLine: {
+        show: true,
+        lineStyle: { width: 0.1 },
+      },
+      interval,
+      axisLabel: AXIS_LABEL_STYLE,
+    },
+    series,
+    grid: {
+      top: 30,
+      left: 10,
+      right: 10,
+      bottom: 20,
+      containLabel: true,
+    },
+  };
+}
+
+// ── Hypothesis Statistical Helpers ─────────────────────────────────
+
+/**
+ * Safely converts an unknown value to a plain object record.
+ */
+export function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" ? (value as Record<string, unknown>) : {};
 }
 
 /**
@@ -24,7 +120,9 @@ export interface HypothesisTabDefinition<TResponse> {
 export function formatStatValue(value: unknown): string | number {
   if (value === null || value === undefined) return "N/A";
   if (typeof value !== "object") {
-    return typeof value === "number" || typeof value === "string" ? value : String(value);
+    return typeof value === "number" || typeof value === "string"
+      ? value
+      : String(value);
   }
 
   try {
@@ -35,16 +133,7 @@ export function formatStatValue(value: unknown): string | number {
 }
 
 /**
- * Converts a generic value to a plain object record.
- */
-const asRecord = (value: unknown): Record<string, unknown> =>
-  value && typeof value === "object" ? (value as Record<string, unknown>) : {};
-
-/**
- * Extracts statistical data from hypothesis response based on the hypothesis key.
- * @param hypothesisKey - The hypothesis identifier (e.g., "H1", "H2")
- * @param response - The full hypothesis response object
- * @returns ThesisStats containing extracted statistics for the given hypothesis
+ * Extracts statistical data from a hypothesis API response based on the hypothesis key.
  */
 export function getHypothesisStats(
   hypothesisKey: string,
@@ -126,11 +215,11 @@ export function getHypothesisStats(
 
 /**
  * Determines if a hypothesis has been statistically validated based on its p-values and effect sizes.
- * @param hypothesisKey - The hypothesis identifier (e.g., "H1", "H2")
- * @param stats - Statistical data extracted from the hypothesis response
- * @returns true if the hypothesis is considered passed based on statistical significance
  */
-export function isHypothesisPassed(hypothesisKey: string, stats: ThesisStats): boolean {
+export function isHypothesisPassed(
+  hypothesisKey: string,
+  stats: ThesisStats,
+): boolean {
   const pValue = String(stats.pVal ?? "= 1.0");
   // Check if p-value indicates statistical significance (< 0.05 or < 0.001)
   const isSignificant =
@@ -164,14 +253,27 @@ export function isHypothesisPassed(hypothesisKey: string, stats: ThesisStats): b
 }
 
 /**
- * Gets today's date in ISO format (YYYY-MM-DD).
- * @returns Today's date as a string in ISO 8601 format
+ * Formats hypothesis statistical results into a human-readable summary string.
  */
-export function getTodayISODate(): string {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
+export function formatHypothesisResult(
+  hypothesisKey: string,
+  stats: ThesisStats,
+): string {
+  switch (hypothesisKey) {
+    case "H1":
+      return `Discussion Depth: Spearman rho = ${formatStatValue(stats.rhoComments)} (p ${formatStatValue(stats.pComments)}); Upvote Approval: Spearman rho = ${formatStatValue(stats.rhoApproval)} (p ${formatStatValue(stats.pApproval)}).`;
+    case "H2":
+      return `Spearman rho = ${formatStatValue(stats.rho)} (p ${formatStatValue(stats.pVal)}).`;
+    case "H3":
+    case "H4":
+      return `Coefficient = ${formatStatValue(stats.coef)} (p ${formatStatValue(stats.pVal)}, Model R2 = ${formatStatValue(stats.r2)}).`;
+    case "H5":
+      return `Negative sentiment t = ${formatStatValue(stats.tNeg)} (p ${formatStatValue(stats.pNeg)}); Upvote ratio t = ${formatStatValue(stats.tUpvote)} (p ${formatStatValue(stats.pUpvote)}).`;
+    case "H6":
+      return `Factorial ANOVA F = ${formatStatValue(stats.fStat)} (p ${formatStatValue(stats.pVal)}); Local averages: ${formatStatValue(stats.means)}.`;
+    case "H7":
+      return `Linear coefficient = ${formatStatValue(stats.linearCoef)}; Quadratic coefficient = ${formatStatValue(stats.quadCoef)} (p ${formatStatValue(stats.quadP)}).`;
+    default:
+      return "";
+  }
 }

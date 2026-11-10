@@ -1,18 +1,81 @@
-import { Button, Dialog, Portal, IconButton, Text } from "@chakra-ui/react";
-import { useState } from "react";
-import LoadingAndError from "./LoadingAndError";
+import { forwardRef, useImperativeHandle, useState } from "react";
+import { Button, CloseButton, Dialog, IconButton, Portal } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
-import { editingData, queryClient, sendingData } from "@/util/http";
 import { useSelector } from "react-redux";
 import { FiEdit } from "react-icons/fi";
+import {
+  createAuthHeaders,
+  editingData,
+  queryClient,
+  sendingData,
+} from "@/util/api";
+import { LoadingAndError } from "./Feedback";
 import type {
+  AlertDialogHandle,
+  AlertDialogProps,
   FormDialogProps,
   MutationBody,
   RootState,
   UserFormValues,
 } from "@/util/Types";
 
-export default function FormDialog({
+// ── AlertDialog ────────────────────────────────────────────────────
+
+export const AlertDialog = forwardRef<AlertDialogHandle, AlertDialogProps>(
+  ({ onDelete, id, message }, ref) => {
+    const [open, setOpen] = useState(false);
+
+    useImperativeHandle(ref, () => {
+      return {
+        open() {
+          setOpen(true);
+        },
+        close() {
+          setOpen(false);
+        },
+      };
+    });
+
+    return (
+      <Dialog.Root role="dialog" modal open={open}>
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content color="black">
+              <Dialog.Header>
+                <Dialog.Title>Are you sure?</Dialog.Title>
+              </Dialog.Header>
+              <Dialog.Body>
+                <p>{message}</p>
+              </Dialog.Body>
+              <Dialog.Footer>
+                <Dialog.ActionTrigger asChild>
+                  <Button variant="outline" onClick={() => setOpen(false)}>
+                    Cancel
+                  </Button>
+                </Dialog.ActionTrigger>
+                <Button
+                  colorPalette="red"
+                  fontWeight="bolder"
+                  onClick={() => onDelete(id)}
+                >
+                  Delete
+                </Button>
+              </Dialog.Footer>
+              <Dialog.CloseTrigger asChild>
+                <CloseButton size="sm" onClick={() => setOpen(false)} />
+              </Dialog.CloseTrigger>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
+    );
+  },
+);
+
+// ── FormDialog ─────────────────────────────────────────────────────
+
+export function FormDialog({
   title,
   triggerText,
   initialValues,
@@ -38,41 +101,27 @@ export default function FormDialog({
     setFormValues((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleNewUserSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const body: MutationBody = {
-      endpoint: "users/create",
-      signal: undefined,
-      headers: {
-        Authorization: `Bearer ${authState.token}`,
-        "Content-Type": "application/json",
-      },
-      body: formValues,
-    };
-    mutate(body);
-  };
 
-  const handleEditUserSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const bodyValues: UserFormValues = {
-      email: formValues.email,
-      password: formValues.password,
-      name: formValues.name,
-      role: formValues.role,
-      api_calls_count: formValues.api_calls_count,
-      api_calls_limit: formValues.api_calls_limit,
-    };
-
-    console.log(bodyValues);
+    const isNew = mode === "new";
+    const endpoint = isNew ? "users/create" : `users/${formValues.id}`;
+    const payload: UserFormValues = isNew
+      ? formValues
+      : {
+          email: formValues.email,
+          password: formValues.password,
+          name: formValues.name,
+          role: formValues.role,
+          api_calls_count: formValues.api_calls_count,
+          api_calls_limit: formValues.api_calls_limit,
+        };
 
     const body: MutationBody = {
-      endpoint: `users/${formValues.id}`,
+      endpoint,
       signal: undefined,
-      headers: {
-        Authorization: `Bearer ${authState.token}`,
-        "Content-Type": "application/json",
-      },
-      body: bodyValues,
+      headers: createAuthHeaders(authState.token),
+      body: payload,
     };
     mutate(body);
   };
@@ -100,7 +149,7 @@ export default function FormDialog({
               color="black"
               borderColor="whiteAlpha.200"
               as="form"
-              onSubmit={mode === "new" ? handleNewUserSubmit : handleEditUserSubmit}
+              onSubmit={handleSubmit}
             >
               <Dialog.Header>
                 <Dialog.Title color="orange.500" fontWeight="bolder">

@@ -1,4 +1,4 @@
-import { queryClient, sendingData } from "@/util/http";
+import { createAuthHeaders, queryClient, sendingData } from "@/util/api";
 import { Button, Spinner } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
@@ -18,10 +18,7 @@ export default function GenerateAPIKey() {
       endpoint: "users/generate-api-key",
       signal: undefined,
       body: null,
-      headers: {
-        Authorization: `Bearer ${authState.token}`,
-        "Content-Type": "application/json",
-      },
+      headers: createAuthHeaders(authState.token),
     });
   }
 

@@ -1,18 +1,14 @@
-import { Badge, Text, VStack } from "@chakra-ui/react";
+import { Text } from "@chakra-ui/react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
-import { fetchingData } from "@/util/http";
-import LoadingAndError from "@/components/ui-components/LoadingAndError";
+import { createAuthHeaders, fetchingData } from "@/util/api";
+import { LoadingAndError, StatusBadge } from "@/components/ui-components/Feedback";
 import ApproveWord from "./ApproveWord";
 import TanStackDataTable from "@/components/ui-components/Data Table/TanstackDataTable";
-import {
-  TextSearch,
-  ValueSearch,
-} from "@/components/ui-components/Data Table/Filters";
+import { KeywordBaseFilters } from "@/components/ui-components/Data Table/Filters";
 import type {
   IgnoredWord,
-  IgnoredWordsTableFiltersProps,
   RootState,
 } from "@/util/Types";
 
@@ -41,17 +37,14 @@ const tableColumns: ColumnDef<IgnoredWord>[] = [
   {
     accessorKey: "processed",
     header: "Processed",
-    cell: ({ getValue }) => {
-      const isProcessed = Boolean(getValue());
-      return (
-        <Badge
-          variant="subtle"
-          colorPalette={isProcessed ? "green" : "gray"}
-        >
-          {isProcessed ? "Processed" : "Not Processed"}
-        </Badge>
-      );
-    },
+    cell: ({ getValue }) => (
+      <StatusBadge
+        active={Boolean(getValue())}
+        trueLabel="Processed"
+        falseLabel="Not Processed"
+        variant="subtle"
+      />
+    ),
   },
   {
     accessorKey: "approved",
@@ -74,10 +67,8 @@ export default function IgnoredWordsSection() {
       fetchingData({
         endpoint: "ignored-words",
         signal,
-        headers: { Authorization: `Bearer ${token}` },
+        headers: createAuthHeaders(token, false),
       }),
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 5,
   });
 
   if (isError || isPending || isLoading) {
@@ -89,31 +80,9 @@ export default function IgnoredWordsSection() {
   return (
     <TanStackDataTable
       data={words ?? []}
-      TableFiltersComponent={KeywordFilters}
+      TableFiltersComponent={KeywordBaseFilters}
       tableColumns={tableColumns}
       pageSize={10}
     />
-  );
-}
-
-function KeywordFilters({ table }: IgnoredWordsTableFiltersProps = {}) {
-  if (!table) return <></>;
-
-  return (
-    <VStack>
-      <TextSearch
-        fieldName="word"
-        placeholder="Search Keyword..."
-        table={table}
-      />
-      <ValueSearch
-        table={table}
-        fieldName="reported"
-        options={[
-          { value: "true", text: "All" },
-          { value: "false", text: "Hide Reported Word" },
-        ]}
-      />
-    </VStack>
   );
 }

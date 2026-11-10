@@ -94,6 +94,8 @@ export interface ProgressBarProps {
 export interface UiProgressBarProps {
   value: number;
   processingStatus: string;
+  indeterminateWhenZero?: boolean;
+  inline?: boolean;
 }
 
 // Navbar props types
@@ -290,6 +292,7 @@ export interface DataPaginationProps {
   currentPage: number;
   pageSize: number;
   onPageChange: (page: number) => void;
+  hideWhenSinglePage?: boolean;
 }
 
 // Admin dashboard data types
@@ -543,6 +546,10 @@ export interface FeatureCsvRow {
 
 export interface ThesisStats {
   [key: string]: string | number | boolean;
+}
+
+export interface HypothesisResponse {
+  hypothesis: Record<string, unknown>;
 }
 
 // ========================================

@@ -7,8 +7,9 @@ export default function DataPagination({
   currentPage,
   pageSize,
   onPageChange,
+  hideWhenSinglePage = true,
 }: DataPaginationProps) {
-  if (!totalItems || totalItems <= pageSize) {
+  if (hideWhenSinglePage && (!totalItems || totalItems <= pageSize)) {
     return null;
   }
 

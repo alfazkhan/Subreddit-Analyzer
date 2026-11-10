@@ -5,13 +5,16 @@ import {
   HStack,
   Badge,
   Text,
-  Spinner,
-  Center,
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchingData } from "@/util/http";
+import { buildWebSocketUrl, fetchingData } from "@/util/api";
+import {
+  createMinLengthFilterFn,
+  getRedditPostUrl,
+  mergeQueueCounts,
+} from "@/util/data";
 import TanStackDataTable from "@/components/ui-components/Data Table/TanstackDataTable";
-import { BASE_URL } from "@/Constants";
+import { QueryStateView } from "@/components/ui-components/Feedback";
 import type {
   ProcessQueueTask,
   QueueApiResponse,
@@ -34,19 +37,6 @@ const initialQueueCounts: QueueCounts = {
   failed: 0,
 };
 
-function mergeQueueCounts(
-  current: QueueCounts,
-  updates: Partial<QueueCounts>,
-): QueueCounts {
-  return {
-    total: updates.total ?? current.total,
-    pending: updates.pending ?? current.pending,
-    processing: updates.processing ?? current.processing,
-    completed: updates.completed ?? current.completed,
-    failed: updates.failed ?? current.failed,
-  };
-}
-
 const tableColumns: ColumnDef<ProcessQueueTask>[] = [
   {
     accessorKey: "id",
@@ -66,7 +56,7 @@ const tableColumns: ColumnDef<ProcessQueueTask>[] = [
       return (
         <Text fontWeight="semibold" fontSize="xs" color="blue.400">
           <a
-            href={`https://www.reddit.com/r/${row.original.subreddit_name}/comments/${postId}`}
+            href={getRedditPostUrl(row.original.subreddit_name, String(getValue() ?? ""))}
             target="_blank"
             rel="noreferrer"
           >
@@ -75,15 +65,7 @@ const tableColumns: ColumnDef<ProcessQueueTask>[] = [
         </Text>
       );
     },
-    filterFn: (row, columnID, filterValue) => {
-      const query = String(filterValue ?? "");
-      return (
-        query.length < 2 ||
-        String(row.getValue(columnID))
-          .toLowerCase()
-          .includes(query.toLowerCase())
-      );
-    },
+    filterFn: createMinLengthFilterFn<ProcessQueueTask>(2),
     size: 130,
   },
   {
@@ -94,15 +76,7 @@ const tableColumns: ColumnDef<ProcessQueueTask>[] = [
         r/{String(getValue() ?? "")}
       </Badge>
     ),
-    filterFn: (row, columnID, filterValue) => {
-      const query = String(filterValue ?? "");
-      return (
-        query.length < 2 ||
-        String(row.getValue(columnID))
-          .toLowerCase()
-          .includes(query.toLowerCase())
-      );
-    },
+    filterFn: createMinLengthFilterFn<ProcessQueueTask>(2),
   },
   {
     accessorKey: "status",
@@ -187,8 +161,6 @@ export default function ProcessQueueSection() {
     queryFn: ({ signal }) =>
       fetchingData({ endpoint: "queue", signal, headers: {} }),
     refetchInterval: wsStatus !== "Connected" ? 5000 : false,
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 5,
   });
 
   useEffect(() => {
@@ -198,8 +170,9 @@ export default function ProcessQueueSection() {
       setQueueTasks(initialData);
       return;
     }
-    if (initialData.counts) {
-      setQueueCounts((previous) => mergeQueueCounts(previous, initialData.counts));
+    const nextCounts = initialData.counts;
+    if (nextCounts) {
+      setQueueCounts((previous) => mergeQueueCounts(previous, nextCounts));
     }
     if (Array.isArray(initialData.tasks)) {
       setQueueTasks(initialData.tasks);
@@ -211,9 +184,7 @@ export default function ProcessQueueSection() {
 
     const connectQueueSocket = () => {
       try {
-        const parsedHttpUrl = new URL(BASE_URL);
-        const wsProtocol = parsedHttpUrl.protocol === "https:" ? "wss:" : "ws:";
-        const targetSocketUrl = `${wsProtocol}//${parsedHttpUrl.host}/ws/queue`;
+        const targetSocketUrl = buildWebSocketUrl("/ws/queue");
 
         const socket = new WebSocket(targetSocketUrl);
         socketRef.current = socket;
@@ -227,9 +198,10 @@ export default function ProcessQueueSection() {
           try {
             const payload = JSON.parse(event.data) as QueueSocketMessage;
             if (payload.type === "QUEUE_UPDATED") {
-              if (payload.counts) {
+              const payloadCounts = payload.counts;
+              if (payloadCounts) {
                 setQueueCounts((previous) =>
-                  mergeQueueCounts(previous, payload.counts),
+                  mergeQueueCounts(previous, payloadCounts),
                 );
               }
               if (Array.isArray(payload.data)) {
@@ -270,31 +242,17 @@ export default function ProcessQueueSection() {
     };
   }, []);
 
-  if (isLoading) {
-    return (
-      <Center height="300px">
-        <VStack gap={2}>
-          <Spinner size="lg" color="orange.500" />
-          <Text fontSize="xs" color="gray.400">
-            Loading scraping queue tasks...
-          </Text>
-        </VStack>
-      </Center>
-    );
-  }
-
-  if (isError) {
-    return (
-      <Center height="300px">
-        <Text color="red.400" fontSize="sm">
-          Failed to fetch queue: {error?.message || "Internal Server Error"}
-        </Text>
-      </Center>
-    );
-  }
-
   return (
-    <VStack width="full" align="stretch" gap={4}>
+    <QueryStateView
+      isLoading={isLoading}
+      isError={isError}
+      error={error}
+      errorPrefix="Failed to fetch queue"
+      loadingText="Loading scraping queue tasks..."
+      height="300px"
+      spinnerSize="lg"
+    >
+      <VStack width="full" align="stretch" gap={4}>
       <style>{`
         @keyframes processStripes {
           0% { background-position: 0 0; }
@@ -356,6 +314,7 @@ export default function ProcessQueueSection() {
         pageSize={15}
         tableColumns={tableColumns}
       />
-    </VStack>
+      </VStack>
+    </QueryStateView>
   );
 }
