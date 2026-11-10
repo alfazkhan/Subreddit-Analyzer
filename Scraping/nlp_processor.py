@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import nltk
 from collections import Counter
 import spacy
@@ -9,18 +10,24 @@ from nltk.tokenize import word_tokenize
 from transformers import pipeline
 
 # Configure PyTorch allocator
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
 
-# Force Hugging Face offline mode
-os.environ["HF_HUB_OFFLINE"] = "1"
-os.environ["TRANSFORMERS_OFFLINE"] = "1"
-os.environ["TRANSFORMERS_VERBOSITY"] = "error"
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-os.environ["HF_HOME"] = r"D:\huggingface_cache"
+# Default Hugging Face to offline mode unless overridden via environment variables
+os.environ.setdefault("HF_HUB_OFFLINE", "1")
+os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "3")
 
-# Register local NLTK directory paths
-nltk.data.path.append(r"C:\Users\Administrator\AppData\Roaming\nltk_data")
-nltk.data.path.append(r"D:\React JS\Reddit-Data-Scrapper\Reddit-Scrapper\nltk_data")
+# Register project-local or environment-configured NLTK paths without hardcoded drive letters
+_BASE_DIR = Path(__file__).resolve().parent
+_CANDIDATE_NLTK_PATHS = [
+    os.getenv("NLTK_DATA"),
+    str(_BASE_DIR / "nltk_data"),
+    str(_BASE_DIR.parent / "nltk_data"),
+]
+for _nltk_path in _CANDIDATE_NLTK_PATHS:
+    if _nltk_path and os.path.isdir(_nltk_path) and _nltk_path not in nltk.data.path:
+        nltk.data.path.append(_nltk_path)
 
 # Bypass torch.load safety check
 import transformers.utils.import_utils

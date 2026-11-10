@@ -26,15 +26,20 @@ coverage
 *.sln
 *.sw?
 *.pyc
+*.pyo
+*.pyd
 
-__pycache__
-/__pycache__/
+__pycache__/
+**/__pycache__/
+.pytest_cache/
+**/.pytest_cache/
 
-Scrapping/auth.json
-Scrapping/venv
-Scrapping/config.py
-Scrapping/firebase_creds.json
-Scrapping/Routes/__pycache__/
+Scraping/auth.json
+Scraping/venv/
+Scraping/.venv/
+Scraping/config.py
+Scraping/firebase_creds.json
+Scraping/Routes/__pycache__/
 .env
 
 # Docker / Local Caches & Downloads
@@ -42,7 +47,7 @@ Scrapping/Routes/__pycache__/
 *.dump
 *.log
 *.sqlite3
-Scrapping/docker-compose.yml
+Scraping/docker-compose.yml
 D:*
 *huggingface_cache*
 Reddit-Scrapper/

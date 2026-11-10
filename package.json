@@ -15,7 +15,6 @@
     "typecheck": "tsc --noEmit --project tsconfig.json"
   },
   "dependencies": {
-    "@chakra-ui/charts": "^3.35.0",
     "@chakra-ui/react": "^3.35.0",
     "@emotion/react": "^11.14.0",
     "@reduxjs/toolkit": "^2.11.2",
@@ -33,8 +32,7 @@
     "react-echarts-library": "^1.4.0",
     "react-icons": "^5.6.0",
     "react-redux": "^9.2.0",
-    "react-router-dom": "^7.16.0",
-    "recharts": "^3.8.1"
+    "react-router-dom": "^7.16.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

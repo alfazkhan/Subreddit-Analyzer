@@ -11,7 +11,7 @@ from database.core import get_db_pool
 from database.posts import get_last_post_timestamp
 from database.subreddits import is_subreddit_bootstrapped, get_active_subreddits
 
-# Updated import to match the unified scrapper function
+# Updated import to match the unified scraper function
 from scraper_v2 import run_discovery_scan, process_queue_batch
 
 # Import decouple routing modules from the Routes package folder
@@ -22,7 +22,7 @@ IS_PRODUCTION = os.getenv("APP_ENV") == "production"
 
 # Assign environmental runtime variables
 headlessMode = True if IS_PRODUCTION else True
-API_HOST = "0.0.0.0" if IS_PRODUCTION else "192.168.0.246"
+API_HOST = "0.0.0.0" if IS_PRODUCTION else os.getenv("API_HOST", "127.0.0.1")
 
 app = FastAPI(title="Reddit BI REST API", version="2.1.0")
 

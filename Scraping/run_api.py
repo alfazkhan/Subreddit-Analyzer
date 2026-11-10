@@ -19,8 +19,8 @@ from Routes import (
 )
 
 IS_PRODUCTION = os.getenv("APP_ENV") == "production"
-API_HOST = "0.0.0.0" if IS_PRODUCTION else "0.0.0.0"
-os.environ["FORCE_CPU"] = "1"
+API_HOST = os.getenv("API_HOST", "0.0.0.0")
+os.environ.setdefault("FORCE_CPU", "1")
 
 # Initialize Firebase Admin SDK prior to spinning up network dependencies
 if os.path.exists("firebase_creds.json"):
@@ -29,18 +29,25 @@ if os.path.exists("firebase_creds.json"):
 else:
     raise RuntimeError("Critical Failure: Missing firebase_creds.json administrative credential files container.")
 
-app = FastAPI(title="Subreddit Scrapper REST API Gateway", version="3.0.0")
+app = FastAPI(title="Subreddit Scraper REST API Gateway", version="3.0.0")
 
 
-# Explicit permitted origins for CORS configuration
+# Explicit permitted origins for CORS configuration (extendable via CORS_ALLOWED_ORIGINS)
 allowed_origins = [
     "https://subanalyzer.theonlyalfaz.com",
     "http://localhost:3000",
+    "http://localhost:4173",
     "http://localhost:5173",
     "http://127.0.0.1:3000",
+    "http://127.0.0.1:4173",
     "http://127.0.0.1:5173",
-    "http://192.168.0.246:5173",
 ]
+extra_origins = [
+    origin.strip()
+    for origin in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
+    if origin.strip()
+]
+allowed_origins.extend(origin for origin in extra_origins if origin not in allowed_origins)
 
 app.add_middleware(
     CORSMiddleware,

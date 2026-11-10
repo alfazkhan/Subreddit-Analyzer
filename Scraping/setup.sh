@@ -7,20 +7,20 @@ echo "Starting system provisioning pipeline..."
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$SCRIPT_DIR"
 
-if [ ! -d "venv" ]; then
+if [ ! -d ".venv" ]; then
     echo "Creating Python virtual environment..."
-    python3 -m venv venv
+    python3 -m venv .venv
 fi
 
 echo "Activating virtual environment..."
-source venv/bin/activate
+source .venv/bin/activate
 
 echo "Upgrading pip..."
 pip install --upgrade pip
 
 REQ_PATH="requirements.txt"
-if [ ! -f "$REQ_PATH" ] && [ -f "Scrapping/requirements.txt" ]; then
-    REQ_PATH="Scrapping/requirements.txt"
+if [ ! -f "$REQ_PATH" ] && [ -f "Scraping/requirements.txt" ]; then
+    REQ_PATH="Scraping/requirements.txt"
 fi
 
 if [ -f "$REQ_PATH" ]; then
@@ -34,8 +34,9 @@ fi
 echo "Installing Playwright system dependencies and Chromium..."
 playwright install --with-deps chromium
 
-echo "Downloading spaCy model..."
+echo "Downloading spaCy models..."
 python -m spacy download en_core_web_sm
+python -m spacy download xx_ent_wiki_sm
 
 echo "Downloading NLTK datasets..."
 python -c "

@@ -8,8 +8,8 @@ def run_pip_install():
     subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
 
     req_file = "requirements.txt"
-    if not os.path.exists(req_file) and os.path.exists("Scrapping/requirements.txt"):
-        req_file = "Scrapping/requirements.txt"
+    if not os.path.exists(req_file) and os.path.exists("Scraping/requirements.txt"):
+        req_file = "Scraping/requirements.txt"
 
     print(f"Installing Python dependencies from {req_file}...")
     try:
@@ -27,8 +27,9 @@ def setup_nlp():
     for resource in nltk_resources:
         nltk.download(resource, quiet=True)
     
-    print("Downloading spaCy NLP model (en_core_web_sm)...")
+    print("Downloading spaCy NLP models (en_core_web_sm, xx_ent_wiki_sm)...")
     subprocess.check_call([sys.executable, "-m", "spacy", "download", "en_core_web_sm"])
+    subprocess.check_call([sys.executable, "-m", "spacy", "download", "xx_ent_wiki_sm"])
 
     print("Pre-downloading Hugging Face multilingual models to local cache...")
     try:

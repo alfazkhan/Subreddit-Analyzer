@@ -673,8 +673,8 @@ export interface EnvModeType {
 }
 
 // Default constants values for development
-export const DEFAULT_BASE_URL = 'http://192.168.0.246:8000';
-export const DEFAULT_WS_URL = 'ws://192.168.0.246:8000/ws/reanalyze';
+export const DEFAULT_BASE_URL = 'http://127.0.0.1:8000';
+export const DEFAULT_WS_URL = 'ws://127.0.0.1:8000/ws/reanalyze';
 
 // Production constants (type only, values in Constants.js)
 export const PROD_BASE_URL = 'https://api.theonlyalfaz.com';
