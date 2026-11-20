@@ -1,8 +1,15 @@
 import type { AdminUserRole, SentimentLabel } from "@/util/Types";
 
-export const BASE_URL = "https://api.theonlyalfaz.com";
+const isDev = process.env.NODE_ENV === "development";
 
-export const wsUrl = "wss://api.theonlyalfaz.com/ws/reanalyze";
+export const BASE_URL = isDev 
+  ? "http://192.168.0.246:8000" 
+  : "https://api.theonlyalfaz.com";
+
+export const wsUrl = isDev 
+  ? "ws://192.168.0.246:8000/ws/reanalyze" 
+  : "wss://api.theonlyalfaz.com/ws/reanalyze";
+
 
 export const SENTIMENT_FILTER_CONFIG = [
   { emoji: "", color: "#009637", label: "All" },

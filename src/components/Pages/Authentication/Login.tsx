@@ -1,12 +1,12 @@
 import { auth } from "../../../../firebase_config";
 import { useEffect, useState } from "react";
 import {
+  Button,
   Field,
-  Input,
+  Flex,
   Grid,
   GridItem,
-  AbsoluteCenter,
-  Button,
+  Input,
   Stack,
   Text,
 } from "@chakra-ui/react";
@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { authSliceActions } from "@/store/authSlice";
 import { useNavigate } from "react-router-dom";
 import type { RootState } from "@/util/Types";
+import Footer from "@/components/ui-components/Footer";
 
 export default function Login() {
   const [email, setEmail] = useState<string>("");
@@ -59,15 +60,17 @@ export default function Login() {
   }
 
   return (
-    <>
-      <AbsoluteCenter axis="both">
-        <Grid>
+    <Flex direction="column" minH="100vh">
+      <Flex flex="1" align="center" justify="center" p={4}>
+        <Grid width={{ base: "full", sm: "400px" }}>
           <GridItem width="full" pb="10">
             <Header text={"Login to Dashboard"} highlight="Dashboard" />
           </GridItem>
-          <GridItem>
-            <Text color="red.500">{errorMsg}</Text>
-          </GridItem>
+          {errorMsg && (
+            <GridItem pb="4">
+              <Text color="red.500">{errorMsg}</Text>
+            </GridItem>
+          )}
           <GridItem gap="4" width="full">
             <Field.Root required>
               <Field.Label>
@@ -78,7 +81,6 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
                 value={email}
               />
-              {/* <Field.HelperText>Enter your email</Field.HelperText> */}
               <Field.ErrorText>{errorMsg}</Field.ErrorText>
             </Field.Root>
             <Field.Root required mt="5">
@@ -91,7 +93,6 @@ export default function Login() {
                 onVisibleChange={setVisible}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              {/* <Field.HelperText>Enter your password</Field.HelperText> */}
               <Field.ErrorText>{errorMsg}</Field.ErrorText>
             </Field.Root>
             <Stack mt="5">
@@ -120,7 +121,8 @@ export default function Login() {
             </Stack>
           </GridItem>
         </Grid>
-      </AbsoluteCenter>
-    </>
+      </Flex>
+      <Footer />
+    </Flex>
   );
 }

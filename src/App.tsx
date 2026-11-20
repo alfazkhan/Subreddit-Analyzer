@@ -2,7 +2,7 @@ import "./App.css";
 import AdminDashboard from "./components/Pages/Admin Dashboard/AdminDashboard";
 import Login from "./components/Pages/Authentication/Login";
 import Homepage from "./components/Pages/Homepage/Homepage";
-import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ProtectedRoute from "./components/Pages/ProtectedRoute";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
@@ -13,6 +13,7 @@ import { queryClient, Unsubscribe } from "./util/api";
 import AboutProject from "./components/Pages/AboutProject/AboutProject";
 import Navbar from "./components/Pages/Homepage/Navbar";
 import ErrorElement from "./components/Pages/Homepage/ErrorElement";
+import PrivacyPolicy from "./components/Pages/Privacy/PrivacyPolicy";
 
 // Define the type for the App component
 const App: React.FC = () => {
@@ -43,45 +44,50 @@ const App: React.FC = () => {
     Unsubscribe(dispatch);
   }, [dispatch]);
 
-  const router = createBrowserRouter([
+  const router = createBrowserRouter(
+    [
+      {
+        path: "/",
+        element: <Navbar />,
+        errorElement: <ErrorElement />,
+        children: [
+          {
+            index: true,
+            element: <Homepage />,
+          },
+          {
+            path: "about",
+            element: <AboutProject />,
+          },
+          {
+            path: "privacy",
+            element: <PrivacyPolicy />,
+          },
+        ],
+      },
+      {
+        path: "/login",
+        element: <Login />,
+      },
+      {
+        path: "/dashboard",
+        element: (
+          <ProtectedRoute allowedRoles={["Super Admin", "Admin"]}>
+            <AdminDashboard />
+          </ProtectedRoute>
+        ),
+      },
+    ],
     {
-      path: "/",
-      element: <Navbar />,
-      errorElement: <ErrorElement />,
-      children: [
-        {
-          index: true,
-          element: <Homepage />,
-        },
-        {
-          path: "about",
-          element: <AboutProject />,
-        },
-      ],
+      basename: "/",
+      future: {},
     },
-    {
-      path: "/login",
-      element: <Login />,
-    },
-    {
-      path: "/dashboard",
-      element: (
-        <ProtectedRoute allowedRoles={["Super Admin", "Admin"]}>
-          <AdminDashboard />
-        </ProtectedRoute>
-      ),
-    },
-  ], {
-    basename: "/",
-    future: {},
-  });
+  );
 
   return (
-    <>
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-      </QueryClientProvider>
-    </>
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
   );
 };
 

@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import ProcessQueueSection from "./ProcessQueueSection";
 import { ORANGE_TABS_CSS, ORANGE_TABS_OPEN_ANIMATION } from "@/util/constants";
 import type { RootState } from "@/util/Types";
+import Footer from "../../ui-components/Footer";
 
 const tabsConfig = {
   Subreddits: ["Super Admin", "Admin", "Guest", "Developer"],
@@ -23,57 +24,67 @@ export default function AdminDashboard() {
   const authState = useSelector((state: RootState) => state.authState);
 
   return (
-    <Flex direction="column" justifyContent="center" width="80%" margin="auto">
-      <Flex gap="4" alignItems="center" justify="space-between" margin="5">
-        <Link to="/">
-          <Header text="Admin Dashboard" highlight="Dashboard" />
-        </Link>
-        <LogoutButton />
-      </Flex>
-      <Tabs.Root
-        variant="plain"
-        defaultValue="subreddits"
-        orientation="horizontal"
-        fitted
-        lazyMount
-        css={ORANGE_TABS_CSS}
-        _open={ORANGE_TABS_OPEN_ANIMATION}
+    <Flex direction="column" minH="100vh">
+      <Flex
+        direction="column"
+        justifyContent="center"
+        width="80%"
+        margin="auto"
+        flex="1"
+        py={6}
       >
-        <Tabs.List>
-          {Object.entries(tabsConfig).map(([tab, allowedRoles]) => {
-            if (allowedRoles.includes(authState.role)) {
-              return (
-                <Tabs.Trigger
-                  key={tab}
-                  fontWeight="bolder"
-                  color="gray.100"
-                  value={tab.toLowerCase()}
-                >
-                  {tab}
-                </Tabs.Trigger>
-              );
-            }
-            return null;
-          })}
-          <Tabs.Indicator rounded="l2" />
-        </Tabs.List>
+        <Flex gap="4" alignItems="center" justify="space-between" margin="5">
+          <Link to="/">
+            <Header text="Admin Dashboard" highlight="Dashboard" />
+          </Link>
+          <LogoutButton />
+        </Flex>
+        <Tabs.Root
+          variant="plain"
+          defaultValue="subreddits"
+          orientation="horizontal"
+          fitted
+          lazyMount
+          css={ORANGE_TABS_CSS}
+          _open={ORANGE_TABS_OPEN_ANIMATION}
+        >
+          <Tabs.List>
+            {Object.entries(tabsConfig).map(([tab, allowedRoles]) => {
+              if (allowedRoles.includes(authState.role)) {
+                return (
+                  <Tabs.Trigger
+                    key={tab}
+                    fontWeight="bolder"
+                    color="gray.100"
+                    value={tab.toLowerCase()}
+                  >
+                    {tab}
+                  </Tabs.Trigger>
+                );
+              }
+              return null;
+            })}
+            <Tabs.Indicator rounded="l2" />
+          </Tabs.List>
 
-        <Tabs.Content value="subreddits">
-          <SubredditsSection />
-        </Tabs.Content>
-        <Tabs.Content value="ignored words">
-          <IgnoredWordsSection />
-        </Tabs.Content>
-        <Tabs.Content value="processes">
-          <ProcessQueueSection />
-        </Tabs.Content>
-        <Tabs.Content value="reanalyze">
-          <ReanalyzeSection />
-        </Tabs.Content>
-        <Tabs.Content value="manage users">
-          <UsersSection />
-        </Tabs.Content>
-      </Tabs.Root>
+          <Tabs.Content value="subreddits">
+            <SubredditsSection />
+          </Tabs.Content>
+          <Tabs.Content value="ignored words">
+            <IgnoredWordsSection />
+          </Tabs.Content>
+          <Tabs.Content value="processes">
+            <ProcessQueueSection />
+          </Tabs.Content>
+          <Tabs.Content value="reanalyze">
+            <ReanalyzeSection />
+          </Tabs.Content>
+          <Tabs.Content value="manage users">
+            <UsersSection />
+          </Tabs.Content>
+        </Tabs.Root>
+      </Flex>
+      <Footer />
     </Flex>
   );
 }

@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import type { Chart, ChartOptions } from "chart.js";
-import { Doughnut } from "react-chartjs-2";
 import {
   Flex,
   HStack,
@@ -17,6 +16,8 @@ import { stringToColor } from "@/util/data";
 import { keywordsQueryOptions } from "@/util/api";
 import { useQuery } from "@tanstack/react-query";
 import { LoadingAndError } from "@/components/ui-components/Feedback";
+import EChartsReact from 'react-echarts-library';
+import type { EChartsOption } from "echarts";
 
 const sumNumericData = (datasetData: readonly unknown[]) =>
   datasetData.reduce<number>(
@@ -49,16 +50,13 @@ ChartJS.register(
 export default function KeywordsPieChart() {
   const { data, isLoading, isPending, isError, error } = useQuery(keywordsQueryOptions);
 
-  // --- 1. Core Filter States ---
   const [minValue, setMinValue] = useState(20);
   const [maxValue, setMaxValue] = useState(20000);
   const [stopWordsStr, setStopWordsStr] = useState("");
 
-  // --- 2. Interaction States ---
   const [topLimit, setTopLimit] = useState(10);
   const [customTop, setCustomTop] = useState(15);
 
-  // --- 3. Streamlined Data Pipeline ---
   const chartData = useMemo(() => {
     if (!data || !Array.isArray(data)) {
       return { labels: [], datasets: [] };
@@ -69,7 +67,6 @@ export default function KeywordsPieChart() {
       .map((s) => s.trim().toLowerCase())
       .filter(Boolean);
 
-    // 1. Direct filter using incoming schema: item.word and item.frequency
     const filteredEntries = [];
     for (let i = 0; i < data.length; i++) {
       const item = data[i];
@@ -79,67 +76,68 @@ export default function KeywordsPieChart() {
       if (count < minValue || count > maxValue) continue;
       if (stopWords.includes(word.toLowerCase())) continue;
 
-      filteredEntries.push({ keyword: word, count: count });
+      filteredEntries.push({ name: word, value: count });
     }
 
-    // 2. Slice top entries (incoming list is already pre-sorted from database)
     const topEntries = filteredEntries.slice(0, topLimit);
 
-    const labels = topEntries.map((e) => e.keyword);
-    const dataValues = topEntries.map((e) => e.count);
-    const colors = labels.map((label) => stringToColor(label));
+    const colors = topEntries.map((entry) => stringToColor(entry.name));
 
-    return {
-      labels: labels,
-      datasets: [
-        {
-          label: "Keyword Weights",
-          data: dataValues,
-          backgroundColor: colors,
-          hoverOffset: 15,
-        },
-      ],
-    };
+
+
+    return { topEntries: topEntries, colors: colors };
   }, [data, minValue, maxValue, stopWordsStr, topLimit]);
 
-  // --- 4. Chart Options ---
-  const options: ChartOptions<"doughnut"> = {
-    responsive: true,
-    maintainAspectRatio: false,
-    cutout: "60%",
-    plugins: {
-      legend: {
-        labels: { color: "white" },
-      },
-      tooltip: {
-        callbacks: {
-          label: (context) => {
-            const value = typeof context.parsed === "number" ? context.parsed : 0;
-            const total = sumNumericData(context.dataset.data);
-            const percentage =
-              total > 0 ? ((value / total) * 100).toFixed(1) + "%" : "0%";
-            return ` ${context.label ?? ""}: ${value.toLocaleString()} (${percentage})`;
-          },
-        },
-      },
-      datalabels: {
-        color: "white",
-        font: { weight: "bold", size: 12 },
-        formatter: (_value, context) => {
-          return context.chart.data.labels?.[context.dataIndex] ?? "";
-        },
-        display: (context) => {
-          const dataset = context.dataset.data;
-          const total = sumNumericData(dataset);
-          const value = Number(dataset[context.dataIndex] ?? 0);
-          return total > 0 && value / total > 0.03; // Hide labels on tiny slivers (<3%)
-        },
-      },
+
+  const option = useMemo<EChartsOption>(() => ({
+    color: chartData.colors,
+    tooltip: {
+      trigger: 'item'
     },
-    layout: {
-      padding: { top: 30, bottom: 30, left: 30, right: 30 },
+    legend: {
+      orient: 'vertical',
+      bottom:'bottom'
     },
-  };
+    series: [
+      {
+        name: 'Access From',
+        type: 'pie',
+        radius: ['40%', '70%'],
+        avoidLabelOverlap: false,
+        itemStyle: {
+          borderRadius: 5,
+          borderColor: '#fff',
+          borderWidth: 1,
+
+        },
+        label: {
+          show: true,
+          position: 'outside',
+          color:"#ffffff"
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: 40,
+            fontWeight: 'bold',
+          }
+        },
+        labelLine: {
+          show: true
+        },
+        data: chartData.topEntries
+      }
+    ],
+    toolbox: {
+      show: true,
+      feature: {
+        restore: { show: false },
+      }
+    }
+
+  }), [chartData]);
+
+
 
   if (isError || isPending || isLoading) {
     return (
@@ -198,7 +196,6 @@ export default function KeywordsPieChart() {
         </Field.Root>
       </HStack>
 
-      {/* Limits & Controls Row */}
       <HStack
         width="full"
         justifyContent="flex-start"
@@ -256,9 +253,8 @@ export default function KeywordsPieChart() {
         </Field.Root>
       </HStack>
 
-      {/* Chart Rendering */}
       <Box width="full" height="500px">
-        <Doughnut options={options} data={chartData} />
+        <EChartsReact option={option} style={{ height: 400 }} />
       </Box>
     </Flex>
   );

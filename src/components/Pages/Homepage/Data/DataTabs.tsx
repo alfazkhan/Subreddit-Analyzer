@@ -75,7 +75,7 @@ export default function DataTabs({ postsData, processingStatus }: DataTabsProps)
     <>
       <Box position="relative" aria-busy="true" userSelect="none">
         <Tabs.Root
-          defaultValue="KPIs"
+          defaultValue="Pie Chart"
           variant="enclosed"
           lazyMount
           // unmountOnExit
