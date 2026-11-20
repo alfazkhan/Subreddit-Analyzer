@@ -1,216 +1,223 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  Badge,
-  Box,
-  Button,
-  Flex,
-  Heading,
-  HStack,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Box, Button, Text } from "@chakra-ui/react";
 import { PLATFORM_TABS } from "@/data/aboutContent";
-import type { PlatformTabScreenshot } from "@/util/Types";
+import { C, P, Section } from "./aboutUi";
 import { LuMaximize2, LuX } from "react-icons/lu";
 
 export function PlatformSection() {
-  const [activeScreenshot, setActiveScreenshot] = useState<PlatformTabScreenshot | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const triggerRef = useRef<HTMLElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  // Close lightbox on Escape key and trap basic keyboard focus
+  const active = PLATFORM_TABS[activeIndex];
+
   useEffect(() => {
-    if (!activeScreenshot) return;
-
+    if (!lightboxOpen) return;
+    const trigger = triggerRef.current;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setActiveScreenshot(null);
-      }
+      if (e.key === "Escape") setLightboxOpen(false);
     };
-
     window.addEventListener("keydown", handleKeyDown);
-    // Focus close button on open
-    setTimeout(() => {
-      closeButtonRef.current?.focus();
-    }, 50);
-
+    closeButtonRef.current?.focus();
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
-      triggerRef.current?.focus();
+      trigger?.focus();
     };
-  }, [activeScreenshot]);
+  }, [lightboxOpen]);
 
-  const openLightbox = (tab: PlatformTabScreenshot, e: React.MouseEvent) => {
-    triggerRef.current = e.currentTarget as HTMLElement;
-    setActiveScreenshot(tab);
+  // Arrow-key navigation between tabs (WAI-ARIA tabs pattern)
+  const onTabKeyDown = (e: React.KeyboardEvent, index: number) => {
+    let next = index;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") next = (index + 1) % PLATFORM_TABS.length;
+    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = (index - 1 + PLATFORM_TABS.length) % PLATFORM_TABS.length;
+    else if (e.key === "Home") next = 0;
+    else if (e.key === "End") next = PLATFORM_TABS.length - 1;
+    else return;
+    e.preventDefault();
+    setActiveIndex(next);
+    tabRefs.current[next]?.focus();
   };
 
   return (
-    <Box id="section-platform">
-      <VStack align="stretch" gap={5}>
-        <Heading as="h2" size="xl" color="orange.400" fontWeight="semibold" pb={2} borderBottom="1px solid" borderColor="gray.800">
-          What the Platform Does
-        </Heading>
+    <Section
+      id="section-platform"
+      title="The dashboard"
+      lede={`The dashboard has ${PLATFORM_TABS.length} tabs, each looking at the same posts from a different angle.`}
+    >
+      <Box display="grid" gridTemplateColumns={{ base: "1fr", md: "180px 1fr" }} gap={{ base: 4, md: 6 }}>
+        {/* Tab list */}
+        <Box
+          role="tablist"
+          aria-label="Dashboard tabs"
+          aria-orientation="vertical"
+          display="flex"
+          flexDirection={{ base: "row", md: "column" }}
+          overflowX={{ base: "auto", md: "visible" }}
+          gap={1}
+          pb={{ base: 1, md: 0 }}
+        >
+          {PLATFORM_TABS.map((tab, index) => {
+            const selected = index === activeIndex;
+            return (
+              <Box
+                as="button"
+                key={tab.tabValue}
+                ref={(el: HTMLButtonElement | null) => {
+                  tabRefs.current[index] = el;
+                }}
+                role="tab"
+                id={`platform-tab-${index}`}
+                aria-selected={selected}
+                aria-controls="platform-tabpanel"
+                tabIndex={selected ? 0 : -1}
+                onClick={() => setActiveIndex(index)}
+                onKeyDown={(e: React.KeyboardEvent) => onTabKeyDown(e, index)}
+                textAlign="left"
+                whiteSpace="nowrap"
+                fontSize="sm"
+                px={3}
+                py={2}
+                borderRadius="md"
+                bg={selected ? "whiteAlpha.100" : "transparent"}
+                color={selected ? C.heading : "gray.400"}
+                fontWeight={selected ? "medium" : "normal"}
+                cursor="pointer"
+                _hover={{ color: "gray.100", bg: "whiteAlpha.50" }}
+                _focusVisible={{ outline: "2px solid", outlineColor: "orange.400", outlineOffset: "1px" }}
+              >
+                {tab.tabLabel}
+              </Box>
+            );
+          })}
+        </Box>
 
-        <Text color="gray.300" fontSize="md" lineHeight="1.8">
-          The dashboard provides eight analytical views exploring civic submissions from multiple angles,
-          ranging from longitudinal moving averages and diurnal time-of-day curves to granular keyword tables and individual post records.
-        </Text>
-
-        {/* Tab Cards Grid */}
-        <Flex wrap="wrap" gap={6} width="full" pt={2}>
-          {PLATFORM_TABS.map((tab) => (
+        {/* Panel */}
+        <Box role="tabpanel" id="platform-tabpanel" aria-labelledby={`platform-tab-${activeIndex}`} minW={0}>
+          {active.imageSrc ? (
             <Box
-              key={tab.tabValue}
-              flex="1 1 calc(50% - 12px)"
-              minW={{ base: "100%", md: "320px" }}
-              bg="gray.950"
+              as="button"
+              ref={triggerRef}
+              onClick={() => setLightboxOpen(true)}
+              aria-label={`Enlarge screenshot: ${active.tabLabel}`}
+              position="relative"
+              display="block"
+              width="full"
+              p={0}
               borderWidth="1px"
-              borderColor="gray.800"
+              borderColor={C.line}
               borderRadius="lg"
               overflow="hidden"
-              display="flex"
-              flexDirection="column"
-              _hover={{ borderColor: "orange.500" }}
-              transition="border-color 180ms ease"
+              bg="black"
+              cursor="zoom-in"
+              css={{ "&:hover .enlarge-hint": { opacity: 1 } }}
+              _focusVisible={{ outline: "2px solid", outlineColor: "orange.400", outlineOffset: "2px" }}
             >
-              {/* Image Preview Container */}
               <Box
-                position="relative"
+                as="img"
+                src={active.imageSrc}
+                alt={active.altText}
+                loading="lazy"
+                display="block"
+                width="100%"
+                height="auto"
+                aspectRatio="16 / 10"
+                objectFit="cover"
+                objectPosition="top"
+              />
+              <Box
+                className="enlarge-hint"
+                position="absolute"
+                bottom={3}
+                right={3}
+                display="flex"
+                alignItems="center"
+                gap={1.5}
+                px={2.5}
+                py={1}
+                borderRadius="md"
                 bg="blackAlpha.800"
-                overflow="hidden"
-                cursor="pointer"
-                onClick={(e) => openLightbox(tab, e)}
-                tabIndex={0}
-                role="button"
-                aria-label={`Enlarge screenshot for ${tab.tabLabel}`}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    openLightbox(tab, e as unknown as React.MouseEvent);
-                  }
-                }}
-                _focus={{ outline: "2px solid #f97316", outlineOffset: "-2px" }}
+                color="gray.200"
+                fontSize="xs"
+                opacity={0.85}
+                transition="opacity 150ms ease"
               >
-                <Box
-                  as="img"
-                  src={tab.imageSrc}
-                  alt={tab.altText}
-                  loading="lazy"
-                  width="100%"
-                  height="200px"
-                  style={{ objectFit: "cover" }}
-                />
-                <Box
-                  position="absolute"
-                  bottom={2}
-                  right={2}
-                  bg="blackAlpha.800"
-                  px={2}
-                  py={1}
-                  borderRadius="md"
-                  color="gray.300"
-                  fontSize="2xs"
-                  display="flex"
-                  alignItems="center"
-                  gap={1}
-                >
-                  <LuMaximize2 size={12} color="#f97316" />
-                  <Text>Click to enlarge</Text>
-                </Box>
-              </Box>
-
-              {/* Caption Content */}
-              <Box p={4} flex="1" display="flex" flexDirection="column" gap={2}>
-                <HStack justify="space-between">
-                  <Text fontSize="sm" fontWeight="bold" color="gray.100">
-                    {tab.tabLabel}
-                  </Text>
-                  <Badge variant="outline" colorPalette="gray" size="xs">
-                    {tab.tabValue}
-                  </Badge>
-                </HStack>
-                <Text fontSize="xs" color="gray.400" lineHeight="1.6">
-                  {tab.caption}
-                </Text>
+                <LuMaximize2 size={12} /> Enlarge
               </Box>
             </Box>
-          ))}
-        </Flex>
-
-        {/* Accessible Lightbox Modal */}
-        {activeScreenshot && (
-          <Box
-            position="fixed"
-            top={0}
-            left={0}
-            right={0}
-            bottom={0}
-            bg="blackAlpha.900"
-            zIndex={1000}
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            p={{ base: 4, md: 8 }}
-            onClick={() => setActiveScreenshot(null)}
-            role="dialog"
-            aria-modal="true"
-            aria-label={`Enlarged view: ${activeScreenshot.tabLabel}`}
-          >
+          ) : (
             <Box
-              bg="gray.900"
-              borderWidth="1px"
-              borderColor="gray.700"
-              borderRadius="xl"
-              maxW="1100px"
-              width="full"
-              maxH="90vh"
+              aspectRatio="16 / 10"
               display="flex"
-              flexDirection="column"
-              overflow="hidden"
-              boxShadow="2xl"
-              onClick={(e) => e.stopPropagation()}
+              alignItems="center"
+              justifyContent="center"
+              borderWidth="1px"
+              borderStyle="dashed"
+              borderColor={C.line}
+              borderRadius="lg"
+              color={C.muted}
+              fontSize="sm"
             >
-              {/* Modal Header */}
-              <Flex justify="space-between" align="center" p={4} borderBottom="1px solid" borderColor="gray.800">
-                <Text fontSize="sm" fontWeight="bold" color="gray.100">
-                  {activeScreenshot.tabLabel}
-                </Text>
-                <Button
-                  ref={closeButtonRef}
-                  size="xs"
-                  variant="ghost"
-                  color="gray.400"
-                  _hover={{ color: "white", bg: "whiteAlpha.100" }}
-                  onClick={() => setActiveScreenshot(null)}
-                  aria-label="Close image preview"
-                >
-                  <LuX size={18} />
-                </Button>
-              </Flex>
-
-              {/* Modal Image Body */}
-              <Box p={2} bg="blackAlpha.800" display="flex" justifyContent="center" alignItems="center" overflowY="auto">
-                <Box
-                  as="img"
-                  src={activeScreenshot.imageSrc}
-                  alt={activeScreenshot.altText}
-                  maxH="70vh"
-                  width="auto"
-                  style={{ objectFit: "contain" }}
-                />
-              </Box>
-
-              {/* Modal Caption Footer */}
-              <Box p={4} bg="gray.950" borderTop="1px solid" borderColor="gray.800">
-                <Text fontSize="xs" color="gray.300" lineHeight="1.6">
-                  {activeScreenshot.caption}
-                </Text>
-              </Box>
+              No screenshot yet
             </Box>
+          )}
+          <P mt={3} fontSize="sm" color="gray.400">
+            <Text as="span" color={C.heading} fontWeight="medium">
+              {active.tabLabel}.
+            </Text>{" "}
+            {active.caption}
+          </P>
+        </Box>
+      </Box>
+
+      {/* Lightbox */}
+      {lightboxOpen && active.imageSrc && (
+        <Box
+          position="fixed"
+          inset={0}
+          bg="blackAlpha.900"
+          zIndex={1000}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          p={{ base: 3, md: 8 }}
+          onClick={() => setLightboxOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Enlarged screenshot: ${active.tabLabel}`}
+        >
+          <Box position="relative" maxW="1400px" width="full" onClick={(e) => e.stopPropagation()}>
+            <Button
+              ref={closeButtonRef}
+              position="absolute"
+              top={-11}
+              right={0}
+              size="sm"
+              variant="ghost"
+              color="gray.300"
+              _hover={{ color: "white", bg: "whiteAlpha.200" }}
+              onClick={() => setLightboxOpen(false)}
+              aria-label="Close image preview"
+            >
+              <LuX size={20} />
+            </Button>
+            <Box
+              as="img"
+              src={active.imageSrc}
+              alt={active.altText}
+              display="block"
+              mx="auto"
+              maxH="85vh"
+              maxW="100%"
+              borderRadius="md"
+            />
+            <Text fontSize="sm" color="gray.300" mt={3} textAlign="center">
+              {active.caption}
+            </Text>
           </Box>
-        )}
-      </VStack>
-    </Box>
+        </Box>
+      )}
+    </Section>
   );
 }

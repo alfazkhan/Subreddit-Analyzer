@@ -12,7 +12,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:api": "playwright test tests/e2e/api.smoke.spec.ts",
-    "typecheck": "tsc --noEmit --project tsconfig.json"
+    "typecheck": "tsc --noEmit --project tsconfig.json",
+    "deploy": "npm run build && firebase deploy"
   },
   "dependencies": {
     "@chakra-ui/react": "^3.35.0",

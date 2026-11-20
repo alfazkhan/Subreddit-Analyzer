@@ -1,16 +1,8 @@
-import {
-  Badge,
-  Box,
-  Button,
-  Flex,
-  Heading,
-  HStack,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Box, Button, Heading, Text } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import {
   AUTHOR_FACTS,
+  HYPOTHESES_PILLARS,
   SHOW_SUPERVISORS,
   SUPERVISORS,
   THE_QUESTION,
@@ -18,214 +10,208 @@ import {
   THESIS_METADATA,
 } from "@/data/aboutContent";
 import { GlossaryTerm } from "./GlossaryTerm";
-import { LuArrowUpRight, LuGithub, LuLayoutDashboard } from "react-icons/lu";
+import { C, P, Section, SubHeading } from "./aboutUi";
+import { LuArrowUpRight, LuGithub, LuLinkedin, LuMail } from "react-icons/lu";
 
-export function AuthorThesisSection() {
+const HYPOTHESIS_COUNT = HYPOTHESES_PILLARS.reduce((n, p) => n + p.hypotheses.length, 0);
+
+const STATS = [
+  { value: THESIS_METADATA.snapshotSampleSize.toLocaleString("en-US"), label: "posts analysed" },
+  { value: String(THESIS_METADATA.cityCount), label: "city subreddits" },
+  { value: String(HYPOTHESIS_COUNT), label: "hypotheses tested" },
+  { value: "7 days", label: "wait before measuring" },
+];
+
+export function ProjectHero() {
   return (
-    <VStack align="stretch" gap={10}>
-      {/* 1. Header & Metadata Block */}
-      <Box id="section-intro">
-        <VStack align="start" gap={4}>
-          <Heading as="h2" size="xl" color="orange.400" fontWeight="semibold" pb={2} borderBottom="1px solid" borderColor="gray.800" width="full">
-            Project Overview & Thesis Context
-          </Heading>
+    <Box as="header" maxW="820px">
+      <Text fontSize="sm" fontWeight="medium" color={C.accent} mb={3}>
+        MBA thesis project · ISM Munich
+      </Text>
+      <Heading
+        as="h1"
+        fontSize={{ base: "4xl", md: "5xl" }}
+        fontWeight="bold"
+        letterSpacing="-0.03em"
+        lineHeight="1.1"
+        color={C.heading}
+        mb={5}
+      >
+        About this project
+      </Heading>
+      <Text fontSize={{ base: "lg", md: "xl" }} lineHeight="1.6" color="gray.300" maxW="62ch">
+        Subreddit Analyzer collects public posts from {THESIS_METADATA.cityCount} city subreddits and
+        measures which ones get discussed and upvoted, and why. It&apos;s the research tool behind my
+        master&apos;s thesis.
+      </Text>
+      <Text fontSize="sm" color={C.muted} mt={3}>
+        By {AUTHOR_FACTS.name} · Thesis due {THESIS_METADATA.submissionPeriod} · Data snapshot{" "}
+        {THESIS_METADATA.snapshotDate}
+      </Text>
 
-          <Text color="gray.300" fontSize="md" lineHeight="1.8">
-            An empirical data mining and computational linguistics platform investigating civic communication patterns,
-            emotional affect, and thematic consensus across eleven metropolitan community subreddits.
-          </Text>
+      <Box display="flex" flexWrap="wrap" gap={3} mt={7}>
+        <Button asChild size="md" bg="orange.500" color="white" fontWeight="semibold" _hover={{ bg: "orange.400" }}>
+          <RouterLink to="/">Open the dashboard</RouterLink>
+        </Button>
+        <Button
+          asChild
+          size="md"
+          variant="outline"
+          borderColor="whiteAlpha.300"
+          color="gray.100"
+          _hover={{ bg: "whiteAlpha.100" }}
+        >
+          <a href={AUTHOR_FACTS.links.github} target="_blank" rel="noopener noreferrer">
+            <LuGithub /> View on GitHub <LuArrowUpRight />
+          </a>
+        </Button>
+      </Box>
 
-          {/* Academic Metadata Banner */}
-          <Box
-            bg="gray.950"
-            borderWidth="1px"
-            borderColor="gray.800"
-            borderRadius="lg"
-            p={4}
-            width="full"
-          >
-            <VStack align="start" gap={2}>
-              <Text fontSize="xs" fontWeight="bold" color="orange.400" textTransform="uppercase" letterSpacing="wider">
-                Academic Metadata
-              </Text>
-              <Text fontSize="sm" color="gray.200" fontWeight="medium">
-                {THESIS_METADATA.degree} &bull; {THESIS_METADATA.institution}
-              </Text>
-              <HStack gap={4} wrap="wrap" fontSize="xs" color="gray.400">
-                <Text>Target Submission: {THESIS_METADATA.submissionPeriod}</Text>
-                <Text>&bull;</Text>
-                <Text>Corpus Snapshot: {THESIS_METADATA.snapshotDate} (N = {THESIS_METADATA.snapshotSampleSize.toLocaleString("en-US")} posts)</Text>
-              </HStack>
-            </VStack>
-          </Box>
-
-          {/* Action Buttons */}
-          <HStack gap={3} pt={1} wrap="wrap">
-            <RouterLink to="/">
-              <Button
-                size="sm"
-                bg="orange.600"
-                color="white"
-                _hover={{ bg: "orange.500" }}
-                fontWeight="semibold"
-              >
-                <LuLayoutDashboard size={14} style={{ marginRight: "6px" }} />
-                Open the dashboard
-              </Button>
-            </RouterLink>
-
-            <a
-              href={AUTHOR_FACTS.links.github}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button
-                size="sm"
-                variant="outline"
-                colorPalette="gray"
-                borderColor="gray.700"
-                color="gray.200"
-                _hover={{ bg: "gray.850", borderColor: "gray.600" }}
-              >
-                <LuGithub size={14} style={{ marginRight: "6px" }} />
-                View on GitHub
-                <LuArrowUpRight size={12} style={{ marginLeft: "4px" }} />
-              </Button>
-            </a>
-          </HStack>
-
-          {/* Optional Supervisors (rendered only when SHOW_SUPERVISORS is true) */}
-          {SHOW_SUPERVISORS && (
-            <Box bg="gray.950" p={4} borderRadius="md" borderWidth="1px" borderColor="gray.800" width="full" mt={2}>
-              <Text fontSize="xs" fontWeight="bold" color="gray.400" textTransform="uppercase" mb={2}>
-                Academic Supervisors
-              </Text>
-              <VStack align="start" gap={1}>
-                {SUPERVISORS.map((sup) => (
-                  <Text key={sup.name} fontSize="xs" color="gray.300">
-                    <strong>{sup.name}</strong> ({sup.role}) &mdash; {sup.institution}
-                  </Text>
-                ))}
-              </VStack>
+      <Box
+        as="dl"
+        display="grid"
+        gridTemplateColumns={{ base: "repeat(2, 1fr)", md: "repeat(4, 1fr)" }}
+        gap={{ base: 5, md: 8 }}
+        mt={10}
+        pt={8}
+        borderTopWidth="1px"
+        borderColor={C.line}
+      >
+        {STATS.map((s) => (
+          <Box key={s.label}>
+            <Box as="dd" m={0} fontSize={{ base: "2xl", md: "3xl" }} fontWeight="semibold" color={C.heading} letterSpacing="-0.02em">
+              {s.value}
             </Box>
+            <Box as="dt" fontSize="sm" color={C.muted}>
+              {s.label}
+            </Box>
+          </Box>
+        ))}
+      </Box>
+    </Box>
+  );
+}
+
+export function QuestionSection() {
+  return (
+    <Section id="section-question" title="The question">
+      <Box display="grid" gap={5}>
+        <P>{THE_QUESTION.paragraphs[0]}</P>
+        <P>{THE_QUESTION.paragraphs[1]}</P>
+        <P>
+          The thesis frames this as an <GlossaryTerm termId="attention-economy">attention economy</GlossaryTerm>{" "}
+          problem: which kinds of <GlossaryTerm termId="civic-friction">civic friction</GlossaryTerm> rise to the
+          top, and which get ignored.
+        </P>
+
+        <Box as="figure" m={0} my={3} pl={5} borderLeftWidth="3px" borderColor="orange.400">
+          <Text fontSize="sm" color={C.muted} mb={2}>
+            Research question
+          </Text>
+          <Text as="blockquote" m={0} fontSize={{ base: "lg", md: "xl" }} lineHeight="1.55" color={C.heading} fontWeight="medium">
+            {THE_QUESTION.researchQuestion}
+          </Text>
+        </Box>
+
+        <Text fontSize="sm" color={C.muted} lineHeight="1.6" maxW="68ch">
+          Thesis title: <Text as="span" color="gray.400" fontStyle="italic">{THESIS_METADATA.title}</Text>
+        </Text>
+      </Box>
+    </Section>
+  );
+}
+
+function ContactLink({ href, icon, children }: { href: string; icon: React.ReactNode; children: React.ReactNode }) {
+  const external = href.startsWith("http");
+  return (
+    <Box
+      as="a"
+      href={href}
+      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      display="inline-flex"
+      alignItems="center"
+      gap={2}
+      fontSize="sm"
+      color="gray.200"
+      textDecoration="none"
+      _hover={{ color: "orange.300" }}
+      _focusVisible={{ outline: "2px solid", outlineColor: "orange.400", outlineOffset: "2px" }}
+    >
+      {icon}
+      {children}
+    </Box>
+  );
+}
+
+export function AboutMeSection() {
+  const { links } = AUTHOR_FACTS;
+  return (
+    <Section id="section-about-me" title="About me">
+      <Box display="grid" gap={5}>
+        <P>
+          I&apos;m <Text as="strong" color={C.heading}>{AUTHOR_FACTS.name}</Text>, an {AUTHOR_FACTS.degree} student at{" "}
+          {AUTHOR_FACTS.institution}. My thesis is due in {AUTHOR_FACTS.thesisSubmission}.
+        </P>
+        <P>{AUTHOR_FACTS.bio}</P>
+
+        <Box as="figure" m={0} pl={5} borderLeftWidth="3px" borderColor={C.line}>
+          <Text fontSize="sm" color={C.muted} mb={1.5}>
+            Why I built it
+          </Text>
+          <Text as="blockquote" m={0} fontSize="md" lineHeight="1.7" color="gray.200">
+            {AUTHOR_FACTS.whyIBuiltThis}
+          </Text>
+        </Box>
+
+        <Box display="flex" flexWrap="wrap" columnGap={6} rowGap={2}>
+          <ContactLink href={`mailto:${links.email}`} icon={<LuMail />}>
+            {links.email}
+          </ContactLink>
+          <ContactLink href={links.github} icon={<LuGithub />}>
+            GitHub
+          </ContactLink>
+          {links.linkedin && (
+            <ContactLink href={links.linkedin} icon={<LuLinkedin />}>
+              LinkedIn
+            </ContactLink>
           )}
-        </VStack>
-      </Box>
+        </Box>
 
-      {/* 2. The Question */}
-      <Box id="section-question">
-        <VStack align="start" gap={4}>
-          <Heading as="h2" size="xl" color="orange.400" fontWeight="semibold" pb={2} borderBottom="1px solid" borderColor="gray.800" width="full">
-            The Research Question
-          </Heading>
-
-          <Box bg="blackAlpha.600" borderLeftWidth="3px" borderColor="orange.500" p={4} borderRadius="md" width="full">
-            <Text fontSize="xs" fontWeight="bold" color="orange.400" textTransform="uppercase" letterSpacing="wider" mb={1}>
-              Master Thesis Title
+        {SHOW_SUPERVISORS && (
+          <Box>
+            <Text fontSize="sm" color={C.muted} mb={1}>
+              Supervisors
             </Text>
-            <Text fontSize="md" fontWeight="semibold" color="gray.100" lineHeight="1.6">
-              &ldquo;{THESIS_METADATA.title}&rdquo;
-            </Text>
+            {SUPERVISORS.map((sup) => (
+              <Text key={sup.name} fontSize="sm" color={C.text}>
+                {sup.name} ({sup.role}), {sup.institution}
+              </Text>
+            ))}
           </Box>
+        )}
 
-          <Text color="gray.300" fontSize="md" lineHeight="1.8">
-            {THE_QUESTION.paragraphs[0]}
-          </Text>
-
-          <Text color="gray.300" fontSize="md" lineHeight="1.8">
-            {THE_QUESTION.paragraphs[1]} This dynamic connects directly to the{" "}
-            <GlossaryTerm termId="attention-economy">attention economy</GlossaryTerm> and the emergence of{" "}
-            <GlossaryTerm termId="civic-friction">civic friction</GlossaryTerm> in metropolitan governance.
-          </Text>
-
-          <Box bg="gray.950" p={4} borderRadius="lg" borderWidth="1px" borderColor="gray.800" width="full">
-            <Text fontSize="xs" fontWeight="bold" color="gray.400" textTransform="uppercase" letterSpacing="wider" mb={1}>
-              Primary Research Question
-            </Text>
-            <Text fontSize="sm" color="gray.200" fontStyle="italic" lineHeight="1.7">
-              {THE_QUESTION.researchQuestion}
-            </Text>
-          </Box>
-        </VStack>
-      </Box>
-
-      {/* 3. About Me */}
-      <Box id="section-about-me">
-        <VStack align="start" gap={4}>
-          <Heading as="h2" size="xl" color="orange.400" fontWeight="semibold" pb={2} borderBottom="1px solid" borderColor="gray.800" width="full">
-            About Me
-          </Heading>
-
-          <Text color="gray.300" fontSize="md" lineHeight="1.8">
-            My name is <strong>{AUTHOR_FACTS.name}</strong>. I am an {AUTHOR_FACTS.degree} student at {AUTHOR_FACTS.institution}, with scheduled thesis submission in {AUTHOR_FACTS.thesisSubmission}.
-          </Text>
-
-          <Text color="gray.300" fontSize="md" lineHeight="1.8">
-            {AUTHOR_FACTS.bio}
-          </Text>
-
-          {/* Quote Block: Why I built this */}
-          <Box bg="gray.950" p={4} borderRadius="lg" borderWidth="1px" borderColor="gray.800" width="full">
-            <Text fontSize="xs" fontWeight="bold" color="orange.400" textTransform="uppercase" letterSpacing="wider" mb={1}>
-              Why I Built This (in my own words)
-            </Text>
-            <Text fontSize="sm" color="gray.300" fontStyle="italic" lineHeight="1.7">
-              &ldquo;{AUTHOR_FACTS.whyIBuiltThis}&rdquo;
-            </Text>
-          </Box>
-
-          {/* Contact and Links */}
-          <Flex wrap="wrap" gap={3} pt={1} fontSize="xs">
-            <Box bg="whiteAlpha.50" px={3} py={2} borderRadius="md" borderWidth="1px" borderColor="gray.800">
-              <Text color="gray.400">Email: <code>{AUTHOR_FACTS.links.email}</code></Text>
-            </Box>
-            <Box bg="whiteAlpha.50" px={3} py={2} borderRadius="md" borderWidth="1px" borderColor="gray.800">
-              <Text color="gray.400">GitHub: <a href={AUTHOR_FACTS.links.github} target="_blank" rel="noopener noreferrer" style={{ color: "#f97316" }}>{AUTHOR_FACTS.links.github}</a></Text>
-            </Box>
-            <Box bg="whiteAlpha.50" px={3} py={2} borderRadius="md" borderWidth="1px" borderColor="gray.800">
-              <Text color="gray.400">LinkedIn: <code>{AUTHOR_FACTS.links.linkedin}</code></Text>
-            </Box>
-          </Flex>
-
-          <Box bg="blackAlpha.500" p={3} borderRadius="md" borderWidth="1px" borderColor="gray.850" width="full">
-            <Text fontSize="xs" color="gray.400">
-              <strong>H4 Re-run Status:</strong> {AUTHOR_FACTS.h4RerunStatus}
-            </Text>
-          </Box>
-        </VStack>
-      </Box>
-
-      {/* 4. Why This Is My Master's Thesis */}
-      <Box id="section-thesis">
-        <VStack align="start" gap={4}>
-          <Heading as="h2" size="xl" color="orange.400" fontWeight="semibold" pb={2} borderBottom="1px solid" borderColor="gray.800" width="full">
-            Why This Is My Master&apos;s Thesis
-          </Heading>
-
-          <Text color="gray.300" fontSize="md" lineHeight="1.8">
-            {THESIS_CONTEXT.instrumentStatement} Building an automated analytical dashboard ensures full methodological transparency:
-            every metric, classification, and regression can be inspected interactively rather than remaining hidden in static appendices.
-          </Text>
-
-          <VStack align="stretch" gap={3} width="full" pt={2}>
+        <Box mt={4}>
+          <SubHeading>Why this is my thesis</SubHeading>
+          <P mb={4}>{THESIS_CONTEXT.instrumentStatement}</P>
+          <Box as="ol" m={0} p={0} listStyleType="none" display="grid" gap={4}>
             {THESIS_CONTEXT.contributions.map((item, index) => (
-              <Box key={item.title} bg="gray.950" p={4} borderRadius="lg" borderWidth="1px" borderColor="gray.800">
-                <HStack gap={2} mb={1}>
-                  <Badge colorPalette="orange" variant="outline" size="xs">
-                    Contribution {index + 1}
-                  </Badge>
-                  <Text fontSize="sm" fontWeight="bold" color="gray.200">
+              <Box as="li" key={item.title} display="grid" gridTemplateColumns="28px 1fr" gap={3}>
+                <Text fontSize="sm" fontWeight="semibold" color={C.accent} lineHeight="1.7" fontVariantNumeric="tabular-nums">
+                  {String(index + 1).padStart(2, "0")}
+                </Text>
+                <Box>
+                  <Text fontWeight="semibold" color={C.heading}>
                     {item.title}
                   </Text>
-                </HStack>
-                <Text fontSize="xs" color="gray.400" lineHeight="1.7">
-                  {item.description}
-                </Text>
+                  <Text color={C.text} lineHeight="1.7" maxW="64ch">
+                    {item.description}
+                  </Text>
+                </Box>
               </Box>
             ))}
-          </VStack>
-        </VStack>
+          </Box>
+        </Box>
       </Box>
-    </VStack>
+    </Section>
   );
 }

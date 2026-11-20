@@ -1,56 +1,35 @@
-import {
-  Box,
-  Heading,
-  HStack,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Box, Text } from "@chakra-ui/react";
 import { READING_RESULTS_CONTENT } from "@/data/aboutContent";
 import { GlossaryTerm } from "./GlossaryTerm";
-import { LuBookOpen, LuScale } from "react-icons/lu";
+import { C, P, Section } from "./aboutUi";
 
 export function ReadingResultsSection() {
   return (
-    <Box id="section-reading-results">
-      <VStack align="stretch" gap={5}>
-        <Heading as="h2" size="xl" color="orange.400" fontWeight="semibold" pb={2} borderBottom="1px solid" borderColor="gray.800">
-          How to Read the Results: Statistical Rigor &amp; Interpretation
-        </Heading>
-
-        <Text color="gray.300" fontSize="md" lineHeight="1.8">
-          Interpreting empirical computational social science requires distinguishing between statistical detection
-          and substantive real-world significance. In big data research, standard statistical assumptions must be treated with caution.
-        </Text>
-
-        <VStack align="stretch" gap={4} pt={2}>
-          {READING_RESULTS_CONTENT.paragraphs.map((para, index) => (
-            <Box
-              key={para.title}
-              bg="gray.950"
-              p={5}
-              borderRadius="lg"
-              borderWidth="1px"
-              borderColor="gray.800"
-            >
-              <HStack gap={2} mb={2}>
-                <LuScale color="#f97316" size={16} />
-                <Text fontSize="sm" fontWeight="bold" color="gray.100">
-                  {index + 1}. {para.title}
-                </Text>
-              </HStack>
-              <Text fontSize="xs" color="gray.300" lineHeight="1.8">
-                {para.text}
+    <Section
+      id="section-reading-results"
+      title="Reading the numbers"
+      lede="Four things to keep in mind when reading the results above."
+    >
+      <Box as="ol" m={0} p={0} listStyleType="none" display="grid" gap={7}>
+        {READING_RESULTS_CONTENT.paragraphs.map((para, index) => (
+          <Box as="li" key={para.title} display="grid" gridTemplateColumns="28px 1fr" gap={3}>
+            <Text fontSize="sm" fontWeight="semibold" color={C.accent} lineHeight="1.9" fontVariantNumeric="tabular-nums">
+              {index + 1}
+            </Text>
+            <Box>
+              <Text as="h3" fontSize="lg" fontWeight="semibold" color={C.heading} mb={1}>
+                {para.title}
               </Text>
+              <P>{para.text}</P>
             </Box>
-          ))}
-        </VStack>
+          </Box>
+        ))}
+      </Box>
 
-        <Box bg="blackAlpha.700" p={4} borderRadius="lg" borderWidth="1px" borderColor="gray.800" mt={2}>
-          <Text fontSize="xs" color="gray.400" lineHeight="1.6">
-            <strong>Key Takeaway:</strong> High statistical confidence (tiny <GlossaryTerm termId="p-value">p-values</GlossaryTerm>) guarantees that patterns in this 51,587-post corpus are not random noise. However, the magnitude of the <GlossaryTerm termId="effect-size">effect size</GlossaryTerm> determines whether an observed pattern truly shapes municipal community attention.
-          </Text>
-        </Box>
-      </VStack>
-    </Box>
+      <P mt={8} pl={5} borderLeftWidth="3px" borderColor="orange.400" color="gray.200">
+        In short: a tiny <GlossaryTerm termId="p-value">p-value</GlossaryTerm> means a pattern is real. The{" "}
+        <GlossaryTerm termId="effect-size">effect size</GlossaryTerm> tells you whether it's big enough to care about.
+      </P>
+    </Section>
   );
 }

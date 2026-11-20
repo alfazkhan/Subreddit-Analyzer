@@ -1,176 +1,144 @@
-import {
-  Badge,
-  Box,
-  Flex,
-  Heading,
-  HStack,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Box, Text } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 import { DATA_METHOD_CONTENT, THESIS_METADATA } from "@/data/aboutContent";
-import { GlossaryTerm } from "./GlossaryTerm";
 import type { RootState } from "@/util/Types";
-import { LuCheck, LuX, LuDatabase, LuFilter, LuCpu } from "react-icons/lu";
+import { C, P, Section, SubHeading } from "./aboutUi";
+import { LuCheck, LuX } from "react-icons/lu";
+
+const FALLBACK_CITIES = [
+  "amsterdam", "berlin", "delhi", "hongkong", "london", "losangeles",
+  "mumbai", "munich", "nyc", "singapore", "toronto",
+];
+
+function IconList({ items, kept }: { items: { label: string; detail?: string }[]; kept: boolean }) {
+  return (
+    <Box as="ul" m={0} p={0} listStyleType="none" display="grid" gap={2.5}>
+      {items.map((item) => (
+        <Box as="li" key={item.label} display="flex" gap={2.5} alignItems="flex-start">
+          <Box as="span" mt="4px" flexShrink={0} color={kept ? "green.300" : "red.300"} aria-hidden="true">
+            {kept ? <LuCheck size={15} /> : <LuX size={15} />}
+          </Box>
+          <Box>
+            <Text color="gray.200" lineHeight="1.6">
+              {item.label}
+            </Text>
+            {item.detail && (
+              <Text fontSize="sm" color={C.muted} lineHeight="1.5">
+                {item.detail}
+              </Text>
+            )}
+          </Box>
+        </Box>
+      ))}
+    </Box>
+  );
+}
 
 export function DataMethodSection() {
-  const latestSummary = useSelector(
-    (state: RootState) => state.serverStatusState.latestSummary,
-  );
-
-  const activeCities = Object.keys(latestSummary || {}).length > 0
-    ? Object.keys(latestSummary).sort()
-    : ["amsterdam", "berlin", "delhi", "hongkong", "london", "losangeles", "mumbai", "munich", "nyc", "singapore", "toronto"];
+  const latestSummary = useSelector((state: RootState) => state.serverStatusState.latestSummary);
+  const liveCities = Object.keys(latestSummary || {});
+  const cities = liveCities.length > 0 ? [...liveCities].sort() : FALLBACK_CITIES;
+  const n = THESIS_METADATA.snapshotSampleSize.toLocaleString("en-US");
 
   return (
-    <Box id="section-data-method">
-      <VStack align="stretch" gap={6}>
-        <Heading as="h2" size="xl" color="orange.400" fontWeight="semibold" pb={2} borderBottom="1px solid" borderColor="gray.800">
-          Data and Method
-        </Heading>
+    <Section id="section-data-method" title="Data">
+      <Box display="grid" gap={12}>
+        <Box>
+          <SubHeading>Why wait 7 days?</SubHeading>
+          <P>{DATA_METHOD_CONTENT.maturityWindowExplanation}</P>
+        </Box>
 
-        {/* 1. The 7-Day Maturity Window */}
-        <VStack align="start" gap={3}>
-          <Heading as="h3" size="md" color="gray.100" fontWeight="medium">
-            The 7-Day Maturity Window &amp; Equilibrium Principle
-          </Heading>
-          <Text color="gray.300" fontSize="md" lineHeight="1.8">
-            {DATA_METHOD_CONTENT.maturityWindowExplanation}
-          </Text>
-        </VStack>
-
-        {/* 2. What Is Stored vs. What Is Deliberately Excluded */}
-        <Flex wrap="wrap" gap={4} width="full">
-          <Box flex="1 1 calc(50% - 8px)" minW={{ base: "100%", md: "320px" }} bg="gray.950" p={5} borderRadius="lg" borderWidth="1px" borderColor="gray.800">
-            <HStack gap={2} mb={3}>
-              <LuCheck color="#4ade80" size={18} />
-              <Text fontSize="sm" fontWeight="bold" color="gray.100">
-                Data Points Collected &amp; Stored
+        <Box>
+          <SubHeading>What's collected, and what isn't</SubHeading>
+          <Box display="grid" gridTemplateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={{ base: 8, md: 10 }} mt={4}>
+            <Box>
+              <Text fontSize="sm" color={C.muted} mb={3}>
+                Kept for each post
               </Text>
-            </HStack>
-            <VStack align="stretch" gap={2}>
-              {DATA_METHOD_CONTENT.storedFields.map((item) => (
-                <Box key={item.field} bg="whiteAlpha.50" p={2.5} borderRadius="md">
-                  <Text fontSize="xs" fontWeight="semibold" color="orange.300">
-                    {item.field}
-                  </Text>
-                  <Text fontSize="2xs" color="gray.400">
-                    {item.detail}
-                  </Text>
-                </Box>
-              ))}
-            </VStack>
-          </Box>
-
-          <Box flex="1 1 calc(50% - 8px)" minW={{ base: "100%", md: "320px" }} bg="gray.950" p={5} borderRadius="lg" borderWidth="1px" borderColor="gray.800">
-            <HStack gap={2} mb={3}>
-              <LuX color="#f87171" size={18} />
-              <Text fontSize="sm" fontWeight="bold" color="gray.100">
-                Deliberately Excluded (Data Minimization)
-              </Text>
-            </HStack>
-            <VStack align="stretch" gap={2}>
-              {DATA_METHOD_CONTENT.deliberatelyExcludedFields.map((field) => (
-                <HStack key={field} bg="whiteAlpha.50" p={2.5} borderRadius="md" align="flex-start" gap={2}>
-                  <Text color="red.400" fontSize="xs" lineHeight="1">&times;</Text>
-                  <Text fontSize="xs" color="gray.400" lineHeight="1.5">
-                    {field}
-                  </Text>
-                </HStack>
-              ))}
-            </VStack>
-          </Box>
-        </Flex>
-
-        {/* 3. The Cleaning Filter & Sample Size */}
-        <Box bg="gray.950" p={5} borderRadius="lg" borderWidth="1px" borderColor="gray.800">
-          <VStack align="start" gap={3}>
-            <HStack gap={2}>
-              <LuFilter color="#f97316" size={18} />
-              <Text fontSize="sm" fontWeight="bold" color="gray.100">
-                Data Cleaning Filter &amp; Corpus Size
-              </Text>
-            </HStack>
-            <Text fontSize="xs" color="gray.300" lineHeight="1.7">
-              Raw posts in the PostgreSQL database undergo strict programmatic cleaning in <code>Scraping/database/kpis.py</code> before entering the statistical analysis engine:
-            </Text>
-            <VStack align="stretch" gap={1.5} width="full" pl={2}>
-              {DATA_METHOD_CONTENT.cleaningFilters.map((filter) => (
-                <HStack key={filter} gap={2}>
-                  <Text color="orange.400" fontSize="xs">&bull;</Text>
-                  <Text fontSize="xs" color="gray.400" fontFamily="mono">
-                    {filter}
-                  </Text>
-                </HStack>
-              ))}
-            </VStack>
-            <Box bg="blackAlpha.700" p={3} borderRadius="md" width="full" mt={1}>
-              <Text fontSize="xs" color="gray.300">
-                <strong>Thesis Frozen Snapshot:</strong> N = <strong>{THESIS_METADATA.snapshotSampleSize.toLocaleString("en-US")}</strong> verified submissions (frozen November 2026).
-                The active database continues continuous headless ingestion and currently holds over 85,000 cleaned records.
-              </Text>
+              <IconList kept items={DATA_METHOD_CONTENT.storedFields.map((f) => ({ label: f.field, detail: f.detail }))} />
             </Box>
-          </VStack>
+            <Box>
+              <Text fontSize="sm" color={C.muted} mb={3}>
+                Never collected
+              </Text>
+              <IconList kept={false} items={DATA_METHOD_CONTENT.deliberatelyExcludedFields.map((label) => ({ label }))} />
+            </Box>
+          </Box>
         </Box>
 
-        {/* 4. Municipal Cities Covered */}
-        <Box bg="gray.950" p={5} borderRadius="lg" borderWidth="1px" borderColor="gray.800">
-          <VStack align="start" gap={3}>
-            <HStack justify="space-between" width="full" wrap="wrap">
-              <HStack gap={2}>
-                <LuDatabase color="#38bdf8" size={18} />
-                <Text fontSize="sm" fontWeight="bold" color="gray.100">
-                  Monitored Municipal Subreddits ({activeCities.length} cities)
-                </Text>
-              </HStack>
-              <Badge variant="subtle" colorPalette="blue" size="xs">
-                Dynamically Loaded from Server Summary
-              </Badge>
-            </HStack>
-            <Text fontSize="xs" color="gray.400">
-              Cities are identified by IANA timezones and monitored for continuous topic and sentiment aggregation:
-            </Text>
-            <Flex wrap="wrap" gap={2}>
-              {activeCities.map((city) => (
-                <Badge key={city} colorPalette="orange" variant="outline" size="sm" px={2.5} py={1}>
-                  r/{city.toLowerCase()}
-                </Badge>
-              ))}
-            </Flex>
-          </VStack>
+        <Box>
+          <SubHeading>Cleaning</SubHeading>
+          <P mb={3}>
+            Before analysis, <code>Scraping/database/kpis.py</code> drops:
+          </P>
+          <Box as="ul" m={0} pl={5} listStyleType="disc" color={C.text} lineHeight="1.8" display="grid" gap={0.5}>
+            {DATA_METHOD_CONTENT.cleaningFilters.map((filter) => (
+              <li key={filter}>{filter}</li>
+            ))}
+          </Box>
+          <P mt={4}>
+            That leaves <Text as="strong" color={C.heading}>{n} posts</Text> in the thesis snapshot, frozen in{" "}
+            {THESIS_METADATA.snapshotDate}. The live database keeps collecting and now holds over 85,000 cleaned posts.
+          </P>
         </Box>
 
-        {/* 5. Local NLP Models & Derived Variables */}
-        <VStack align="start" gap={3}>
-          <HStack gap={2}>
-            <LuCpu color="#c084fc" size={18} />
-            <Heading as="h3" size="md" color="gray.100" fontWeight="medium">
-              Multilingual NLP Models &amp; Derived Variables
-            </Heading>
-          </HStack>
-          <Text fontSize="xs" color="gray.300" lineHeight="1.7">
-            Models execute locally with PyTorch CUDA float16 acceleration, falling back to CPU float32 if GPU is unavailable:
-          </Text>
-
-          <Flex wrap="wrap" gap={3} width="full">
-            {DATA_METHOD_CONTENT.nlpModels.map((item) => (
-              <Box key={item.domain} flex="1 1 calc(50% - 6px)" minW={{ base: "100%", md: "320px" }} bg="gray.950" p={4} borderRadius="lg" borderWidth="1px" borderColor="gray.800">
-                <HStack justify="space-between" mb={1}>
-                  <Text fontSize="xs" fontWeight="bold" color="orange.400">
-                    {item.domain}
-                  </Text>
-                </HStack>
-                <Text fontSize="2xs" color="gray.400" fontFamily="mono" mb={1.5}>
-                  {item.model}
-                </Text>
-                <Text fontSize="xs" color="gray.300" lineHeight="1.6">
-                  <strong>Derived Variables:</strong> {item.derivedVariables}
-                </Text>
+        <Box>
+          <SubHeading>Cities</SubHeading>
+          <P mb={3}>
+            {cities.length} subreddits, each analysed in its own local time zone:
+          </P>
+          <Box display="flex" flexWrap="wrap" gap={2}>
+            {cities.map((city) => (
+              <Box
+                key={city}
+                as="span"
+                fontFamily="mono"
+                fontSize="sm"
+                color="gray.200"
+                bg="whiteAlpha.100"
+                px={2.5}
+                py={1}
+                borderRadius="md"
+              >
+                r/{city.toLowerCase()}
               </Box>
             ))}
-          </Flex>
-        </VStack>
-      </VStack>
-    </Box>
+          </Box>
+        </Box>
+
+        <Box>
+          <SubHeading>Language models</SubHeading>
+          <P mb={4}>All four run locally, on a GPU when one is available and on the CPU otherwise.</P>
+          <Box overflowX="auto">
+            <Box as="table" width="full" minW="520px" style={{ borderCollapse: "collapse" }}>
+              <thead>
+                <Box as="tr" borderBottomWidth="1px" borderColor={C.line}>
+                  {["Task", "Model", "What it produces"].map((h) => (
+                    <Box as="th" key={h} textAlign="left" fontSize="xs" fontWeight="medium" color={C.muted} py={2} pr={4}>
+                      {h}
+                    </Box>
+                  ))}
+                </Box>
+              </thead>
+              <tbody>
+                {DATA_METHOD_CONTENT.nlpModels.map((m) => (
+                  <Box as="tr" key={m.domain} borderBottomWidth="1px" borderColor="whiteAlpha.100" verticalAlign="top">
+                    <Box as="td" py={3} pr={4} fontSize="sm" fontWeight="medium" color={C.heading} whiteSpace="nowrap">
+                      {m.domain}
+                    </Box>
+                    <Box as="td" py={3} pr={4} fontFamily="mono" fontSize="xs" color="gray.400" maxW="220px" wordBreak="break-word">
+                      {m.model}
+                    </Box>
+                    <Box as="td" py={3} fontSize="sm" color={C.text} lineHeight="1.6">
+                      {m.derivedVariables}
+                    </Box>
+                  </Box>
+                ))}
+              </tbody>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+    </Section>
   );
 }

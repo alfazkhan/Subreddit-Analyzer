@@ -1,154 +1,133 @@
-import { useState } from "react";
-import {
-  Badge,
-  Box,
-  Button,
-  Flex,
-  Heading,
-  HStack,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Box, Text } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import { HYPOTHESES_PILLARS, THESIS_METADATA } from "@/data/aboutContent";
 import { HypothesisCard } from "./HypothesisCard";
-import { LuChevronDown, LuChevronUp, LuExternalLink, LuLayers } from "react-icons/lu";
+import { C, Section, VerdictPill } from "../aboutUi";
+import { LuArrowRight } from "react-icons/lu";
+
+const ALL_HYPOTHESES = HYPOTHESES_PILLARS.flatMap((p) => p.hypotheses);
+
+const NUMBER_WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+const word = (count: number) => NUMBER_WORDS[count] ?? String(count);
+
+function verdictSummary() {
+  const count = (v: string) => ALL_HYPOTHESES.filter((h) => h.verdict === v).length;
+  const parts = [
+    `${word(count("Supported"))} held up`,
+    count("Supported, small effect") && `${word(count("Supported, small effect"))} held up with a tiny effect`,
+    count("Inconclusive") && `${word(count("Inconclusive"))} couldn't be tested`,
+  ].filter(Boolean) as string[];
+  const sentence = parts.length > 1 ? `${parts.slice(0, -1).join(", ")}, and ${parts[parts.length - 1]}` : parts[0];
+  return sentence.charAt(0).toUpperCase() + sentence.slice(1) + ".";
+}
+
+function scrollToCard(e: React.MouseEvent, id: string) {
+  e.preventDefault();
+  document.getElementById(`hypothesis-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
 
 export function HypothesesSection() {
-  // Track open state for each pillar accordion
-  const [openPillars, setOpenPillars] = useState<Record<number, boolean>>({
-    1: true,
-    2: true,
-    3: true,
-    4: true,
-  });
-
-  const allOpen = Object.values(openPillars).every(Boolean);
-
-  const toggleAll = () => {
-    const nextState = !allOpen;
-    setOpenPillars({
-      1: nextState,
-      2: nextState,
-      3: nextState,
-      4: nextState,
-    });
-  };
-
-  const togglePillar = (id: number) => {
-    setOpenPillars((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
+  const n = THESIS_METADATA.snapshotSampleSize.toLocaleString("en-US");
 
   return (
-    <Box id="section-hypotheses">
-      <VStack align="stretch" gap={6}>
-        <Flex justify="space-between" align={{ base: "flex-start", sm: "center" }} wrap="wrap" gap={3} pb={2} borderBottom="1px solid" borderColor="gray.800">
-          <Heading as="h2" size="xl" color="orange.400" fontWeight="semibold">
-            Hypotheses: Four Pillars &amp; Seven Tests
-          </Heading>
-
-          <HStack gap={3}>
-            <Button
-              size="xs"
-              variant="outline"
-              colorPalette="gray"
-              onClick={toggleAll}
-              color="gray.300"
-              borderColor="gray.700"
-            >
-              {allOpen ? (
-                <>
-                  <LuChevronUp size={14} style={{ marginRight: "4px" }} />
-                  Collapse all
-                </>
-              ) : (
-                <>
-                  <LuChevronDown size={14} style={{ marginRight: "4px" }} />
-                  Expand all
-                </>
-              )}
-            </Button>
-
-            <RouterLink to="/#kpis">
-              <Button size="xs" variant="ghost" color="orange.400" _hover={{ bg: "whiteAlpha.50" }}>
-                Live KPI Tab
-                <LuExternalLink size={12} style={{ marginLeft: "4px" }} />
-              </Button>
-            </RouterLink>
-          </HStack>
-        </Flex>
-
-        {/* Snapshot Notice Banner */}
-        <Box bg="gray.950" p={4} borderRadius="lg" borderWidth="1px" borderColor="gray.800">
-          <Flex justify="space-between" align={{ base: "flex-start", sm: "center" }} wrap="wrap" gap={2}>
-            <HStack gap={2}>
-              <Badge colorPalette="orange" variant="solid" size="xs">
-                Snapshot, Nov 2026
-              </Badge>
-              <Text fontSize="xs" color="gray.300">
-                Frozen Master&apos;s Thesis Dataset: N = <strong>{THESIS_METADATA.snapshotSampleSize.toLocaleString("en-US")}</strong> posts &bull; Alpha α = <strong>{THESIS_METADATA.alphaLevel}</strong>
-              </Text>
-            </HStack>
-            <Text fontSize="2xs" color="gray.500">
-              Backend code (<code>Scraping/database/kpis.py</code>) represents the source of truth.
-            </Text>
-          </Flex>
-        </Box>
-
-        {/* Pillars Accordion Stack */}
-        <VStack align="stretch" gap={5}>
-          {HYPOTHESES_PILLARS.map((pillar) => {
-            const isOpen = openPillars[pillar.id];
-            return (
-              <Box
-                key={pillar.id}
-                borderWidth="1px"
-                borderColor="gray.800"
-                borderRadius="xl"
-                overflow="hidden"
-                bg="gray.900"
-              >
-                {/* Accordion Header */}
-                <Flex
-                  justify="space-between"
-                  align="center"
-                  p={4}
-                  bg="gray.950"
-                  cursor="pointer"
-                  onClick={() => togglePillar(pillar.id)}
-                  _hover={{ bg: "gray.850" }}
-                  transition="background-color 150ms ease"
+    <Section
+      id="section-hypotheses"
+      title="Findings"
+      lede={`${word(ALL_HYPOTHESES.length).replace(/^./, (c) => c.toUpperCase())} hypotheses, tested on a frozen snapshot of ${n} posts from ${THESIS_METADATA.snapshotDate}. ${verdictSummary()}`}
+    >
+      {/* Results at a glance */}
+      <Box overflowX="auto">
+        <Box as="table" width="full" style={{ borderCollapse: "collapse" }}>
+          <caption style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>
+            Summary of all hypothesis results
+          </caption>
+          <thead>
+            <Box as="tr" borderBottomWidth="1px" borderColor={C.line}>
+              {["", "Question", "Answer", "Verdict"].map((h) => (
+                <Box
+                  as="th"
+                  key={h}
+                  textAlign="left"
+                  fontSize="xs"
+                  fontWeight="medium"
+                  color={C.muted}
+                  py={2}
+                  pr={4}
+                  // The question repeats in each card; drop it on narrow screens
+                  display={h === "Question" ? { base: "none", md: "table-cell" } : undefined}
                 >
-                  <HStack gap={3}>
-                    <LuLayers color="#f97316" size={18} />
-                    <Box>
-                      <Text fontSize="sm" fontWeight="bold" color="gray.100">
-                        {pillar.title}
-                      </Text>
-                      <Text fontSize="2xs" color="gray.400">
-                        {pillar.subtitle} &bull; {pillar.hypotheses.length} {pillar.hypotheses.length === 1 ? "hypothesis" : "hypotheses"}
-                      </Text>
-                    </Box>
-                  </HStack>
-
-                  <Button size="xs" variant="ghost" color="gray.400" aria-label={isOpen ? "Collapse pillar" : "Expand pillar"}>
-                    {isOpen ? <LuChevronUp size={16} /> : <LuChevronDown size={16} />}
-                  </Button>
-                </Flex>
-
-                {/* Accordion Content */}
-                {isOpen && (
-                  <VStack align="stretch" gap={5} p={{ base: 4, md: 5 }}>
-                    {pillar.hypotheses.map((hypothesis) => (
-                      <HypothesisCard key={hypothesis.id} hypothesis={hypothesis} />
-                    ))}
-                  </VStack>
-                )}
+                  {h}
+                </Box>
+              ))}
+            </Box>
+          </thead>
+          <tbody>
+            {ALL_HYPOTHESES.map((h) => (
+              <Box as="tr" key={h.id} borderBottomWidth="1px" borderColor="whiteAlpha.100" verticalAlign="top">
+                <Box as="td" py={3} pr={4}>
+                  <Box
+                    as="a"
+                    href={`#hypothesis-${h.id}`}
+                    onClick={(e: React.MouseEvent) => scrollToCard(e, h.id)}
+                    fontFamily="mono"
+                    fontSize="sm"
+                    color={C.accent}
+                    textDecoration="none"
+                    _hover={{ textDecoration: "underline" }}
+                  >
+                    {h.id}
+                  </Box>
+                </Box>
+                <Box
+                  as="td"
+                  py={3}
+                  pr={4}
+                  fontSize="sm"
+                  color="gray.200"
+                  lineHeight="1.5"
+                  width="42%"
+                  display={{ base: "none", md: "table-cell" }}
+                >
+                  {h.plainQuestion}
+                </Box>
+                <Box as="td" py={3} pr={4} fontSize="sm" color={C.text} lineHeight="1.5">
+                  {h.shortFinding}
+                </Box>
+                <Box as="td" py={3}>
+                  <VerdictPill verdict={h.verdict} />
+                </Box>
               </Box>
-            );
-          })}
-        </VStack>
-      </VStack>
-    </Box>
+            ))}
+          </tbody>
+        </Box>
+      </Box>
+
+      <Text fontSize="sm" color={C.muted} mt={4}>
+        Significance level α = {THESIS_METADATA.alphaLevel}. The backend (<code>Scraping/database/kpis.py</code>) is the
+        source of truth.{" "}
+        <RouterLink to="/#kpis" style={{ color: "var(--chakra-colors-orange-300)" }}>
+          See live results on the KPI tab <LuArrowRight style={{ display: "inline", verticalAlign: "-2px" }} />
+        </RouterLink>
+      </Text>
+
+      {/* Detail, grouped by theme */}
+      <Box display="grid" gap={14} mt={14}>
+        {HYPOTHESES_PILLARS.map((pillar) => (
+          <Box key={pillar.id}>
+            <Box mb={5}>
+              <Text as="h3" fontSize="xl" fontWeight="semibold" color={C.heading}>
+                {pillar.title}
+              </Text>
+              <Text color={C.muted}>{pillar.subtitle}</Text>
+            </Box>
+            <Box display="grid" gap={6}>
+              {pillar.hypotheses.map((hypothesis) => (
+                <HypothesisCard key={hypothesis.id} hypothesis={hypothesis} />
+              ))}
+            </Box>
+          </Box>
+        ))}
+      </Box>
+    </Section>
   );
 }

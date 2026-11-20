@@ -94,19 +94,63 @@ export default function PrivacyPolicy() {
                 </Text>
               ),
               ul: ({ children }) => (
-                <Box as="ul" pl={6} mb={4} color="gray.300">
+                <Box
+                  as="ul"
+                  mb={5}
+                  pl={6}
+                  color="gray.300"
+                  css={{
+                    listStyleType: "disc",
+                    listStylePosition: "outside",
+                    "& > li": {
+                      display: "list-item",
+                    },
+                    "& > li::marker": {
+                      color: "#f97316",
+                    },
+                  }}
+                >
                   {children}
                 </Box>
               ),
               ol: ({ children }) => (
-                <Box as="ol" pl={6} mb={4} color="gray.300">
+                <Box
+                  as="ol"
+                  mb={5}
+                  pl={6}
+                  color="gray.300"
+                  css={{
+                    listStyleType: "decimal",
+                    listStylePosition: "outside",
+                    "& > li": {
+                      display: "list-item",
+                    },
+                    "& > li::marker": {
+                      color: "#f97316",
+                      fontWeight: "bold",
+                    },
+                  }}
+                >
                   {children}
                 </Box>
               ),
               li: ({ children }) => (
-                <Box as="li" mb={2} lineHeight="1.7">
+                <Box
+                  as="li"
+                  mb={2.5}
+                  lineHeight="1.8"
+                  color="gray.300"
+                  css={{
+                    display: "list-item",
+                  }}
+                >
                   {children}
                 </Box>
+              ),
+              strong: ({ children }) => (
+                <strong style={{ color: "#f3f4f6", fontWeight: "600" }}>
+                  {children}
+                </strong>
               ),
               a: ({ href, children }) => (
                 <a

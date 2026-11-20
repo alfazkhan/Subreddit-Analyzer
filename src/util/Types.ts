@@ -163,6 +163,8 @@ export interface HypothesisCardData {
   pillarTitle: string;
   name: string;
   plainQuestion: string;
+  /** One-line answer used in the "results at a glance" table. */
+  shortFinding: string;
   formalStatement: string;
   variables: {
     name: string;
@@ -199,7 +201,8 @@ export interface GlossaryItem {
 export interface PlatformTabScreenshot {
   tabValue: string;
   tabLabel: string;
-  imageSrc: string;
+  /** Omit when no screenshot exists yet; the viewer shows a placeholder. */
+  imageSrc?: string;
   caption: string;
   altText: string;
 }
@@ -209,7 +212,11 @@ export interface PipelineStep {
   title: string;
   system: string;
   description: string;
-  details: string;
+}
+
+export interface TitledPoint {
+  title: string;
+  text: string;
 }
 
 export interface TechStackCategory {

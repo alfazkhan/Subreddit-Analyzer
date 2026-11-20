@@ -1,127 +1,150 @@
-import { useState, useMemo } from "react";
-import {
-  Badge,
-  Box,
-  Flex,
-  Heading,
-  HStack,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { useEffect, useMemo, useState } from "react";
+import { Box, Text } from "@chakra-ui/react";
 import { GLOSSARY_ITEMS } from "@/data/aboutContent";
-import { LuSearch, LuBookOpen } from "react-icons/lu";
+import { C, Section } from "./aboutUi";
+import { GLOSSARY_OPEN_EVENT } from "./GlossaryTerm";
+import { LuChevronDown, LuSearch } from "react-icons/lu";
+
+const SORTED_ITEMS = [...GLOSSARY_ITEMS].sort((a, b) => a.term.localeCompare(b.term));
+const COLLAPSED_COUNT = 8;
 
 export function TerminologySection() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [expanded, setExpanded] = useState(false);
 
-  const sortedItems = useMemo(() => {
-    return [...GLOSSARY_ITEMS].sort((a, b) => a.term.localeCompare(b.term));
+  // Inline glossary links ask the list to expand before scrolling to an entry
+  useEffect(() => {
+    const expand = () => setExpanded(true);
+    window.addEventListener(GLOSSARY_OPEN_EVENT, expand);
+    return () => window.removeEventListener(GLOSSARY_OPEN_EVENT, expand);
   }, []);
 
+  const isSearching = searchQuery.trim().length > 0;
+
   const filteredItems = useMemo(() => {
-    if (!searchQuery.trim()) return sortedItems;
-    const q = searchQuery.toLowerCase();
-    return sortedItems.filter(
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return expanded ? SORTED_ITEMS : SORTED_ITEMS.slice(0, COLLAPSED_COUNT);
+    return SORTED_ITEMS.filter(
       (item) =>
         item.term.toLowerCase().includes(q) ||
         item.plainDefinition.toLowerCase().includes(q) ||
-        item.whereUsed.toLowerCase().includes(q),
+        item.whereUsed.toLowerCase().includes(q) ||
+        (item.formula ?? "").toLowerCase().includes(q),
     );
-  }, [searchQuery, sortedItems]);
+  }, [searchQuery, expanded]);
+
+  const search = (
+    <Box position="relative" width={{ base: "full", sm: "260px" }}>
+      <Box position="absolute" left={3} top="50%" transform="translateY(-50%)" color={C.muted} pointerEvents="none">
+        <LuSearch size={15} />
+      </Box>
+      <Box
+        as="input"
+        type="search"
+        aria-label="Search glossary"
+        placeholder="Search terms, formulas..."
+        value={searchQuery}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+        width="full"
+        pl={9}
+        pr={3}
+        py={2}
+        bg="gray.900"
+        borderWidth="1px"
+        borderColor={C.line}
+        borderRadius="md"
+        color="gray.100"
+        fontSize="sm"
+        _placeholder={{ color: "gray.500" }}
+        _focusVisible={{ outline: "2px solid", outlineColor: "orange.400", outlineOffset: "1px" }}
+      />
+    </Box>
+  );
 
   return (
-    <Box id="section-glossary">
-      <VStack align="stretch" gap={6}>
-        <Flex justify="space-between" align={{ base: "flex-start", sm: "center" }} wrap="wrap" gap={3} pb={2} borderBottom="1px solid" borderColor="gray.800">
-          <Heading as="h2" size="xl" color="orange.400" fontWeight="semibold">
-            Glossary of Terms ({GLOSSARY_ITEMS.length} entries)
-          </Heading>
-
-          {/* Search Bar */}
-          <Box position="relative" width={{ base: "full", sm: "280px" }}>
-            <Box position="absolute" left={3} top="50%" transform="translateY(-50%)" color="gray.500" pointerEvents="none">
-              <LuSearch size={14} />
-            </Box>
-            <Box
-              as="input"
-              type="text"
-              placeholder="Search terms, formulas..."
-              value={searchQuery}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-              pl={8}
-              pr={3}
-              py={1.5}
-              bg="gray.950"
-              borderWidth="1px"
-              borderColor="gray.800"
-              borderRadius="md"
-              color="gray.200"
-              fontSize="xs"
-              width="full"
-              _focus={{ outline: "2px solid #f97316" }}
-            />
-          </Box>
-        </Flex>
-
-        <Text color="gray.300" fontSize="md" lineHeight="1.8">
-          Alphabetical reference of every computational, econometric, linguistic, and platform concept operationalized in the research instrument.
+    <Section
+      id="section-glossary"
+      title="Glossary"
+      aside={search}
+      lede={`Plain definitions for the ${GLOSSARY_ITEMS.length} technical terms used on this page. Underlined terms above link here.`}
+    >
+      {filteredItems.length === 0 ? (
+        <Text color={C.muted} py={6}>
+          No terms match &ldquo;{searchQuery}&rdquo;.
         </Text>
-
-        {filteredItems.length === 0 ? (
-          <Box bg="gray.950" p={6} borderRadius="lg" textAlign="center" color="gray.400">
-            <Text fontSize="sm">No glossary entries match &quot;{searchQuery}&quot;.</Text>
-          </Box>
-        ) : (
-          <VStack align="stretch" gap={4}>
-            {filteredItems.map((item) => (
-              <Box
-                key={item.id}
-                id={`glossary-${item.id}`}
-                tabIndex={-1}
-                bg="gray.950"
-                borderWidth="1px"
-                borderColor="gray.800"
-                borderRadius="lg"
-                p={4}
-                _focus={{ borderColor: "orange.500", boxShadow: "0 0 0 1px #f97316" }}
-                transition="border-color 150ms ease"
-              >
-                <VStack align="stretch" gap={2}>
-                  <Flex justify="space-between" align={{ base: "flex-start", sm: "center" }} wrap="wrap" gap={2}>
-                    <Text fontSize="sm" fontWeight="bold" color="gray.100">
-                      {item.term}
-                    </Text>
-                    <Badge variant="subtle" colorPalette="gray" size="2xs">
-                      {item.category}
-                    </Badge>
-                  </Flex>
-
-                  {/* 1. Plain sentence definition */}
-                  <Text fontSize="xs" color="gray.300" lineHeight="1.6">
-                    {item.plainDefinition}
-                  </Text>
-
-                  {/* 2. Formula (if any) */}
-                  {item.formula && (
-                    <Box bg="blackAlpha.800" p={2} borderRadius="md" borderWidth="1px" borderColor="gray.850" my={1} overflowX="auto">
-                      <Text fontSize="2xs" color="orange.300" fontFamily="mono">
-                        <code>{item.formula}</code>
-                      </Text>
-                    </Box>
-                  )}
-
-                  {/* 3. Where it is used here */}
-                  <Box bg="whiteAlpha.50" px={3} py={1.5} borderRadius="md">
-                    <Text fontSize="2xs" color="gray.400" lineHeight="1.5">
-                      <strong style={{ color: "#9ca3af" }}>Where it is used here:</strong> {item.whereUsed}
-                    </Text>
-                  </Box>
-                </VStack>
+      ) : (
+        <Box as="dl" m={0} borderTopWidth="1px" borderColor="whiteAlpha.100">
+          {filteredItems.map((item) => (
+            <Box
+              key={item.id}
+              id={`glossary-${item.id}`}
+              tabIndex={-1}
+              scrollMarginTop="96px"
+              py={4}
+              borderBottomWidth="1px"
+              borderColor="whiteAlpha.100"
+              outline="none"
+              transition="background-color 300ms ease"
+              _focus={{ bg: "whiteAlpha.50" }}
+              display="grid"
+              gridTemplateColumns={{ base: "1fr", md: "220px 1fr" }}
+              columnGap={6}
+              rowGap={1}
+            >
+              <Box as="dt">
+                <Text fontWeight="semibold" color={C.heading} lineHeight="1.5">
+                  {item.term}
+                </Text>
+                <Text fontSize="xs" color={C.muted}>
+                  {item.category}
+                </Text>
               </Box>
-            ))}
-          </VStack>
-        )}
-      </VStack>
-    </Box>
+              <Box as="dd" m={0}>
+                <Text color={C.text} lineHeight="1.65">
+                  {item.plainDefinition}
+                </Text>
+                {item.formula && (
+                  <Box
+                    as="code"
+                    display="inline-block"
+                    mt={2}
+                    px={2}
+                    py={0.5}
+                    fontSize="xs"
+                    color="orange.200"
+                    bg="blackAlpha.500"
+                    borderRadius="sm"
+                  >
+                    {item.formula}
+                  </Box>
+                )}
+                <Text fontSize="sm" color={C.muted} mt={1.5} lineHeight="1.5">
+                  Used in: {item.whereUsed}
+                </Text>
+              </Box>
+            </Box>
+          ))}
+        </Box>
+      )}
+
+      {!isSearching && !expanded && (
+        <Box
+          as="button"
+          onClick={() => setExpanded(true)}
+          mt={5}
+          display="inline-flex"
+          alignItems="center"
+          gap={1.5}
+          fontSize="sm"
+          fontWeight="medium"
+          color="orange.300"
+          cursor="pointer"
+          _hover={{ color: "orange.200" }}
+          _focusVisible={{ outline: "2px solid", outlineColor: "orange.400", outlineOffset: "2px" }}
+        >
+          Show all {SORTED_ITEMS.length} terms <LuChevronDown />
+        </Box>
+      )}
+    </Section>
   );
 }

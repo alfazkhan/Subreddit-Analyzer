@@ -28,6 +28,7 @@ coverage
 *.pyc
 *.pyo
 *.pyd
+.firebase/
 
 __pycache__/
 **/__pycache__/
@@ -64,3 +65,4 @@ auth.json
 firebase_creds.json
 .env
 .env.local
+.firebase/*

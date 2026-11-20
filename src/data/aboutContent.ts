@@ -4,7 +4,15 @@ import type {
   PipelineStep,
   PlatformTabScreenshot,
   TechStackCategory,
+  TitledPoint,
 } from "@/util/Types";
+import kpiScreenshot from "@/assets/Screenshots/KPI-Analytics.png";
+import sentimentsScreenshot from "@/assets/Screenshots/Sentiments.png";
+import pieChartScreenshot from "@/assets/Screenshots/Pie-Chart.png";
+import postTableScreenshot from "@/assets/Screenshots/Post-Table.png";
+import keywordTableScreenshot from "@/assets/Screenshots/Keyword-Table.png";
+import postFrequencyScreenshot from "@/assets/Screenshots/Post-Frequency.png";
+import sentimentFrequencyScreenshot from "@/assets/Screenshots/Sentiment-Frequency.png";
 
 // Configuration toggle: Supervisors appear only if true
 export const SHOW_SUPERVISORS = false;
@@ -29,14 +37,15 @@ export const AUTHOR_FACTS = {
   thesisSubmission: "January 2027",
   links: {
     github: "https://github.com/alfazkhan/Subreddit-Analyzer",
-    linkedin: "TODO_ALFAZ:",
+    // TODO_ALFAZ: add LinkedIn URL. Empty values are not rendered.
+    linkedin: "",
     email: "khanalfaaz14@gmail.com",
   },
-  bio: "Frontend developer who loves playing with data and figuring out the best way to get actionable insights from it.",
+  bio: "I'm a frontend developer who likes working with data and figuring out how to turn it into something useful.",
   whyIBuiltThis:
-    "I had an idea what if we can use the reddit which has a highly moderate city subreddit and is a text based platform to find out more about the people of those cities and sentiments around different things.",
-  h4RerunStatus:
-    "TODO_ALFAZ: (planned / done / not planned) Hypothesis has insufficient data or methods for now to get a conclusive answer",
+    "City subreddits are heavily moderated, text-based, and full of locals talking about everyday life. I wanted to see what they could tell us about the people in those cities and how they feel about different things.",
+  // TODO_ALFAZ: H4 re-run status (planned / done / not planned). Currently:
+  // insufficient data or methods to get a conclusive answer. Not rendered.
 };
 
 export const THESIS_METADATA = {
@@ -47,6 +56,7 @@ export const THESIS_METADATA = {
   submissionPeriod: "January 2027",
   snapshotDate: "November 2026",
   snapshotSampleSize: 51587,
+  cityCount: 11,
   alphaLevel: 0.05,
   topicLabelCount: 30, // Verified from CANDIDATE_LABELS in Scraping/nlp_processor.py
   entropyBase: "natural logarithm (base e)", // Verified from calculate_shannon_entropy in Scraping/database/kpis.py
@@ -55,8 +65,8 @@ export const THESIS_METADATA = {
 
 export const THE_QUESTION = {
   paragraphs: [
-    "Municipal and regional subreddits function as continuous, digital town squares for modern cities. On forums such as r/berlin, r/munich, r/nyc, r/london, and r/singapore, local residents, commuters, and newcomers report day-to-day administrative challenges, discuss rent increases, review transit lines, and share neighborhood safety warnings. Unlike short-form, algorithmic social feeds, these discussion boards host long-form, pseudonymous debates grounded in concrete urban geography.",
-    "In any civic environment, attention is scarce. Which complaints get heard, which questions receive answers, and which topics dominate collective awareness depend heavily on community dynamics. Understanding the structural and emotional traits that drive post visibility and consensus voting offers direct insight into municipal priority-setting and civic friction.",
+    "City subreddits like r/berlin, r/munich, r/nyc, r/london and r/singapore work like a town square. Locals, commuters and newcomers post about rent, paperwork, transit, safety and things to do. Unlike most social feeds, the posts are long, mostly anonymous, and tied to real places.",
+    "Attention in these forums is limited. Some posts get hundreds of comments; most get a handful. Some get upvoted; others sink. If we know what separates the two, we learn something about which local problems people care about and where the friction is.",
   ],
   researchQuestion:
     "How do emotional tone, topic structure, subject area, and posting time relate to the comments and approval a post receives in urban community discourse?",
@@ -64,22 +74,22 @@ export const THE_QUESTION = {
 
 export const THESIS_CONTEXT = {
   instrumentStatement:
-    "The software platform built here is the research instrument. The interactive web dashboard demonstrates the pipeline in operation; the data collection, natural language models, and statistical tests form the empirical foundation of the thesis.",
+    "This software is the research instrument for the thesis. The scraper, the language models and the statistical tests produce the results; the dashboard lets anyone see how.",
   contributions: [
     {
-      title: "Empirical baseline of municipal discourse",
+      title: "A baseline for city discourse",
       description:
-        "Standardized measurements of sentiment, discussion volume, and topic friction across eleven major city subreddits, evaluating real community responses across 51,587 verified submissions.",
+        "Consistent measurements of sentiment, discussion volume and topic across 11 city subreddits, based on 51,587 posts.",
     },
     {
-      title: "Probabilistic NLP measurement approach",
+      title: "Probabilities instead of labels",
       description:
-        "Applying continuous sentiment probabilities and informational Shannon entropy over multi-label zero-shot distributions, capturing subtle nuances rather than relying on discrete binary labels.",
+        "Each post gets a probability for every sentiment and topic, not a single hard label. That lets the analysis measure things like how mixed a post's topic is (Shannon entropy).",
     },
     {
-      title: "Practical model for civic monitoring",
+      title: "A setup others can reuse",
       description:
-        "A reproducible architecture pairing headless browser extraction with a strict 7-day maturity buffer and local, self-hosted transformers for non-commercial urban research.",
+        "Browser-based collection, a fixed 7-day wait before saving posts, and language models that run on local hardware. All of it can be rerun for non-commercial research.",
     },
   ],
 };
@@ -88,160 +98,146 @@ export const THESIS_CONTEXT = {
 export const PLATFORM_TABS: PlatformTabScreenshot[] = [
   {
     tabValue: "KPIs",
-    tabLabel: "KPIs & Hypothesis Engine",
-    imageSrc: "/src/assets/Screenshots/KPI-Analytics.png",
+    tabLabel: "KPIs",
+    imageSrc: kpiScreenshot,
     caption:
-      "Interactive dual-axis time series plotting post count, 7-day moving averages of negative sentiment and upvote ratio, alongside real-time hypothesis calculation panels.",
-    altText: "Screenshot of the KPI Analytics dashboard showing time series charts and hypothesis metrics.",
+      "Post volume over time with 7-day moving averages of negative sentiment and upvote ratio, plus live hypothesis results.",
+    altText: "KPI tab showing a time series chart and hypothesis metrics.",
   },
   {
     tabValue: "Sentiments",
-    tabLabel: "Sentiment Distribution",
-    imageSrc: "/src/assets/Screenshots/Sentiments.png",
-    caption:
-      "Cross-city and per-subreddit sentiment probability distributions broken down into positive, neutral, and negative classifications.",
-    altText: "Screenshot of the Sentiments view displaying metric cards and category percentages.",
+    tabLabel: "Sentiments",
+    imageSrc: sentimentsScreenshot,
+    caption: "Share of positive, neutral and negative posts, for all cities or one subreddit.",
+    altText: "Sentiments tab with positive, neutral and negative percentage cards.",
   },
   {
     tabValue: "WordCloud",
-    tabLabel: "Lexical Word Cloud",
-    imageSrc: "/src/assets/Screenshots/Keyword-Table.png",
-    caption:
-      "Visual frequency representation of extracted and lemmatized community vocabulary, filtered against dynamic municipal stopword blacklists.",
-    altText: "Screenshot of extracted keywords showing frequency distributions across municipal discourse.",
+    tabLabel: "Word cloud",
+    // TODO_ALFAZ: add a WordCloud screenshot (previously reused Keyword-Table.png).
+    caption: "The most frequent words across posts, after removing common filler words.",
+    altText: "Word cloud of the most frequent words.",
   },
   {
     tabValue: "Pie Chart",
-    tabLabel: "Keywords Donut & Pie Chart",
-    imageSrc: "/src/assets/Screenshots/Pie-Chart.png",
-    caption:
-      "Apache ECharts breakdown of prominent civic keywords grouped by frequency and colored by their underlying emotional associations.",
-    altText: "Screenshot of keyword distribution pie chart visualizer.",
+    tabLabel: "Keyword chart",
+    imageSrc: pieChartScreenshot,
+    caption: "The top keywords by frequency, coloured by the sentiment of the posts they appear in.",
+    altText: "Pie chart of the most frequent keywords.",
   },
   {
     tabValue: "Posts Table",
-    tabLabel: "Paginated Post Explorer",
-    imageSrc: "/src/assets/Screenshots/Post-Table.png",
-    caption:
-      "Cursor-paginated table presenting individual submission records, verified scores, upvote ratios, sentiment vectors, and primary topics.",
-    altText: "Screenshot of the paginated post table showing Reddit titles and NLP scores.",
+    tabLabel: "Posts",
+    imageSrc: postTableScreenshot,
+    caption: "Every post with its score, upvote ratio, sentiment and main topic. Paginated and filterable.",
+    altText: "Table of Reddit posts with scores and sentiment labels.",
   },
   {
     tabValue: "Keyword Table",
-    tabLabel: "Keyword Frequency Table",
-    imageSrc: "/src/assets/Screenshots/Keyword-Table.png",
-    caption:
-      "Tabular inventory of lemmatized tokens with frequency counts and user reporting actions to maintain stopword purity.",
-    altText: "Screenshot of the keyword table with frequency numbers and filter options.",
+    tabLabel: "Keywords",
+    imageSrc: keywordTableScreenshot,
+    caption: "Word counts in table form. Users can flag words that should be filtered out.",
+    altText: "Keyword table with frequency counts.",
   },
   {
     tabValue: "Posts Frequency",
-    tabLabel: "24-Hour Post Activity",
-    imageSrc: "/src/assets/Screenshots/Post-Frequency.png",
-    caption:
-      "Diurnal submission curve plotting activity volume by hour of day, synchronized to each city's local IANA timezone.",
-    altText: "Screenshot of diurnal 24-hour activity bar chart.",
+    tabLabel: "Posts by hour",
+    imageSrc: postFrequencyScreenshot,
+    caption: "How many posts go up at each hour of the day, in each city's local time.",
+    altText: "Line chart of post volume by hour of day.",
   },
   {
     tabValue: "Sentiments Frequency",
-    tabLabel: "Circadian Affect Curves",
-    imageSrc: "/src/assets/Screenshots/Sentiment-Frequency.png",
-    caption:
-      "Hourly emotion distribution tracking positive, neutral, and negative sentiment ratios throughout the 24-hour civic cycle in local solar time.",
-    altText: "Screenshot of emotions throughout the day chart.",
+    tabLabel: "Sentiment by hour",
+    imageSrc: sentimentFrequencyScreenshot,
+    caption: "How the mix of positive, neutral and negative posts changes over the day, in local time.",
+    altText: "Line chart of sentiment by hour of day.",
   },
 ];
 
 export const PIPELINE_STEPS: PipelineStep[] = [
   {
     stepNumber: 1,
-    title: "Reddit Municipal Feeds",
-    system: "Target Subreddits",
-    description: "Public regional communities representing eleven major cities.",
-    details: "Monitored subreddits include Berlin, Munich, NYC, London, Amsterdam, Singapore, Toronto, Los Angeles, Mumbai, Delhi, and Hong Kong.",
+    title: "Collect",
+    system: "Playwright · scraper_v2.py",
+    description:
+      "A headless Chromium browser opens each of the 11 city subreddits and reads the public posts: ID, time, title, body, score, upvote ratio and comment count. No Reddit API key is needed.",
   },
   {
     stepNumber: 2,
-    title: "Headless Web Ingestion",
-    system: "Playwright (scraper_v2.py)",
-    description: "Automated Chromium browser sessions extract live submissions without relying on restricted API quotas.",
-    details: "Parses DOM attributes from shreddit-post components to collect submission ID, timestamp, title, selftext, score, upvote ratio, and comment count.",
+    title: "Wait 7 days",
+    system: "PostgreSQL queue · run_worker.py",
+    description:
+      "New posts sit in a queue until they are at least a week old. By then votes and comments have mostly stopped changing and moderators have removed rule-breaking posts.",
   },
   {
     stepNumber: 3,
-    title: "7-Day Maturity Queue",
-    system: "PostgreSQL Queue (run_worker.py)",
-    description: "Enforces a mandatory one-week maturation delay before archival.",
-    details: "Submissions remain pending until age exceeds 7 days, ensuring vote counts, debate threads, and moderator actions settle into steady state.",
+    title: "Store",
+    system: "PostgreSQL 15+ · reddit_posts",
+    description:
+      "Mature posts are saved to PostgreSQL. Indexes keep the tables fast to page through and search, and LISTEN/NOTIFY pushes changes to the admin view in real time.",
   },
   {
     stepNumber: 4,
-    title: "Relational Storage & Indexing",
-    system: "PostgreSQL 15+ (reddit_posts)",
-    description: "Stores enriched records with compound B-Tree cursor indexes and GIN inverted indexes.",
-    details: "PostgreSQL LISTEN/NOTIFY broadcasts table mutations to real-time WebSocket feeds for administrative monitoring.",
+    title: "Analyse",
+    system: "Transformers, spaCy, NLTK · nlp_processor.py",
+    description:
+      "Four language tools run on local hardware, with no external API calls: sentiment (XLM-RoBERTa), 30 topics (mDeBERTa-v3), named entities (spaCy) and keywords (NLTK).",
   },
   {
     stepNumber: 5,
-    title: "Local Offline Neural NLP",
-    system: "Transformers & SpaCy (nlp_processor.py)",
-    description: "Four offline analytical pipelines run locally on self-hosted hardware without external API calls.",
-    details: "Computes 3-class sentiment (XLM-RoBERTa), 30-class zero-shot topic distribution (mDeBERTa-v3), named entities (SpaCy), and lemmatized keywords (NLTK).",
-  },
-  {
-    stepNumber: 6,
-    title: "Statistical API & Dashboard",
-    system: "FastAPI & React 19 Client",
-    description: "Asynchronous backend calculates moving averages and hypothesis regressions, served to a responsive Chakra UI v3 dashboard.",
-    details: "Client utilizes TanStack Query v5 for caching and Apache ECharts for rendering interactive analytical charts.",
+    title: "Serve",
+    system: "FastAPI · React 19",
+    description:
+      "A FastAPI backend calculates moving averages and runs the hypothesis tests. The React dashboard fetches results with TanStack Query and draws charts with Apache ECharts.",
   },
 ];
 
 export const DATA_METHOD_CONTENT = {
   maturityWindowExplanation:
-    "Social media engagement metrics are notoriously volatile during the initial 24 to 72 hours following publication. Early votes swing rapidly, comment chains develop over multiple days, and community moderators remove rule-breaking posts. Ingesting records immediately introduces severe sampling error. This project enforces a strict 7-day maturity delay: a post is only archived once its age reaches at least seven full days, capturing metrics at steady-state community equilibrium.",
+    "Votes and comments change quickly in the first one to three days after a post goes up, and moderators remove rule-breaking posts during that time. Measuring too early gives misleading numbers. So the scraper waits until a post is at least seven days old before saving it.",
   storedFields: [
-    { field: "Reddit Submission ID", detail: "Alphanumeric post identifier stripped of Reddit prefix" },
-    { field: "Creation Timestamp", detail: "UTC timestamp converted to municipal local time during analysis" },
-    { field: "Title & Body Text", detail: "Verbatim public text required for lexical and transformer NLP parsing" },
-    { field: "Score (Net Karma)", detail: "Public balance of total upvotes minus downvotes" },
-    { field: "Upvote Ratio", detail: "Ratio of positive community votes bounded between 0.0 and 1.0" },
-    { field: "Number of Comments", detail: "Total stabilized discussion thread count" },
+    { field: "Post ID", detail: "Reddit's ID for the post, without the prefix" },
+    { field: "Time posted", detail: "Stored in UTC, converted to the city's local time for analysis" },
+    { field: "Title and body", detail: "The public text, needed for the language analysis" },
+    { field: "Score", detail: "Upvotes minus downvotes" },
+    { field: "Upvote ratio", detail: "Share of votes that were upvotes, from 0 to 1" },
+    { field: "Comment count", detail: "Number of comments after seven days" },
   ],
   deliberatelyExcludedFields: [
-    "Reddit usernames and author profile handles",
-    "Account biographies, karma history, and user avatars",
-    "Internal Reddit user identifiers",
-    "Private chat messages and moderator correspondence",
-    "Nested comment tree bodies and replier identities",
+    "Usernames and profile handles",
+    "Profile bios, karma history and avatars",
+    "Reddit's internal user IDs",
+    "Private messages and modmail",
+    "Comment text and who wrote the comments",
   ],
   cleaningFilters: [
-    "Valid timestamp constraint (timestamp IS NOT NULL)",
-    "Exclusion of deleted posts (title not matching [deleted] or [deleted by user])",
-    "Exclusion of moderator-removed posts (title not matching [removed] or [removed by moderator])",
-    "Exclusion of unparsed zero-state rows where score = 0, upvote_ratio = 0, and num_comments = 0",
+    "Posts with no timestamp",
+    "Deleted posts ([deleted] or [deleted by user])",
+    "Posts removed by moderators ([removed] or [removed by moderator])",
+    "Rows that failed to parse (score, upvote ratio and comments all 0)",
   ],
   snapshotSize: 51587,
   nlpModels: [
     {
-      domain: "Sentiment Analysis",
+      domain: "Sentiment",
       model: "cardiffnlp/twitter-xlm-roberta-base-sentiment",
-      derivedVariables: "P_pos, P_neu, P_neg (continuous softmax probabilities summing to 1.0)",
+      derivedVariables: "Probability that a post is positive, neutral or negative (the three add up to 1).",
     },
     {
-      domain: "Topic Classification",
+      domain: "Topic",
       model: "MoritzLaurer/mDeBERTa-v3-base-mnli-xnli",
-      derivedVariables: "Primary topic label and 30-class probability distribution; Shannon entropy H = -Σ p_i ln(p_i)",
+      derivedVariables: "A probability for each of 30 topics, the most likely topic, and how spread out the topics are (Shannon entropy).",
     },
     {
-      domain: "Named Entity Recognition",
-      model: "SpaCy en_core_web_sm (with xx_ent_wiki_sm multilingual fallback)",
-      derivedVariables: "16 entity types (MONEY, ORG, GPE, LOC, etc.); entity density = count / word count",
+      domain: "Named entities",
+      model: "spaCy en_core_web_sm (xx_ent_wiki_sm as multilingual fallback)",
+      derivedVariables: "Mentions of money, organisations, places and 13 other types; entity density = mentions ÷ word count.",
     },
     {
-      domain: "Lexical Economics",
-      model: "NLTK word_tokenize & WordNetLemmatizer",
-      derivedVariables: "Word count, unique lemma count, Type-Token Ratio TTR = unique lemmas / word count",
+      domain: "Vocabulary",
+      model: "NLTK word_tokenize + WordNetLemmatizer",
+      derivedVariables: "Word count, unique word count, and type-token ratio (unique words ÷ total words).",
     },
   ],
 };
@@ -250,159 +246,164 @@ export const HYPOTHESES_PILLARS: PillarData[] = [
   {
     id: 1,
     number: 1,
-    title: "Pillar 1: Affective & Behavioral Dynamics",
-    subtitle: "Emotion and Community Action",
+    title: "Emotion",
+    subtitle: "Does the tone of a post change how people respond?",
     hypotheses: [
       {
         id: "H1",
         pillarId: 1,
-        pillarTitle: "Pillar 1: Emotion & Community Action",
+        pillarTitle: "Emotion",
         name: "Negativity and Engagement",
         plainQuestion:
           "Does a negative emotional tone lead to longer discussion threads while reducing post approval?",
+        shortFinding: "Negative posts get more comments. Their upvote ratio is barely lower.",
         formalStatement:
           "Negative sentiment probability (P_neg) drives higher discussion depth (num_comments) and reduces post approval (upvote_ratio) across civic community discourse.",
         variables: [
-          { name: "P_neg", role: "Independent", description: "Continuous negative sentiment probability [0.0, 1.0]" },
-          { name: "num_comments", role: "Dependent", description: "Stabilized discussion thread comment count" },
-          { name: "upvote_ratio", role: "Dependent", description: "Ratio of community upvotes relative to total votes [0.0, 1.0]" },
+          { name: "P_neg", role: "Independent", description: "Probability the post is negative, 0 to 1" },
+          { name: "num_comments", role: "Dependent", description: "Comment count after seven days" },
+          { name: "upvote_ratio", role: "Dependent", description: "Share of votes that were upvotes, 0 to 1" },
         ],
         methodAndRationale:
-          "Spearman rank correlation (ρ) was selected because comment counts are heavily right-skewed and non-normal. Two-tailed significance testing at α = 0.05.",
+          "Spearman rank correlation (ρ) was selected because comment counts are heavily right-skewed and non-normal. Two-tailed tests at α = 0.05.",
         snapshotResult:
-          "Snapshot, Nov 2026 (N = 51,587): P_neg vs comments ρ = +0.1924 (p < 0.001); P_neg vs upvote ratio ρ = −0.0254 (p < 0.001). Within the Berlin municipal slice alone (N = 1,089), approval correlation was ρ = −0.0859 (p = 0.0046).",
+          "Snapshot, Nov 2026 (N = 51,587): P_neg vs comments ρ = +0.1924 (p < 0.001); P_neg vs upvote ratio ρ = −0.0254 (p < 0.001). Berlin only (N = 1,089): P_neg vs upvote ratio ρ = −0.0859 (p = 0.0046).",
         verdict: "Supported",
-        verdictDetail: "Supported; comments link is modest, approval link is very small.",
+        verdictDetail: "Supported. The link to comments is modest; the link to approval is very small.",
         whatItTellsUs:
-          "Frustrated or grievance-oriented posts reliably mobilize community discussion and debate. Negative submissions tend to receive more comments than positive or neutral posts.",
+          "Posts with a negative tone, such as complaints and frustrations, reliably draw more comments than neutral or positive ones.",
         whatItDoesNotTellUs:
-          "The relationship with upvote approval is exceedingly small across the global corpus (ρ = −0.0254), indicating that negative complaints are not routinely downvoted into oblivion if the issue resonates with residents.",
+          "The drop in approval is tiny (ρ = −0.0254). Negative posts are not routinely downvoted, especially when the problem is one other residents share.",
         chartType: "h1_bars",
       },
       {
         id: "H2",
         pillarId: 1,
-        pillarTitle: "Pillar 1: Emotion & Community Action",
+        pillarTitle: "Emotion",
         name: "Polarization and Visibility",
         plainQuestion:
-          "Do posts with strong, decisive emotional stances achieve higher net karma scores than balanced, neutral posts?",
+          "Do posts that take a strong emotional stance get a higher score than balanced, neutral posts?",
+        shortFinding: "Yes. Posts with a clear emotional stance score higher than neutral ones.",
         formalStatement:
           "Extreme opinion polarization, operationalized as emotional polarity magnitude |P_pos − P_neg|, correlates positively with net karma score amplification.",
         variables: [
-          { name: "Polarity Magnitude |P_pos − P_neg|", role: "Independent", description: "Absolute divergence between positive and negative probabilities [0.0, 1.0]" },
-          { name: "score", role: "Dependent", description: "Public net Reddit karma score (upvotes minus downvotes)" },
+          { name: "|P_pos − P_neg|", role: "Independent", description: "How far the post is from emotionally neutral, 0 to 1" },
+          { name: "score", role: "Dependent", description: "Upvotes minus downvotes" },
         ],
         methodAndRationale:
-          "Bivariate Spearman correlation testing monotonic association between polarity distance from neutrality and net score rewards.",
+          "Spearman rank correlation between distance from neutral and score.",
+        // TODO_ALFAZ: confirm exact global ρ vs Berlin-slice reporting threshold.
         snapshotResult:
-          "Snapshot, Nov 2026 (N = 51,587): Spearman ρ ≈ +0.22 to +0.24 (p < 0.001) across global cohorts. Within the Berlin municipal slice (N = 1,089), ρ = +0.1413 (p < 0.001). TODO_ALFAZ: confirm exact global vs slice reporting threshold.",
+          "Snapshot, Nov 2026 (N = 51,587): Spearman ρ ≈ +0.22 to +0.24 (p < 0.001) across all cities. Berlin only (N = 1,089): ρ = +0.1413 (p < 0.001).",
         verdict: "Supported",
-        verdictDetail: "Supported across global and municipal cohorts.",
+        verdictDetail: "Supported across all cities and in the Berlin subset.",
         whatItTellsUs:
-          "Clear, impassioned points of view accumulate more upvotes than hedged or indifferent statements. Neutrality is rewarded less in public forum visibility.",
+          "Posts with a clear, strong point of view get more upvotes than hedged or indifferent ones. Being neutral doesn't get you noticed.",
         whatItDoesNotTellUs:
-          "Polarity measures emotional intensity, not logical validity. High scores do not imply that community members agree with the premise, only that the post engaged active voting behavior.",
+          "Polarity measures how strongly a post feels, not whether it is right. A high score doesn't mean people agree, only that they voted.",
         chartType: "none",
         calloutNote:
-          "Polarity magnitude measures distance from emotional neutrality (|P_pos − P_neg|). Values near 1.0 indicate strong conviction; values near 0.0 indicate emotional indifference.",
+          "Polarity is |P_pos − P_neg|. Close to 1 means the post is clearly positive or clearly negative; close to 0 means it is neutral or mixed.",
       },
     ],
   },
   {
     id: 2,
     number: 2,
-    title: "Pillar 2: Semantic Structure & Information Theory",
-    subtitle: "Text Organization and Algorithmic Reward",
+    title: "Structure",
+    subtitle: "Does how clearly a post is written matter?",
     hypotheses: [
       {
         id: "H3",
         pillarId: 2,
-        pillarTitle: "Pillar 2: Semantic Structure",
+        pillarTitle: "Structure",
         name: "Topic Ambiguity vs. Information Clarity",
         plainQuestion:
-          "Are posts that wander across multiple themes penalized in karma score compared to sharply focused submissions?",
+          "Do posts that wander across several topics score lower than posts focused on one?",
+        shortFinding: "Yes. Focused posts score clearly higher than ones that mix topics.",
         formalStatement:
           "Informational Shannon entropy calculated across the topic distribution exhibits a negative relationship with log-transformed karma score, penalizing thematic ambiguity.",
         variables: [
-          { name: "Shannon Entropy (H)", role: "Independent", description: "Entropy over the 30-class zero-shot topic distribution: H = -Σ p_i ln(p_i)" },
-          { name: "ln(score + 1)", role: "Dependent", description: "Natural log-transformed net karma score" },
-          { name: "ln(num_comments + 1)", role: "Control", description: "Natural log-transformed discussion thread depth" },
+          { name: "Entropy (H)", role: "Independent", description: "How spread out the 30 topic probabilities are: H = −Σ p_i ln(p_i)" },
+          { name: "ln(score + 1)", role: "Dependent", description: "Score, log-transformed" },
+          { name: "ln(num_comments + 1)", role: "Control", description: "Comment count, log-transformed" },
         ],
         methodAndRationale:
-          "Ordinary Least Squares (OLS) multiple linear regression controlling for comment volume: ln(score + 1) = β0 + β1*Entropy + β2*ln(comments + 1) + ε.",
+          "OLS regression controlling for comment volume: ln(score + 1) = β0 + β1·Entropy + β2·ln(comments + 1) + ε.",
         snapshotResult:
-          "Snapshot, Nov 2026 (N = 51,587): Entropy coefficient β1 = −0.5053 (SE = 0.031, t = −16.07, p < 0.001, 95% CI [−0.567, −0.444]). Discussion control coefficient β2 = +0.9175 (p < 0.001).",
+          "Snapshot, Nov 2026 (N = 51,587): entropy β1 = −0.5053 (SE = 0.031, t = −16.07, p < 0.001, 95% CI [−0.567, −0.444]). Comments β2 = +0.9175 (p < 0.001).",
         verdict: "Supported",
-        verdictDetail: "Supported; thematic ambiguity is significantly associated with lower net karma.",
+        verdictDetail: "Supported. Mixed-topic posts get significantly lower scores.",
         whatItTellsUs:
-          "Submissions with focused thematic concentration receive substantially higher community endorsement. Spreading probability evenly across many categories incurs reader friction.",
+          "Posts that stick to one clear topic get noticeably more upvotes. Posts that spread across many topics lose out.",
         whatItDoesNotTellUs:
-          "Discussion depth also strongly correlates with score (β = +0.9175). Comment volume may partially mediate the visibility penalty of ambiguous posts.",
+          "Comment count is also strongly tied to score (β = +0.9175), so part of the penalty may work through fewer comments.",
         chartType: "none",
         calloutNote:
-          "Code verification: calculate_shannon_entropy in Scraping/database/kpis.py calculates natural log (np.log), yielding natural entropy units (nats) rather than base-2 bits.",
+          "Entropy is calculated with the natural log (np.log in Scraping/database/kpis.py), so it is measured in nats, not bits.",
       },
       {
         id: "H4",
         pillarId: 2,
-        pillarTitle: "Pillar 2: Semantic Structure",
+        pillarTitle: "Structure",
         name: "Entity Specificity Moderation",
         plainQuestion:
-          "Does citing concrete names, agencies, or monetary figures protect negative complaints from community downvotes?",
+          "Do complaints that name specific places, organisations or amounts avoid being downvoted?",
+        shortFinding: "Unknown. Too few entities were detected to run the test.",
         formalStatement:
           "Named entity density (MONEY, ORG, GPE, LOC via SpaCy NER) moderates the relationship between negative sentiment (P_neg) and community approval.",
         variables: [
-          { name: "P_neg", role: "Independent", description: "Continuous negative affect probability" },
-          { name: "entity_density", role: "Moderator", description: "Count of MONEY, ORG, GPE, LOC tokens divided by total word count" },
-          { name: "P_neg × entity_density", role: "Interaction", description: "Moderating interaction term" },
-          { name: "upvote_ratio", role: "Dependent", description: "Community approval ratio [0.0, 1.0]" },
+          { name: "P_neg", role: "Independent", description: "Probability the post is negative" },
+          { name: "entity_density", role: "Moderator", description: "Money, organisation and place mentions ÷ word count" },
+          { name: "P_neg × entity_density", role: "Moderator", description: "Interaction term" },
+          { name: "upvote_ratio", role: "Dependent", description: "Share of votes that were upvotes" },
         ],
         methodAndRationale:
-          "Moderated OLS linear regression: upvote_ratio = β0 + β1*P_neg + β2*entity_density + β3*(P_neg × entity_density) + β4*ln(comments + 1) + ε.",
+          "Moderated OLS regression: upvote_ratio = β0 + β1·P_neg + β2·entity_density + β3·(P_neg × entity_density) + β4·ln(comments + 1) + ε.",
         snapshotResult:
-          "Snapshot, Nov 2026: The interaction coefficient could not be reliably estimated due to a rank-deficient design matrix. In the snapshot dataset, entity density showed near-zero variance across large portions of the corpus.",
+          "Snapshot, Nov 2026: the interaction coefficient could not be estimated because the design matrix was rank-deficient. Entity density was close to zero for large parts of the data.",
         verdict: "Inconclusive",
-        verdictDetail: "Inconclusive due to rank-deficient design matrix.",
+        verdictDetail: "Inconclusive. The model could not be estimated.",
         whatItTellsUs:
-          "The test could not confirm or refute the theoretical hypothesis. As documented in nlp_processor.py, SpaCy was loaded primarily with en_core_web_sm with an unspecialized multilingual fallback, resulting in sparse entity extraction on non-English municipal texts.",
+          "Nothing yet, in either direction. spaCy ran mainly with its English model, so it found very few entities in German, Dutch and French posts.",
+        // TODO_ALFAZ: confirm re-run schedule.
         whatItDoesNotTellUs:
-          "We cannot state whether entity grounding helps or hurts approval until multilingual NER models (e.g. de_core_news_sm for German subreddits) are applied. TODO_ALFAZ: confirm re-run schedule.",
+          "Whether naming specifics helps or hurts. That needs a re-run with language-specific models, such as de_core_news_sm for the German subreddits.",
         chartType: "none",
-        calloutNote:
-          "Methodological note: This hypothesis produced an inconclusive result because entity extraction was sparse on multilingual posts. No chart is shown; the model is awaiting specialized language-specific NER pipelines.",
       },
     ],
   },
   {
     id: 3,
     number: 3,
-    title: "Pillar 3: Urban Civic Domains",
-    subtitle: "Contextual Topic Disparity",
+    title: "Topic",
+    subtitle: "Do some subjects cause more friction than others?",
     hypotheses: [
       {
         id: "H5",
         pillarId: 3,
-        pillarTitle: "Pillar 3: Urban Civic Domains",
+        pillarTitle: "Topic",
         name: "Civic Friction vs. Lifestyle Consensus",
         plainQuestion:
-          "Do posts about housing and bureaucracy trigger more negative sentiment and lower approval than posts about cafes, arts, and events?",
+          "Are posts about housing and bureaucracy more negative and less upvoted than posts about food, culture and events?",
+        shortFinding: "Yes. Housing and admin posts are more negative and less approved.",
         formalStatement:
           "Administrative and housing topics exhibit significantly higher negative sentiment (P_neg) and lower approval ratios (upvote_ratio) compared to cultural and lifestyle topics.",
         variables: [
-          { name: "Topic Domain", role: "Independent", description: "Cluster classification: ADMIN_HOUSING (8 topics) vs. LIFESTYLE_CULTURE (7 topics)" },
-          { name: "P_neg", role: "Dependent", description: "Negative sentiment probability" },
-          { name: "upvote_ratio", role: "Dependent", description: "Community approval ratio" },
+          { name: "Topic group", role: "Independent", description: "Admin & housing (8 topics) vs. lifestyle & culture (7 topics)" },
+          { name: "P_neg", role: "Dependent", description: "Probability the post is negative" },
+          { name: "upvote_ratio", role: "Dependent", description: "Share of votes that were upvotes" },
         ],
         methodAndRationale:
-          "Two-sample Welch's unequal variances t-test comparing mean sentiment and mean upvote ratio between the two distinct civic topic clusters.",
+          "Welch's t-test (does not assume equal variances) comparing the two topic groups.",
         snapshotResult:
-          "Snapshot, Nov 2026 (N = 51,587): Mean P_neg for Admin/Housing = 0.3842 vs. Lifestyle/Culture = 0.3315 (t = +5.98, p < 0.001). Mean upvote ratio for Admin/Housing = 0.7356 vs. Lifestyle/Culture = 0.7690 (t = −5.42, p < 0.001). Berlin slice approval was 0.6781 vs 0.7430 (p = 0.0026).",
+          "Snapshot, Nov 2026 (N = 51,587): mean P_neg admin/housing = 0.3842 vs. lifestyle/culture = 0.3315 (t = +5.98, p < 0.001). Mean upvote ratio 0.7356 vs. 0.7690 (t = −5.42, p < 0.001). Berlin only: upvote ratio 0.6781 vs. 0.7430 (p = 0.0026).",
         verdict: "Supported",
-        verdictDetail: "Supported; administrative discourse carries significantly higher friction.",
+        verdictDetail: "Supported. Admin and housing posts show clearly more friction.",
         whatItTellsUs:
-          "Institutional and housing topics carry systemic civic friction. Discussions about bureaucracy, rent, and legal paperwork provoke more negative language and lower community consensus than leisure discourse.",
+          "Posts about rent, paperwork and bureaucracy are more negative and get a lower share of upvotes than posts about leisure and culture.",
         whatItDoesNotTellUs:
-          "Topic clustering does not capture whether complaints are directed at municipal authorities or private landlords; it reflects aggregate affective tone in each domain.",
+          "Who the frustration is aimed at, whether city authorities or private landlords. The comparison only looks at overall tone per group.",
         chartType: "h5_bars",
       },
     ],
@@ -410,84 +411,86 @@ export const HYPOTHESES_PILLARS: PillarData[] = [
   {
     id: 4,
     number: 4,
-    title: "Pillar 4: Temporal Rhythms & Lexical Economics",
-    subtitle: "Time Cycles and Textual Effort",
+    title: "Time and language",
+    subtitle: "Do the time of day and choice of words matter?",
     hypotheses: [
       {
         id: "H6",
         pillarId: 4,
-        pillarTitle: "Pillar 4: Time and Language",
+        pillarTitle: "Time and language",
         name: "Daily Rhythm and Affect Cycles",
         plainQuestion:
-          "Does emotional negativity change throughout the day according to the local solar time of each city?",
+          "Does negativity change over the course of the day, in each city's local time?",
+        shortFinding: "Slightly. Mornings are most negative and nights least, but the effect is tiny.",
         formalStatement:
           "Negative sentiment intensity (P_neg) and polarity follow significant local diurnal periodicities across local time windows.",
         variables: [
-          { name: "Local Time Window", role: "Independent", description: "Four 6-hour windows: Night (00:00–05:59), Morning (06:00–12:59), Afternoon (13:00–18:59), Evening (19:00–23:59)" },
-          { name: "P_neg", role: "Dependent", description: "Continuous negative affect probability" },
+          { name: "Time of day", role: "Independent", description: "Night 00:00–05:59, morning 06:00–12:59, afternoon 13:00–18:59, evening 19:00–23:59" },
+          { name: "P_neg", role: "Dependent", description: "Probability the post is negative" },
         ],
         methodAndRationale:
-          "One-way Analysis of Variance (ANOVA) testing equality of mean P_neg across the four diurnal windows aligned to each subreddit's municipal IANA timezone.",
+          "One-way ANOVA comparing mean P_neg across the four windows, using each subreddit's local time zone.",
         snapshotResult:
-          "Snapshot, Nov 2026 (N = 51,587): One-way ANOVA F(3, 51583) = 15.46, p = 4.76 × 10⁻¹⁰. Group means for P_neg: Night = 0.3399, Morning = 0.3679, Afternoon = 0.3611, Evening = 0.3601.",
+          "Snapshot, Nov 2026 (N = 51,587): F(3, 51583) = 15.46, p = 4.76 × 10⁻¹⁰. Mean P_neg: night = 0.3399, morning = 0.3679, afternoon = 0.3611, evening = 0.3601.",
         verdict: "Supported, small effect",
-        verdictDetail: "Supported, but diurnal window explains under 0.1% of total variance.",
+        verdictDetail: "Supported, but time of day explains under 0.1% of the variation.",
         whatItTellsUs:
-          "Statistically significant diurnal variation exists. In the snapshot data, Morning hours exhibited the highest average negativity (0.3679), followed by Afternoon and Evening, with Night showing the lowest average (0.3399).",
+          "There is a real daily pattern: morning posts are the most negative (0.3679) and night posts the least (0.3399).",
         whatItDoesNotTellUs:
-          "Although statistically significant due to the large sample (N = 51,587), the effect size is tiny (η² < 0.001). Time of day is not a primary driver of sentiment. Post-hoc pairwise tests remain pending.",
+          "The difference is statistically real only because the sample is so large. The effect is tiny (η² < 0.001), so time of day barely matters. Pairwise follow-up tests are still to do.",
         chartType: "h6_bars",
         calloutNote:
-          "Code vs. Doc note: Technical documentation originally hypothesized late-night grievance venting. However, empirical snapshot results demonstrate peak negativity occurring in Morning submissions (0.3679), with Night submissions averaging lowest (0.3399).",
+          "We originally expected late-night venting to be the most negative. The data shows the opposite: nights are the least negative.",
       },
       {
         id: "H7",
         pillarId: 4,
-        pillarTitle: "Pillar 4: Time and Language",
+        pillarTitle: "Time and language",
         name: "Vocabulary Diversity and Engagement",
         plainQuestion:
-          "Is there a lexical sweet spot where posts with balanced vocabulary receive the most comments relative to city size?",
+          "Is there a sweet spot in vocabulary variety where posts get the most comments?",
+        shortFinding: "Yes. Comments peak at a type-token ratio of about 0.76.",
         formalStatement:
           "Controlling for community scale (total_users), Type-Token Ratio (TTR) exhibits an inverted U-shape relationship with scale-normalized comments.",
         variables: [
-          { name: "TTR (Type-Token Ratio)", role: "Independent", description: "Ratio of unique lemmatized tokens to total word count [0.0, 1.0]" },
-          { name: "TTR² (Quadratic term)", role: "Independent", description: "Squared Type-Token Ratio capturing non-linear curvature" },
-          { name: "ln(total_users)", role: "Control", description: "Log-transformed subreddit subscriber count" },
-          { name: "Normalized Comments", role: "Dependent", description: "(num_comments / total_users) × 10,000" },
+          { name: "TTR", role: "Independent", description: "Unique words ÷ total words, 0 to 1" },
+          { name: "TTR²", role: "Independent", description: "TTR squared, to capture a curve" },
+          { name: "ln(total_users)", role: "Control", description: "Subreddit size, log-transformed" },
+          { name: "Normalized comments", role: "Dependent", description: "(num_comments ÷ total_users) × 10,000" },
         ],
         methodAndRationale:
-          "Quadratic polynomial OLS regression: Normalized Comments = β0 + β1*TTR + β2*TTR² + β3*ln(total_users) + ε.",
+          "Quadratic OLS regression: normalized comments = β0 + β1·TTR + β2·TTR² + β3·ln(total_users) + ε.",
         snapshotResult:
-          "Snapshot, Nov 2026 (N = 51,587): Linear coefficient β1 = +1080.13 (p < 0.001), quadratic coefficient β2 = −707.26 (p < 0.001). Both terms significant at p < 0.001. Turning point TTR* = −β1 / (2*β2) ≈ 0.764.",
+          "Snapshot, Nov 2026 (N = 51,587): β1 = +1080.13 (p < 0.001), β2 = −707.26 (p < 0.001). Peak at TTR* = −β1 / (2·β2) ≈ 0.764.",
         verdict: "Supported",
-        verdictDetail: "Supported; significant concave (inverted-U) relationship with inflection at TTR ≈ 0.764.",
+        verdictDetail: "Supported. An inverted-U curve peaking at TTR ≈ 0.764.",
         whatItTellsUs:
-          "Community discussion depth increases as lexical richness grows, but reaches an inflection point around TTR = 0.764. Overly repetitive and excessively dense vocabularies both receive fewer normalized comments.",
+          "Comments rise as vocabulary gets more varied, up to a ratio of about 0.764, then fall. Very repetitive posts and very dense ones both get fewer comments.",
         whatItDoesNotTellUs:
-          "Type-Token Ratio naturally declines as post length increases. Part of this curvature reflects post length dynamics rather than pure vocabulary sophistication alone.",
+          "Type-token ratio drops as posts get longer, so part of this curve is about post length, not only word choice.",
         chartType: "h7_curve",
       },
     ],
   },
 ];
 
-export const READING_RESULTS_CONTENT = {
+export const READING_RESULTS_CONTENT: { paragraphs: TitledPoint[] } = {
   paragraphs: [
     {
-      title: "What a p-value actually says",
-      text: "A p-value measures the probability of observing data as extreme as what was measured, assuming the null hypothesis (that no true relationship exists) is true. When a p-value is below the threshold of 0.05, researchers reject the null hypothesis. It does not measure the probability that the hypothesis is correct, nor does it measure the strength or practical importance of the finding.",
+      title: "A p-value is not the chance the hypothesis is true",
+      text: "It's the chance of seeing data this extreme if there were really no relationship. Below 0.05, we reject the idea of no relationship. It says nothing about how big or important the relationship is.",
     },
     {
-      title: "Why huge sample sizes make tiny effects statistically significant",
-      text: "With a dataset of 51,587 submissions, standard errors become very small. In large datasets, even trivial differences easily yield p < 0.001. A tiny p-value confirms that an observed relationship is unlikely to be random sampling noise, but it does not mean the effect has meaningful real-world impact.",
+      title: "Big samples make tiny effects significant",
+      text: "With 51,587 posts, even trivial differences come out at p < 0.001. A small p-value means the pattern probably isn't random noise, not that it matters in practice.",
     },
     {
-      title: "Understanding effect size over significance",
-      text: "Effect size measures the magnitude of a relationship. For instance, in Hypothesis 1, negative sentiment is statistically linked to lower upvote approval with p < 0.001. However, the rank correlation is only ρ = −0.0254—an effect so small that negative sentiment accounts for less than 0.1% of the variation in post approval. Similarly, in Hypothesis 6, the diurnal time window achieves p = 4.76 × 10⁻¹⁰ in ANOVA, yet explains less than 0.1% of sentiment variance. Significance tells us an effect exists; effect size tells us how much it matters.",
+      title: "Effect size tells you how much it matters",
+      text: "In H1, negative tone is linked to lower approval with p < 0.001, but ρ = −0.0254: negativity accounts for less than 0.1% of the variation in approval. In H6, time of day reaches p = 4.76 × 10⁻¹⁰, yet explains less than 0.1% of sentiment variance. Significance says an effect exists; effect size says how big it is.",
     },
     {
-      title: "Correlation versus causation in observational data",
-      text: "Every model in this research is correlational. When post polarity correlates with higher karma (H2), this does not prove that adopting an extreme opinion causes community members to upvote. It indicates that emotionally decisive posts and high vote totals occur together. Confounding variables, author intent, and platform recommendation algorithms cannot be held constant in observational studies.",
+      title: "Correlation is not causation",
+      text: "Every result here is a correlation. When strong-stance posts score higher (H2), that doesn't prove a strong stance causes upvotes, only that the two go together. Author intent, Reddit's ranking algorithm and other factors can't be controlled for.",
     },
   ],
 };
@@ -495,278 +498,314 @@ export const READING_RESULTS_CONTENT = {
 export const GLOSSARY_ITEMS: GlossaryItem[] = [
   {
     id: "alpha",
-    term: "Alpha (Significance Level)",
+    term: "Alpha (significance level)",
     category: "Statistics",
-    plainDefinition: "The predetermined probability threshold below which the null hypothesis is rejected. In this study, alpha is set to 0.05 (a 5% risk of concluding a difference exists when it does not).",
+    plainDefinition: "The cut-off for calling a result significant. Here it's 0.05: a 5% risk of seeing an effect that isn't there.",
     formula: "α = 0.05",
-    whereUsed: "Standard decision threshold applied across all seven hypothesis tests (H1–H7).",
+    whereUsed: "All seven hypothesis tests.",
   },
   {
     id: "anova",
-    term: "ANOVA (One-Way Analysis of Variance)",
+    term: "ANOVA (one-way)",
     category: "Statistics",
-    plainDefinition: "A statistical test that compares the means of three or more independent groups to determine if at least one group mean is significantly different from the others.",
+    plainDefinition: "A test of whether the averages of three or more groups differ.",
     formula: "F = MS_between / MS_within",
-    whereUsed: "Used in H6 to test if mean negative sentiment differs across four diurnal time windows.",
+    whereUsed: "H6, comparing negativity across four times of day.",
   },
   {
     id: "attention-economy",
-    term: "Attention Economy",
+    term: "Attention economy",
     category: "Civic & Platform",
-    plainDefinition: "A framework treating human attention as a scarce resource in information-rich digital environments. In city forums, attention determines which municipal concerns get amplified or ignored.",
-    whereUsed: "Framing concept for the entire thesis title and research question.",
+    plainDefinition: "The idea that attention is scarce online. In city forums it decides which local problems get noticed.",
+    whereUsed: "The framing of the thesis title and research question.",
   },
   {
     id: "civic-friction",
-    term: "Civic Friction",
+    term: "Civic friction",
     category: "Civic & Platform",
-    plainDefinition: "Institutional, logistical, and bureaucratic obstacles that citizens encounter in urban life, such as housing shortages, permit backlogs, and public transit disruptions.",
-    whereUsed: "Tested in H5 by comparing administrative topics against lifestyle and recreational discourse.",
+    plainDefinition: "The everyday hassles of city life: housing shortages, permit queues, transit problems.",
+    whereUsed: "H5, comparing admin and housing posts with lifestyle posts.",
   },
   {
     id: "confidence-interval",
-    term: "Confidence Interval (95% CI)",
+    term: "Confidence interval (95%)",
     category: "Statistics",
-    plainDefinition: "A range of plausible values for an unknown population parameter. A 95% confidence interval means that 95 out of 100 similarly constructed intervals would contain the true parameter.",
+    plainDefinition: "A range of plausible values for the true effect. Intervals built this way contain the true value 95 times out of 100.",
     formula: "CI = β ± (1.96 × SE)",
-    whereUsed: "Reported in H3 for the Shannon entropy regression coefficient: 95% CI [−0.567, −0.444].",
+    whereUsed: "H3: entropy coefficient 95% CI [−0.567, −0.444].",
   },
   {
     id: "correlation-vs-causation",
-    term: "Correlation vs. Causation",
+    term: "Correlation vs. causation",
     category: "Statistics",
-    plainDefinition: "A core principle stating that an observed association between two variables does not prove that one variable causes the other. Observational social stream data cannot establish causal mechanisms.",
-    whereUsed: "Methodological guideline applied in 'How to read results' and across all hypothesis discussions.",
+    plainDefinition: "Two things moving together doesn't mean one causes the other. Observational data like Reddit posts can't prove cause.",
+    whereUsed: "Every hypothesis on this page.",
   },
   {
     id: "diurnal-cycle",
-    term: "Diurnal Cycle",
+    term: "Diurnal cycle",
     category: "Architecture",
-    plainDefinition: "A 24-hour recurring temporal rhythm. In this project, UTC post timestamps are mapped to municipal local solar time to analyze circadian communication patterns.",
+    plainDefinition: "A pattern that repeats every 24 hours. Post times are converted from UTC to each city's local time to find it.",
     formula: "t_local = UTC_timestamp.tz_convert(IANA_timezone)",
-    whereUsed: "Operationalized in H6 across four 6-hour time windows (Night, Morning, Afternoon, Evening).",
+    whereUsed: "H6, split into night, morning, afternoon and evening.",
   },
   {
     id: "effect-size",
-    term: "Effect Size",
+    term: "Effect size",
     category: "Statistics",
-    plainDefinition: "A quantitative measure of the magnitude of a phenomenon, distinct from statistical significance. Examples include correlation coefficients (ρ) and regression coefficients (β).",
-    whereUsed: "Evaluated in H1 (ρ = −0.0254) and H6 (η² < 0.001) to distinguish practical importance from large-sample significance.",
+    plainDefinition: "How big a relationship is, as opposed to whether it exists. Correlations (ρ) and regression coefficients (β) are examples.",
+    whereUsed: "H1 (ρ = −0.0254) and H6 (η² < 0.001).",
   },
   {
     id: "entity-density",
-    term: "Entity Density",
+    term: "Entity density",
     category: "NLP & Linguistics",
-    plainDefinition: "The proportion of structured, verifiable named entities (money, agencies, locations) relative to the total word count of a post.",
-    formula: "Entity Density = Count(MONEY + ORG + GPE + LOC) / Total Words",
-    whereUsed: "Moderator variable tested in H4 to evaluate whether concrete anchors protect complaints from downvotes.",
+    plainDefinition: "How many concrete names (money, organisations, places) a post mentions relative to its length.",
+    formula: "Count(MONEY + ORG + GPE + LOC) / total words",
+    whereUsed: "H4, testing whether specifics protect complaints from downvotes.",
   },
   {
     id: "iana-timezone",
-    term: "IANA Timezone",
+    term: "IANA time zone",
     category: "Architecture",
-    plainDefinition: "The standard global database of timezone designations (e.g., Europe/Berlin, America/New_York) accounting for geographic longitude and daylight saving transitions.",
-    whereUsed: "Configured per subreddit in the subreddits database table to synchronize local submission hours.",
+    plainDefinition: "Standard time zone names like Europe/Berlin or America/New_York, including daylight saving rules.",
+    whereUsed: "Set per subreddit to convert post times to local time.",
   },
   {
     id: "interaction-moderation",
-    term: "Interaction (Moderation)",
+    term: "Interaction (moderation)",
     category: "Statistics",
-    plainDefinition: "A statistical model where the effect of an independent variable on a dependent variable depends on the level of a third moderator variable.",
-    formula: "Y = β0 + β1*X + β2*M + β3*(X × M) + ε",
-    whereUsed: "Operationalized in H4 to test if entity density (M) moderates negative sentiment (X) on upvote ratio (Y).",
+    plainDefinition: "When the effect of one variable depends on the level of another.",
+    formula: "Y = β0 + β1·X + β2·M + β3·(X × M) + ε",
+    whereUsed: "H4: does entity density (M) change how negativity (X) affects upvote ratio (Y)?",
   },
   {
     id: "inverted-u-relationship",
-    term: "Inverted-U Relationship",
+    term: "Inverted-U relationship",
     category: "Statistics",
-    plainDefinition: "A non-linear, concave curve where an outcome increases up to an optimal inflection point and decreases thereafter. Captured mathematically via a negative quadratic coefficient.",
-    formula: "Y = β0 + β1*X + β2*X² where β2 < 0; Peak X* = -β1 / (2*β2)",
-    whereUsed: "Confirmed in H7 for vocabulary diversity (TTR) and normalized comments, peaking at TTR ≈ 0.764.",
+    plainDefinition: "An outcome that rises to a peak and then falls. Shows up as a negative squared term in a regression.",
+    formula: "Y = β0 + β1·X + β2·X², β2 < 0; peak X* = −β1 / (2·β2)",
+    whereUsed: "H7: comments peak at TTR ≈ 0.764.",
   },
   {
     id: "lemmatization",
     term: "Lemmatization",
     category: "NLP & Linguistics",
-    plainDefinition: "The algorithmic process of reducing inflected word forms to their canonical dictionary base form (lemma) using vocabulary and morphological analysis.",
-    whereUsed: "Executed via NLTK's WordNet Lemmatizer in nlp_processor.py prior to keyword aggregation.",
+    plainDefinition: "Reducing words to their dictionary form, so “running” and “ran” both count as “run”.",
+    whereUsed: "NLTK's WordNet lemmatizer, before counting keywords.",
   },
   {
     id: "log-transform",
-    term: "Log Transform (ln(x + 1))",
+    term: "Log transform, ln(x + 1)",
     category: "Statistics",
-    plainDefinition: "A mathematical transformation applied to heavily right-skewed variables to stabilize variance and normalize distributions. Adding 1 prevents taking the logarithm of zero.",
+    plainDefinition: "Compresses very skewed numbers (a few posts with huge scores) so they don't dominate. The +1 avoids log(0).",
     formula: "ln(x + 1)",
-    whereUsed: "Applied to score and comment counts in H3 multiple regression, and to subscriber totals in H7.",
+    whereUsed: "Score and comments in H3; subreddit size in H7.",
   },
   {
     id: "maturity-window",
-    term: "Maturity Window (7-Day Delay)",
+    term: "Maturity window (7 days)",
     category: "Architecture",
-    plainDefinition: "A deliberate observation period between a post's publication and its ingestion into the analytical corpus, ensuring community voting and commenting have stabilized.",
-    formula: "Age = (Current Timestamp − Post Timestamp) ≥ 7 Days",
-    whereUsed: "Enforced by the background scraping worker (scraper_v2.py) prior to database insertion.",
+    plainDefinition: "The wait between a post going up and it being saved, so votes and comments have settled.",
+    formula: "post age ≥ 7 days",
+    whereUsed: "Enforced by the scraping worker before posts are stored.",
   },
   {
     id: "sample-size-n",
-    term: "N (Sample Size)",
+    term: "N (sample size)",
     category: "Statistics",
-    plainDefinition: "The total number of observational units included in an empirical analysis. Larger sample sizes increase statistical power and precision.",
-    whereUsed: "The frozen thesis snapshot comprises N = 51,587 cleaned submissions from municipal subreddits.",
+    plainDefinition: "The number of items analysed. More data gives more precise estimates.",
+    whereUsed: "The thesis snapshot has N = 51,587 cleaned posts.",
   },
   {
     id: "named-entity-recognition",
-    term: "Named Entity Recognition (NER)",
+    term: "Named entity recognition (NER)",
     category: "NLP & Linguistics",
-    plainDefinition: "An NLP pipeline that locates and classifies text spans into predefined categories such as person names, organizations, locations, monetary amounts, and laws.",
-    whereUsed: "Implemented via SpaCy models (en_core_web_sm / xx_ent_wiki_sm) in nlp_processor.py.",
+    plainDefinition: "Finding names of people, organisations, places, amounts and so on in text.",
+    whereUsed: "spaCy (en_core_web_sm / xx_ent_wiki_sm).",
   },
   {
     id: "natural-language-inference",
-    term: "Natural Language Inference (NLI)",
+    term: "Natural language inference (NLI)",
     category: "NLP & Linguistics",
-    plainDefinition: "A machine learning task determining whether a premise sentence entails, contradicts, or is neutral toward a hypothesis sentence.",
-    whereUsed: "Underlies zero-shot classification in mDeBERTa-v3 by testing whether a post entails candidate topic labels.",
+    plainDefinition: "Deciding whether one sentence implies, contradicts or is unrelated to another.",
+    whereUsed: "How mDeBERTa-v3 assigns topics without topic-specific training.",
   },
   {
     id: "nlp-pipeline",
-    term: "NLP Pipeline",
+    term: "NLP pipeline",
     category: "Architecture",
-    plainDefinition: "A sequential automated workflow that accepts raw text and applies tokenization, filtering, classification, and feature extraction stages.",
-    whereUsed: "The local offline engine in nlp_processor.py coordinating sentiment, topics, entities, and lemmas.",
+    plainDefinition: "The chain of steps that turns raw text into numbers: splitting into words, filtering, classifying.",
+    whereUsed: "nlp_processor.py: sentiment, topics, entities and keywords.",
   },
   {
     id: "ols-regression",
-    term: "OLS Regression (Ordinary Least Squares)",
+    term: "OLS regression",
     category: "Statistics",
-    plainDefinition: "A linear regression method estimating unknown parameters by minimizing the sum of squared differences between observed values and values predicted by the linear model.",
-    formula: "β = (X^T X)⁻¹ X^T Y",
-    whereUsed: "Used in H3 (topic ambiguity), H4 (moderation), and H7 (quadratic lexical diversity).",
+    plainDefinition: "Fits a straight-line model by minimising the squared gaps between predicted and actual values.",
+    formula: "β = (XᵀX)⁻¹ XᵀY",
+    whereUsed: "H3, H4 and H7.",
   },
   {
     id: "p-value",
-    term: "P-Value",
+    term: "p-value",
     category: "Statistics",
-    plainDefinition: "The probability of obtaining test results at least as extreme as the results actually observed, under the assumption that the null hypothesis is correct.",
-    whereUsed: "Reported alongside every hypothesis test to assess statistical significance against α = 0.05.",
+    plainDefinition: "The chance of seeing results this extreme if there were really no effect.",
+    whereUsed: "Every hypothesis test, compared with α = 0.05.",
   },
   {
     id: "polarity",
-    term: "Polarity (Emotional Polarity Magnitude)",
+    term: "Polarity",
     category: "NLP & Linguistics",
-    plainDefinition: "The absolute difference between positive and negative sentiment probabilities, measuring emotional intensity regardless of direction.",
-    formula: "Polarity = |P_pos − P_neg| ∈ [0.0, 1.0]",
-    whereUsed: "Operationalized in H2 to evaluate whether decisive stances accumulate higher net karma.",
+    plainDefinition: "How strongly emotional a post is, ignoring whether it's positive or negative.",
+    formula: "|P_pos − P_neg|, from 0 to 1",
+    whereUsed: "H2.",
   },
   {
     id: "primary-topic",
-    term: "Primary Topic",
+    term: "Primary topic",
     category: "NLP & Linguistics",
-    plainDefinition: "The single candidate topic label assigned the highest softmax entailment score by the zero-shot classifier.",
-    whereUsed: "Stored in reddit_posts.topics->>'primary_topic' and used to group topic clusters in H5.",
+    plainDefinition: "The single most likely of the 30 topics for a post.",
+    whereUsed: "Grouping posts into topic clusters for H5.",
   },
   {
     id: "rank-deficiency",
-    term: "Rank Deficiency",
+    term: "Rank deficiency",
     category: "Statistics",
-    plainDefinition: "A condition in linear regression where columns in the design matrix are linearly dependent or exhibit near-zero variance, preventing matrix inversion and unique parameter estimation.",
-    whereUsed: "Occurred in H4 where entity density lacked variation across non-English texts, causing an inconclusive result.",
+    plainDefinition: "When a regression's inputs are redundant or barely vary, so the model can't be solved.",
+    whereUsed: "Why H4 is inconclusive: entity density was nearly always zero.",
   },
   {
     id: "score-net-karma",
-    term: "Score (Net Karma)",
+    term: "Score",
     category: "Civic & Platform",
-    plainDefinition: "The net public point total of a Reddit submission, representing total community upvotes minus downvotes.",
-    formula: "Score = Upvotes − Downvotes",
-    whereUsed: "Dependent variable in H2 and log-transformed in H3 (ln(score + 1)).",
+    plainDefinition: "A post's upvotes minus its downvotes.",
+    formula: "upvotes − downvotes",
+    whereUsed: "H2, and log-transformed in H3.",
   },
   {
     id: "sentiment-probability",
-    term: "Sentiment Probability (P_neg, P_pos, P_neu)",
+    term: "Sentiment probability",
     category: "NLP & Linguistics",
-    plainDefinition: "Continuous, calibrated probability outputs from the cross-lingual XLM-RoBERTa model reflecting confidence across three emotional categories.",
-    formula: "P_pos + P_neu + P_neg = 1.0, P_i ∈ [0.0, 1.0]",
-    whereUsed: "Core affective metrics used in H1, H2, H4, H5, and H6.",
+    plainDefinition: "The model's confidence that a post is positive (P_pos), neutral (P_neu) or negative (P_neg).",
+    formula: "P_pos + P_neu + P_neg = 1",
+    whereUsed: "H1, H2, H4, H5 and H6.",
   },
   {
     id: "shannon-entropy",
-    term: "Shannon Entropy (H)",
+    term: "Shannon entropy",
     category: "Statistics",
-    plainDefinition: "An Information Theory metric measuring the degree of uncertainty or dispersal across a probability distribution. Uniform distributions yield high entropy; focused distributions yield low entropy.",
-    formula: "H = - Σ (p_i × ln(p_i)) for i = 1 to 30",
-    whereUsed: "Key independent variable in H3, testing whether topic ambiguity incurs a visibility penalty.",
+    plainDefinition: "How spread out a set of probabilities is. A post clearly about one topic has low entropy; one that could be about anything has high entropy.",
+    formula: "H = −Σ p_i ln(p_i), i = 1…30",
+    whereUsed: "H3.",
   },
   {
     id: "spearmans-rho",
-    term: "Spearman's Rank Correlation (ρ)",
+    term: "Spearman's ρ",
     category: "Statistics",
-    plainDefinition: "A non-parametric measure of statistical dependence between the rankings of two variables, assessing how well a monotonic function describes their relationship.",
-    formula: "ρ = 1 − [6 Σ d_i² / (n(n² − 1))]",
-    whereUsed: "Employed in H1 and H2 because comment counts and karma scores follow heavy-tailed distributions.",
+    plainDefinition: "A correlation based on rank order rather than raw values, so a few extreme posts can't distort it.",
+    formula: "ρ = 1 − 6Σd_i² / (n(n² − 1))",
+    whereUsed: "H1 and H2.",
   },
   {
     id: "subreddit",
     term: "Subreddit",
     category: "Civic & Platform",
-    plainDefinition: "A user-created, topic-specific or geography-specific community board on the Reddit social media platform prefixed with r/.",
-    whereUsed: "The primary unit of data collection, focused on municipal forums (e.g., r/berlin, r/munich, r/nyc).",
+    plainDefinition: "A community on Reddit, named with r/ in front.",
+    whereUsed: "The unit of collection: r/berlin, r/munich, r/nyc and others.",
   },
   {
     id: "transformer-models",
-    term: "Transformer Model (XLM-RoBERTa & mDeBERTa-v3)",
+    term: "Transformer model",
     category: "NLP & Linguistics",
-    plainDefinition: "Deep learning architectures based on multi-head self-attention mechanisms capable of processing long-range textual dependencies and cross-lingual representations.",
-    whereUsed: "cardiffnlp/twitter-xlm-roberta-base-sentiment and MoritzLaurer/mDeBERTa-v3-base-mnli-xnli in nlp_processor.py.",
+    plainDefinition: "The type of neural network behind modern language models. These ones handle many languages.",
+    whereUsed: "XLM-RoBERTa for sentiment, mDeBERTa-v3 for topics.",
   },
   {
     id: "type-token-ratio",
-    term: "Type-Token Ratio (TTR)",
+    term: "Type-token ratio (TTR)",
     category: "NLP & Linguistics",
-    plainDefinition: "A classical measure of vocabulary diversity calculated as the number of unique lemmatized word types divided by the total number of word tokens in a text.",
-    formula: "TTR = Unique Lemmas / Total Words ∈ [0.0, 1.0]",
-    whereUsed: "Independent variable in H7, testing for an inverted U-shape curve with comment engagement.",
+    plainDefinition: "Unique words divided by total words. Higher means more varied vocabulary.",
+    formula: "unique lemmas / total words",
+    whereUsed: "H7.",
   },
   {
     id: "upvote-ratio",
-    term: "Upvote Ratio",
+    term: "Upvote ratio",
     category: "Civic & Platform",
-    plainDefinition: "The proportion of total community votes cast on a post that were upvotes rather than downvotes, bounded between 0.0 and 1.0.",
-    formula: "Upvote Ratio = Upvotes / (Upvotes + Downvotes)",
-    whereUsed: "Primary consensus approval metric in H1, H4, and H5.",
+    plainDefinition: "The share of a post's votes that were upvotes, from 0 to 1.",
+    formula: "upvotes / (upvotes + downvotes)",
+    whereUsed: "H1, H4 and H5.",
   },
   {
     id: "welchs-t-test",
-    term: "Welch's Two-Sample t-Test",
+    term: "Welch's t-test",
     category: "Statistics",
-    plainDefinition: "A two-sample hypothesis test comparing group means that does not assume equal population variances or equal sample sizes.",
-    formula: "t = (x̄1 − x̄2) / sqrt(s1²/n1 + s2²/n2)",
-    whereUsed: "Employed in H5 to compare sentiment and upvote ratios between Admin/Housing and Lifestyle topics.",
+    plainDefinition: "Compares the averages of two groups without assuming they have the same spread or size.",
+    formula: "t = (x̄1 − x̄2) / √(s1²/n1 + s2²/n2)",
+    whereUsed: "H5.",
   },
   {
     id: "zero-shot-classification",
-    term: "Zero-Shot Classification",
+    term: "Zero-shot classification",
     category: "NLP & Linguistics",
-    plainDefinition: "A machine learning inference technique where a pre-trained model categorizes text into novel classes that it was not explicitly trained on, using semantic entailment.",
-    whereUsed: "Used by mDeBERTa-v3 in nlp_processor.py to map posts into 30 municipal civic taxonomy categories.",
+    plainDefinition: "Sorting text into categories the model was never specifically trained on.",
+    whereUsed: "Assigning posts to the 30 topics.",
   },
 ];
 
-export const LIMITATIONS_ETHICS_CONTENT = {
+export const LIMITATIONS_ETHICS_CONTENT: {
+  limitations: TitledPoint[];
+  ethics: TitledPoint[];
+} = {
   limitations: [
-    "Demographic skew: Reddit users do not represent the general population of any metropolitan city. Communities skew younger, more male, more tech-literate, and include higher proportions of expatriates and international students than official census baselines.",
-    "Correlational design: All findings demonstrate observational associations rather than causal mechanisms. Engagement dynamics cannot isolate individual psychology from platform recommendation algorithms.",
-    "Pretrained models in local contexts: Pretrained multilingual transformers were deployed without domain-specific fine-tuning on regional municipal slang. A manual validation sample is planned for future work.",
-    "Zero-shot topic approximations: Classifying text into 30 civic categories via NLI entailment provides a strong heuristic approximation, but cannot substitute for in-depth qualitative coding.",
-    "Multilingual text and NER sparsity: SpaCy's default English pipeline exhibited high error and missed entity spans on German, Dutch, and French submissions, causing H4 rank-deficiency.",
-    "Length-dependent TTR: Type-Token Ratio naturally declines as post word count increases, meaning H7 captures both vocabulary diversity and text length dynamics.",
+    {
+      title: "Reddit isn't the city.",
+      text: "Users skew younger, more male, more tech-savvy, and include more expats and international students than the general population.",
+    },
+    {
+      title: "Correlation only.",
+      text: "None of the results show cause and effect, and Reddit's own ranking algorithm can't be separated out.",
+    },
+    {
+      title: "Models weren't tuned for local slang.",
+      text: "The language models are used as-is, without training on city-specific language. A manual accuracy check is planned.",
+    },
+    {
+      title: "Topics are approximate.",
+      text: "Automatic sorting into 30 topics is a useful estimate, not a replacement for a human reading the posts.",
+    },
+    {
+      title: "Entity detection is weak outside English.",
+      text: "spaCy's English model missed most names in German, Dutch and French posts, which is why H4 couldn't be tested.",
+    },
+    {
+      title: "Vocabulary variety depends on length.",
+      text: "Longer posts naturally have a lower type-token ratio, so H7 partly measures post length.",
+    },
   ],
+  // TODO_ALFAZ: review current Reddit terms and developer policy, then add a line here.
   ethics: [
-    "Strict public scope: Only public Reddit submissions from open regional subreddits are ingested. Private communications, modmail, and closed groups are never accessed.",
-    "Zero user profiling: Reddit usernames, author handles, user profile links, and account biographies are deliberately not scraped, stored, or indexed.",
-    "100% self-hosted NLP: Machine learning models execute entirely on local, self-hosted hardware. No citizen text is ever transmitted to commercial third-party cloud AI APIs.",
-    "Right to erasure (Art. 17 GDPR): Any Reddit author can request permanent removal of their submission by emailing khanalfaaz14@gmail.com with their post ID. The submission is purged without delay.",
-    "Compliance with research frameworks: Conducted under GDPR Art. 6(1)(f) and Art. 89 academic research exemptions.",
-    "Reddit Terms of Service: TODO_ALFAZ: review current platform terms and developer policy considerations.",
+    {
+      title: "Public posts only.",
+      text: "Only public posts from open city subreddits are collected. No private messages, modmail or closed communities.",
+    },
+    {
+      title: "No user data.",
+      text: "Usernames, profile links and bios are never collected or stored.",
+    },
+    {
+      title: "Everything runs locally.",
+      text: "The language models run on my own hardware. No post text is sent to a commercial AI service.",
+    },
+    {
+      title: "You can have your post removed.",
+      text: "Email khanalfaaz14@gmail.com with the post ID and it will be deleted (GDPR Art. 17).",
+    },
+    {
+      title: "Legal basis.",
+      text: "GDPR Art. 6(1)(f) and the Art. 89 exemption for academic research.",
+    },
   ],
 };
 
@@ -774,54 +813,54 @@ export const TECH_STACK_CATEGORIES: TechStackCategory[] = [
   {
     category: "Frontend",
     technologies: [
-      { name: "React", version: "19.2.5", purpose: "Core UI single-page application library", source: "package.json" },
-      { name: "TypeScript", version: "5.9.3", purpose: "Static typing and schema contract enforcement", source: "package.json" },
-      { name: "Chakra UI v3", version: "3.35.0", purpose: "Accessible dark-theme layout primitives and styling", source: "package.json" },
-      { name: "Redux Toolkit", version: "2.11.2", purpose: "Global client state (filters, server status, auth)", source: "package.json" },
-      { name: "TanStack Query v5", version: "5.101.0", purpose: "Server state caching, deduplication, and async data fetching", source: "package.json" },
-      { name: "Apache ECharts", version: "6.1.0", purpose: "Interactive time series and hypothesis data visualizations", source: "package.json" },
-      { name: "Chart.js", version: "4.5.1", purpose: "Diurnal polar and frequency charting", source: "package.json" },
-      { name: "React Router", version: "7.16.0", purpose: "Client-side routing and protected view boundaries", source: "package.json" },
-      { name: "Vite", version: "8.0.10", purpose: "Production frontend bundler and local dev server", source: "package.json" },
+      { name: "React", version: "19.2.5", purpose: "UI", source: "package.json" },
+      { name: "TypeScript", version: "5.9.3", purpose: "Types", source: "package.json" },
+      { name: "Chakra UI v3", version: "3.35.0", purpose: "Components and styling", source: "package.json" },
+      { name: "Redux Toolkit", version: "2.11.2", purpose: "Filters, server status, auth", source: "package.json" },
+      { name: "TanStack Query v5", version: "5.101.0", purpose: "Data fetching and caching", source: "package.json" },
+      { name: "Apache ECharts", version: "6.1.0", purpose: "Most charts", source: "package.json" },
+      { name: "Chart.js", version: "4.5.1", purpose: "Remaining older charts", source: "package.json" },
+      { name: "React Router", version: "7.16.0", purpose: "Routing", source: "package.json" },
+      { name: "Vite", version: "8.0.10", purpose: "Build and dev server", source: "package.json" },
     ],
   },
   {
     category: "Backend",
     technologies: [
-      { name: "FastAPI", version: "0.110+", purpose: "Asynchronous REST gateway and WebSocket stream controller", source: "Scraping/requirements.txt" },
-      { name: "Uvicorn", version: "0.29+", purpose: "Production ASGI web server running on port 8000", source: "Scraping/requirements.txt" },
-      { name: "AsyncPG", version: "0.29+", purpose: "High-throughput asynchronous PostgreSQL connection pool driver", source: "Scraping/requirements.txt" },
-      { name: "Playwright", version: "1.42+", purpose: "Headless Chromium browser automation for web ingestion", source: "Scraping/requirements.txt" },
-      { name: "WebSockets", version: "12.0+", purpose: "Real-time queue state monitoring and reanalysis feeds", source: "Scraping/requirements.txt" },
+      { name: "FastAPI", version: "0.110+", purpose: "REST API and WebSockets", source: "Scraping/requirements.txt" },
+      { name: "Uvicorn", version: "0.29+", purpose: "Server", source: "Scraping/requirements.txt" },
+      { name: "AsyncPG", version: "0.29+", purpose: "PostgreSQL driver", source: "Scraping/requirements.txt" },
+      { name: "Playwright", version: "1.42+", purpose: "Scraping", source: "Scraping/requirements.txt" },
+      { name: "WebSockets", version: "12.0+", purpose: "Live queue status", source: "Scraping/requirements.txt" },
     ],
   },
   {
     category: "NLP & Machine Learning",
     technologies: [
-      { name: "PyTorch", version: "2.2+", purpose: "Deep learning framework with NVIDIA CUDA float16 acceleration", source: "Scraping/requirements.txt" },
-      { name: "Transformers (XLM-RoBERTa)", version: "cardiffnlp", purpose: "Multilingual 3-class continuous sentiment probability estimation", source: "Scraping/requirements.txt" },
-      { name: "Transformers (mDeBERTa-v3)", version: "MoritzLaurer", purpose: "30-class zero-shot municipal civic topic classification via NLI", source: "Scraping/requirements.txt" },
-      { name: "SpaCy", version: "3.7.0+", purpose: "Named entity recognition pipelines (en_core_web_sm / xx_ent_wiki_sm)", source: "Scraping/requirements.txt" },
-      { name: "NLTK", version: "3.8+", purpose: "Tokenization, stopword cleaning, and WordNet lemmatization", source: "Scraping/requirements.txt" },
+      { name: "PyTorch", version: "2.2+", purpose: "Runs the models (GPU or CPU)", source: "Scraping/requirements.txt" },
+      { name: "XLM-RoBERTa", version: "cardiffnlp", purpose: "Sentiment", source: "Scraping/requirements.txt" },
+      { name: "mDeBERTa-v3", version: "MoritzLaurer", purpose: "Topics", source: "Scraping/requirements.txt" },
+      { name: "SpaCy", version: "3.7.0+", purpose: "Named entities", source: "Scraping/requirements.txt" },
+      { name: "NLTK", version: "3.8+", purpose: "Tokens, stopwords, lemmas", source: "Scraping/requirements.txt" },
     ],
   },
   {
     category: "Data & Persistence",
     technologies: [
-      { name: "PostgreSQL", version: "15+", purpose: "Relational persistence with compound B-Tree and GIN JSONB indexes", source: "Scraping/Migrations/" },
-      { name: "PostgreSQL LISTEN/NOTIFY", version: "Built-in", purpose: "Real-time database trigger events for scraping queue updates", source: "Scraping/Migrations/0009" },
-      { name: "Pandas", version: "2.2+", purpose: "Time-series bucketing, SMA rolling windows, and data cleaning", source: "Scraping/requirements.txt" },
-      { name: "NumPy", version: "2.0+", purpose: "Vectorized entropy math and array calculations", source: "Scraping/requirements.txt" },
+      { name: "PostgreSQL", version: "15+", purpose: "Database", source: "Scraping/Migrations/" },
+      { name: "LISTEN/NOTIFY", version: "built-in", purpose: "Real-time change events", source: "Scraping/Migrations/0009" },
+      { name: "Pandas", version: "2.2+", purpose: "Time series, moving averages", source: "Scraping/requirements.txt" },
+      { name: "NumPy", version: "2.0+", purpose: "Entropy and array maths", source: "Scraping/requirements.txt" },
     ],
   },
   {
     category: "Hosting, Testing & CI",
     technologies: [
-      { name: "Vitest", version: "5.0.5", purpose: "Unit testing suite with JSDOM and React Testing Library", source: "package.json" },
-      { name: "Playwright Test", version: "1.64.1", purpose: "End-to-end integration and smoke test verification", source: "package.json" },
-      { name: "Pytest & Pytest-AsyncIO", version: "8.0+", purpose: "Backend API and database unit test suite", source: "Scraping/requirements.txt" },
-      { name: "Firebase Hosting", version: "12.13+", purpose: "Static web deployment for single-page React frontend", source: "firebase.json" },
-      { name: "Firebase Auth", version: "12.13+", purpose: "Role-based user authentication and administrative session tokens", source: "firebase_config.js" },
+      { name: "Vitest", version: "5.0.5", purpose: "Unit tests", source: "package.json" },
+      { name: "Playwright Test", version: "1.64.1", purpose: "End-to-end tests", source: "package.json" },
+      { name: "Pytest", version: "8.0+", purpose: "Backend tests", source: "Scraping/requirements.txt" },
+      { name: "Firebase Hosting", version: "12.13+", purpose: "Frontend hosting", source: "firebase.json" },
+      { name: "Firebase Auth", version: "12.13+", purpose: "Login and roles", source: "firebase_config.js" },
     ],
   },
 ];

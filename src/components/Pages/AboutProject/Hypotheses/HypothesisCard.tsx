@@ -1,408 +1,338 @@
 import { useMemo } from "react";
-import {
-  Badge,
-  Box,
-  Flex,
-  HStack,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Box, Text } from "@chakra-ui/react";
 import EChartsReact from "react-echarts-library";
 import type { EChartsOption } from "echarts";
 import type { HypothesisCardData } from "@/util/Types";
-import { LuCheck, LuCircleHelp, LuInfo } from "react-icons/lu";
+import { C, VerdictPill } from "../aboutUi";
+import { LuChevronRight, LuInfo } from "react-icons/lu";
 
 interface HypothesisCardProps {
   hypothesis: HypothesisCardData;
 }
 
-export function HypothesisCard({ hypothesis }: HypothesisCardProps) {
-  // Verdict badge formatting with shape + text
-  const renderVerdictBadge = () => {
-    switch (hypothesis.verdict) {
-      case "Supported":
-        return (
-          <Badge
-            colorPalette="green"
-            variant="solid"
-            size="md"
-            px={2.5}
-            py={1}
-            display="inline-flex"
-            alignItems="center"
-            gap={1}
-          >
-            <LuCheck size={14} />
-            <Text fontWeight="bold">Supported</Text>
-          </Badge>
-        );
-      case "Supported, small effect":
-        return (
-          <Badge
-            colorPalette="yellow"
-            variant="solid"
-            size="md"
-            px={2.5}
-            py={1}
-            display="inline-flex"
-            alignItems="center"
-            gap={1}
-          >
-            <LuCheck size={14} />
-            <Text fontWeight="bold">Supported, small effect</Text>
-          </Badge>
-        );
-      case "Inconclusive":
-      default:
-        return (
-          <Badge
-            colorPalette="gray"
-            variant="solid"
-            size="md"
-            px={2.5}
-            py={1}
-            display="inline-flex"
-            alignItems="center"
-            gap={1}
-          >
-            <LuCircleHelp size={14} />
-            <Text fontWeight="bold">Inconclusive</Text>
-          </Badge>
-        );
-    }
-  };
+const AXIS_LABEL = { color: "#a1a1aa", fontSize: 11 };
+const CATEGORY_LABEL = { color: "#e4e4e7", fontSize: 12 };
+const SPLIT_LINE = { lineStyle: { color: "rgba(255,255,255,0.07)" } };
+const TOOLTIP = {
+  backgroundColor: "#18181b",
+  borderColor: "#3f3f46",
+  textStyle: { color: "#e4e4e7", fontSize: 12 },
+};
+const ORANGE = "#fb923c";
+const TEAL = "#2dd4bf";
 
-  // ECharts options for H1, H5, H6, H7
-  const chartOption = useMemo<EChartsOption | null>(() => {
-    if (hypothesis.chartType === "h1_bars") {
+const H7_B1 = 1080.13;
+const H7_B2 = -707.26;
+const H7_PEAK = -H7_B1 / (2 * H7_B2);
+
+const CHART_CAPTIONS: Partial<Record<NonNullable<HypothesisCardData["chartType"]>, string>> = {
+  h1_bars: "Spearman correlation with negativity. Right of zero means more; left means less.",
+  h5_bars: "Average negativity and upvote ratio for each topic group. Axis starts at 0.",
+  h6_bars: "Average negativity by local time of day. The axis starts at 0.30 so the small differences are visible.",
+  h7_curve:
+    "Fitted curve from the regression (intercept and city-size control left out), not raw data. The dashed line marks the peak.",
+};
+
+function buildChartOption(chartType: HypothesisCardData["chartType"]): EChartsOption | null {
+  switch (chartType) {
+    case "h1_bars":
       return {
         backgroundColor: "transparent",
-        tooltip: { trigger: "axis" },
-        grid: { top: 30, right: 20, bottom: 30, left: 160 },
-        xAxis: {
-          type: "value",
-          min: -0.15,
-          max: 0.25,
-          splitLine: { lineStyle: { color: "rgba(255,255,255,0.08)" } },
-          axisLabel: { color: "#9ca3af", fontSize: 10 },
-        },
+        tooltip: { ...TOOLTIP, trigger: "axis", axisPointer: { type: "shadow" } },
+        grid: { top: 10, right: 56, bottom: 24, left: 8, containLabel: true },
+        xAxis: { type: "value", min: -0.1, max: 0.3, interval: 0.1, splitLine: SPLIT_LINE, axisLabel: AXIS_LABEL },
         yAxis: {
           type: "category",
-          data: ["Global P_neg vs Comments", "Global P_neg vs Upvote Ratio", "Berlin P_neg vs Upvote Ratio"],
-          axisLabel: { color: "#e5e7eb", fontSize: 11 },
+          inverse: true,
+          data: ["Comments, all cities", "Upvote ratio, all cities", "Upvote ratio, Berlin"],
+          axisLabel: CATEGORY_LABEL,
           axisTick: { show: false },
+          axisLine: { show: false },
         },
         series: [
           {
             name: "Spearman ρ",
             type: "bar",
+            barWidth: 18,
             data: [
-              { value: 0.1924, itemStyle: { color: "#38bdf8" } },
-              { value: -0.0254, itemStyle: { color: "#f87171" } },
-              { value: -0.0859, itemStyle: { color: "#ef4444" } },
+              { value: 0.1924, itemStyle: { color: TEAL } },
+              { value: -0.0254, itemStyle: { color: ORANGE } },
+              { value: -0.0859, itemStyle: { color: ORANGE } },
             ],
-            label: {
-              show: true,
-              position: "right",
-              formatter: "{c}",
-              color: "#e5e7eb",
-              fontSize: 10,
-            },
+            label: { show: true, position: "right", color: "#e4e4e7", fontSize: 11 },
           },
         ],
       };
-    }
 
-    if (hypothesis.chartType === "h5_bars") {
+    case "h5_bars":
       return {
         backgroundColor: "transparent",
-        tooltip: { trigger: "axis" },
-        legend: {
-          data: ["Admin & Housing", "Lifestyle & Culture"],
-          textStyle: { color: "#e5e7eb", fontSize: 11 },
-          top: 0,
-        },
-        grid: { top: 35, right: 20, bottom: 25, left: 60 },
+        tooltip: { ...TOOLTIP, trigger: "axis", axisPointer: { type: "shadow" } },
+        legend: { top: 0, left: 0, textStyle: { color: "#d4d4d8", fontSize: 12 }, itemWidth: 12, itemHeight: 12 },
+        grid: { top: 40, right: 8, bottom: 24, left: 8, containLabel: true },
         xAxis: {
           type: "category",
-          data: ["Negative Sentiment (P_neg)", "Upvote Ratio (Approval)"],
-          axisLabel: { color: "#e5e7eb", fontSize: 11 },
+          data: ["Negativity", "Upvote ratio"],
+          axisLabel: CATEGORY_LABEL,
+          axisTick: { show: false },
         },
-        yAxis: {
-          type: "value",
-          min: 0,
-          max: 1.0,
-          splitLine: { lineStyle: { color: "rgba(255,255,255,0.08)" } },
-          axisLabel: { color: "#9ca3af", fontSize: 10 },
-        },
+        yAxis: { type: "value", min: 0, max: 1, splitLine: SPLIT_LINE, axisLabel: AXIS_LABEL },
         series: [
           {
-            name: "Admin & Housing",
+            name: "Admin & housing",
             type: "bar",
+            barGap: "10%",
             data: [0.3842, 0.7356],
-            itemStyle: { color: "#f97316" },
-            label: { show: true, position: "top", color: "#e5e7eb", fontSize: 10 },
+            itemStyle: { color: ORANGE },
+            label: { show: true, position: "top", color: "#e4e4e7", fontSize: 11 },
           },
           {
-            name: "Lifestyle & Culture",
+            name: "Lifestyle & culture",
             type: "bar",
             data: [0.3315, 0.769],
-            itemStyle: { color: "#4ade80" },
-            label: { show: true, position: "top", color: "#e5e7eb", fontSize: 10 },
+            itemStyle: { color: TEAL },
+            label: { show: true, position: "top", color: "#e4e4e7", fontSize: 11 },
           },
         ],
       };
-    }
 
-    if (hypothesis.chartType === "h6_bars") {
+    case "h6_bars":
       return {
         backgroundColor: "transparent",
-        tooltip: { trigger: "axis" },
-        grid: { top: 25, right: 20, bottom: 25, left: 50 },
+        tooltip: { ...TOOLTIP, trigger: "axis", axisPointer: { type: "shadow" } },
+        grid: { top: 24, right: 8, bottom: 24, left: 8, containLabel: true },
         xAxis: {
           type: "category",
-          data: ["Night (00–05)", "Morning (06–12)", "Afternoon (13–18)", "Evening (19–23)"],
-          axisLabel: { color: "#e5e7eb", fontSize: 11 },
+          data: ["Night\n00–06", "Morning\n06–13", "Afternoon\n13–19", "Evening\n19–24"],
+          axisLabel: { ...CATEGORY_LABEL, lineHeight: 16 },
+          axisTick: { show: false },
         },
-        yAxis: {
-          type: "value",
-          min: 0.3,
-          max: 0.4,
-          splitLine: { lineStyle: { color: "rgba(255,255,255,0.08)" } },
-          axisLabel: { color: "#9ca3af", fontSize: 10 },
-        },
+        yAxis: { type: "value", min: 0.3, max: 0.38, splitLine: SPLIT_LINE, axisLabel: AXIS_LABEL },
         series: [
           {
-            name: "Mean Negative Sentiment",
+            name: "Average negativity",
             type: "bar",
-            data: [0.3399, 0.3679, 0.3611, 0.3601],
-            itemStyle: { color: "#c084fc" },
-            label: { show: true, position: "top", color: "#e5e7eb", fontSize: 10 },
+            barWidth: "45%",
+            data: [
+              { value: 0.3399, itemStyle: { color: "#71717a" } },
+              { value: 0.3679, itemStyle: { color: ORANGE } },
+              { value: 0.3611, itemStyle: { color: "#71717a" } },
+              { value: 0.3601, itemStyle: { color: "#71717a" } },
+            ],
+            label: { show: true, position: "top", color: "#e4e4e7", fontSize: 11 },
           },
         ],
       };
-    }
 
-    if (hypothesis.chartType === "h7_curve") {
-      const dataPoints: [number, number][] = [];
-      for (let ttr = 0.1; ttr <= 1.0; ttr += 0.02) {
-        const y = 1080.13 * ttr - 707.26 * Math.pow(ttr, 2);
-        dataPoints.push([Number(ttr.toFixed(2)), Number(y.toFixed(1))]);
+    case "h7_curve": {
+      const points: [number, number][] = [];
+      for (let i = 10; i <= 100; i += 2) {
+        const ttr = i / 100;
+        points.push([ttr, Number((H7_B1 * ttr + H7_B2 * ttr * ttr).toFixed(1))]);
       }
-
       return {
         backgroundColor: "transparent",
         tooltip: {
+          ...TOOLTIP,
           trigger: "axis",
-          formatter: "TTR: {c0}<br/>Normalized Comments: {c1}",
+          valueFormatter: (v) => (typeof v === "number" ? v.toFixed(1) : String(v)),
         },
-        grid: { top: 30, right: 25, bottom: 35, left: 60 },
+        grid: { top: 24, right: 16, bottom: 36, left: 8, containLabel: true },
         xAxis: {
           type: "value",
           min: 0.1,
-          max: 1.0,
-          name: "Type-Token Ratio (TTR)",
+          max: 1,
+          name: "Type-token ratio",
           nameLocation: "middle",
-          nameGap: 24,
-          nameTextStyle: { color: "#9ca3af", fontSize: 10 },
-          axisLabel: { color: "#9ca3af", fontSize: 10 },
-          splitLine: { lineStyle: { color: "rgba(255,255,255,0.08)" } },
+          nameGap: 28,
+          nameTextStyle: AXIS_LABEL,
+          axisLabel: AXIS_LABEL,
+          splitLine: SPLIT_LINE,
         },
         yAxis: {
           type: "value",
-          name: "Norm. Comments",
-          nameTextStyle: { color: "#9ca3af", fontSize: 10 },
-          axisLabel: { color: "#9ca3af", fontSize: 10 },
-          splitLine: { lineStyle: { color: "rgba(255,255,255,0.08)" } },
+          name: "Comments (fitted)",
+          nameTextStyle: { ...AXIS_LABEL, align: "left" },
+          axisLabel: AXIS_LABEL,
+          splitLine: SPLIT_LINE,
         },
         series: [
           {
-            name: "Fitted Curve (y = 1080.13x − 707.26x²)",
+            name: "Fitted comments",
             type: "line",
             smooth: true,
-            data: dataPoints,
-            lineStyle: { color: "#f97316", width: 2.5 },
-            markPoint: {
-              data: [
-                {
-                  name: "Peak (TTR* ≈ 0.764)",
-                  coord: [0.764, 412.6],
-                  value: "Peak ≈ 0.764",
-                  itemStyle: { color: "#ef4444" },
-                },
-              ],
+            showSymbol: false,
+            data: points,
+            lineStyle: { color: ORANGE, width: 2.5 },
+            markLine: {
+              silent: true,
+              symbol: "none",
+              lineStyle: { color: "#a1a1aa", type: "dashed" },
+              label: { formatter: `peak ≈ ${H7_PEAK.toFixed(3)}`, color: "#e4e4e7", fontSize: 11 },
+              data: [{ xAxis: Number(H7_PEAK.toFixed(3)) }],
             },
           },
         ],
       };
     }
 
-    return null;
-  }, [hypothesis.chartType]);
+    default:
+      return null;
+  }
+}
+
+function Label({ children }: { children: React.ReactNode }) {
+  return (
+    <Text fontSize="sm" fontWeight="semibold" color={C.heading} mb={1}>
+      {children}
+    </Text>
+  );
+}
+
+export function HypothesisCard({ hypothesis }: HypothesisCardProps) {
+  const chartOption = useMemo(() => buildChartOption(hypothesis.chartType), [hypothesis.chartType]);
+  const caption = hypothesis.chartType ? CHART_CAPTIONS[hypothesis.chartType] : undefined;
 
   return (
     <Box
-      bg="gray.950"
+      as="article"
+      id={`hypothesis-${hypothesis.id}`}
+      scrollMarginTop="96px"
+      aria-labelledby={`hypothesis-${hypothesis.id}-title`}
+      bg="whiteAlpha.50"
       borderWidth="1px"
-      borderColor="gray.800"
+      borderColor="whiteAlpha.100"
       borderRadius="xl"
-      p={{ base: 5, md: 6 }}
-      boxShadow="sm"
+      p={{ base: 5, md: 7 }}
     >
-      <VStack align="stretch" gap={5}>
-        {/* Header row: ID, Name, Verdict badge */}
-        <Flex justify="space-between" align={{ base: "flex-start", sm: "center" }} wrap="wrap" gap={3}>
-          <HStack gap={3}>
-            <Badge colorPalette="orange" variant="solid" px={2.5} py={1} fontSize="xs" fontWeight="bold">
-              {hypothesis.id}
-            </Badge>
-            <Text fontSize="lg" fontWeight="bold" color="gray.100">
-              {hypothesis.name}
-            </Text>
-          </HStack>
-          {renderVerdictBadge()}
-        </Flex>
+      {/* Header */}
+      <Box display="flex" flexWrap="wrap" alignItems="center" justifyContent="space-between" gap={3} mb={3}>
+        <Box display="flex" alignItems="baseline" gap={3}>
+          <Text fontFamily="mono" fontSize="sm" color={C.accent}>
+            {hypothesis.id}
+          </Text>
+          <Text as="h4" id={`hypothesis-${hypothesis.id}-title`} fontSize="lg" fontWeight="semibold" color={C.heading}>
+            {hypothesis.name}
+          </Text>
+        </Box>
+        <VerdictPill verdict={hypothesis.verdict} />
+      </Box>
 
-        {/* 1. Question in plain words */}
+      <Text fontSize={{ base: "md", md: "lg" }} color="gray.200" lineHeight="1.55" mb={6}>
+        {hypothesis.plainQuestion}
+      </Text>
+
+      <Box display="grid" gap={5}>
         <Box>
-          <Text fontSize="2xs" fontWeight="bold" color="gray.400" textTransform="uppercase" letterSpacing="wider" mb={1}>
-            Question in Plain Words
-          </Text>
-          <Text fontSize="sm" color="gray.200" fontWeight="medium">
-            {hypothesis.plainQuestion}
+          <Label>What we found</Label>
+          <Text color={C.text} lineHeight="1.7">
+            {hypothesis.whatItTellsUs}
           </Text>
         </Box>
 
-        {/* 2. Formal statement */}
-        <Box bg="blackAlpha.700" p={3.5} borderRadius="md" borderLeftWidth="3px" borderColor="orange.500">
-          <Text fontSize="2xs" fontWeight="bold" color="orange.400" textTransform="uppercase" letterSpacing="wider" mb={1}>
-            Formal Academic Statement
-          </Text>
-          <Text fontSize="xs" color="gray.300" fontStyle="italic" lineHeight="1.7">
-            &ldquo;{hypothesis.formalStatement}&rdquo;
-          </Text>
-        </Box>
-
-        {/* 3. Variables */}
-        <Box>
-          <Text fontSize="2xs" fontWeight="bold" color="gray.400" textTransform="uppercase" letterSpacing="wider" mb={2}>
-            Operationalized Variables
-          </Text>
-          <Flex wrap="wrap" gap={2}>
-            {hypothesis.variables.map((v) => (
-              <Box key={v.name} bg="whiteAlpha.50" px={3} py={1.5} borderRadius="md" borderWidth="1px" borderColor="gray.800" flex="1 1 calc(50% - 6px)" minW="220px">
-                <HStack justify="space-between" mb={0.5}>
-                  <Text fontSize="xs" fontWeight="bold" color="orange.300" fontFamily="mono">
-                    {v.name}
-                  </Text>
-                  <Badge
-                    size="xs"
-                    variant="outline"
-                    colorPalette={
-                      v.role === "Dependent"
-                        ? "green"
-                        : v.role === "Independent"
-                        ? "blue"
-                        : v.role === "Moderator"
-                        ? "purple"
-                        : "gray"
-                    }
-                  >
-                    {v.role}
-                  </Badge>
-                </HStack>
-                <Text fontSize="2xs" color="gray.400">
-                  {v.description}
-                </Text>
-              </Box>
-            ))}
-          </Flex>
-        </Box>
-
-        {/* 4. Method and why this method */}
-        <Box>
-          <Text fontSize="2xs" fontWeight="bold" color="gray.400" textTransform="uppercase" letterSpacing="wider" mb={1}>
-            Method &amp; Methodological Rationale
-          </Text>
-          <Text fontSize="xs" color="gray.300" lineHeight="1.6">
-            {hypothesis.methodAndRationale}
-          </Text>
-        </Box>
-
-        {/* 5. Snapshot result */}
-        <Box bg="whiteAlpha.50" p={3} borderRadius="md">
-          <Text fontSize="2xs" fontWeight="bold" color="orange.300" textTransform="uppercase" letterSpacing="wider" mb={1}>
-            Thesis Snapshot Result (November 2026, N = 51,587)
-          </Text>
-          <Text fontSize="xs" color="gray.200" lineHeight="1.6" fontFamily="mono">
-            {hypothesis.snapshotResult}
-          </Text>
-        </Box>
-
-        {/* 6. Verdict detail */}
-        <Box>
-          <Text fontSize="2xs" fontWeight="bold" color="gray.400" textTransform="uppercase" letterSpacing="wider" mb={1}>
-            Empirical Verdict
-          </Text>
-          <Text fontSize="xs" color="gray.300" lineHeight="1.6">
-            {hypothesis.verdictDetail}
-          </Text>
-        </Box>
-
-        {/* Callout Note (e.g. for H4 or code discrepancy) */}
-        {hypothesis.calloutNote && (
-          <Box bg="blackAlpha.800" p={3} borderRadius="md" borderWidth="1px" borderColor="gray.800">
-            <HStack align="flex-start" gap={2}>
-              <LuInfo size={16} color="#f97316" style={{ marginTop: "2px", flexShrink: 0 }} />
-              <Text fontSize="xs" color="gray.400" lineHeight="1.5">
-                {hypothesis.calloutNote}
-              </Text>
-            </HStack>
-          </Box>
-        )}
-
-        {/* ECharts Visualization (when applicable) */}
         {chartOption && (
-          <Box mt={1} pt={2} borderTopWidth="1px" borderColor="gray.850">
-            <HStack justify="space-between" mb={1}>
-              <Text fontSize="2xs" fontWeight="bold" color="gray.500" textTransform="uppercase">
-                Statistical Distribution Chart
+          <Box as="figure" m={0}>
+            <EChartsReact option={chartOption} style={{ height: hypothesis.chartType === "h1_bars" ? "170px" : "240px", width: "100%" }} />
+            {caption && (
+              <Text as="figcaption" fontSize="xs" color={C.muted} mt={1} lineHeight="1.5">
+                {caption}
               </Text>
-              {hypothesis.id === "H7" && (
-                <Badge variant="subtle" colorPalette="orange" size="2xs">
-                  fitted curve, not raw data
-                </Badge>
-              )}
-              {hypothesis.id === "H5" && (
-                <Text fontSize="2xs" color="gray.500">
-                  Axis scale starts at zero (0.0 to 1.0)
-                </Text>
-              )}
-            </HStack>
-            <EChartsReact option={chartOption} style={{ height: "220px", width: "100%" }} />
+            )}
           </Box>
         )}
 
-        {/* 7. What this does and does not tell us */}
-        <Flex direction={{ base: "column", md: "row" }} gap={3} pt={2} borderTopWidth="1px" borderColor="gray.850">
-          <Box flex="1" bg="whiteAlpha.50" p={3} borderRadius="md">
-            <Text fontSize="2xs" fontWeight="bold" color="green.400" textTransform="uppercase" mb={1}>
-              What This Tells Us
-            </Text>
-            <Text fontSize="xs" color="gray.400" lineHeight="1.6">
-              {hypothesis.whatItTellsUs}
-            </Text>
+        <Box>
+          <Label>Keep in mind</Label>
+          <Text color={C.text} lineHeight="1.7">
+            {hypothesis.whatItDoesNotTellUs}
+          </Text>
+        </Box>
+
+        {hypothesis.calloutNote && (
+          <Box display="flex" gap={2.5} fontSize="sm" color="gray.400" lineHeight="1.6">
+            <Box as="span" flexShrink={0} mt="3px" color={C.muted}>
+              <LuInfo size={15} />
+            </Box>
+            <Text>{hypothesis.calloutNote}</Text>
           </Box>
-          <Box flex="1" bg="whiteAlpha.50" p={3} borderRadius="md">
-            <Text fontSize="2xs" fontWeight="bold" color="yellow.400" textTransform="uppercase" mb={1}>
-              What This Does Not Tell Us
-            </Text>
-            <Text fontSize="xs" color="gray.400" lineHeight="1.6">
-              {hypothesis.whatItDoesNotTellUs}
-            </Text>
+        )}
+
+        {/* Method & stats, collapsed by default */}
+        <Box
+          as="details"
+          borderTopWidth="1px"
+          borderColor="whiteAlpha.100"
+          pt={4}
+          css={{
+            "& > summary::-webkit-details-marker": { display: "none" },
+            "&[open] > summary svg": { transform: "rotate(90deg)" },
+          }}
+        >
+          <Box
+            as="summary"
+            cursor="pointer"
+            listStyleType="none"
+            display="inline-flex"
+            alignItems="center"
+            gap={1.5}
+            fontSize="sm"
+            fontWeight="medium"
+            color="gray.400"
+            _hover={{ color: "gray.200" }}
+            _focusVisible={{ outline: "2px solid", outlineColor: "orange.400", outlineOffset: "2px" }}
+          >
+            <LuChevronRight size={16} style={{ transition: "transform 150ms ease" }} />
+            Method and statistics
           </Box>
-        </Flex>
-      </VStack>
+
+          <Box display="grid" gap={5} mt={4}>
+            <Box>
+              <Label>Result</Label>
+              <Text fontFamily="mono" fontSize="xs" color="gray.200" lineHeight="1.8" bg="blackAlpha.400" p={3} borderRadius="md">
+                {hypothesis.snapshotResult}
+              </Text>
+              <Text fontSize="sm" color={C.text} mt={2}>
+                {hypothesis.verdictDetail}
+              </Text>
+            </Box>
+
+            <Box>
+              <Label>Method</Label>
+              <Text fontSize="sm" color={C.text} lineHeight="1.7">
+                {hypothesis.methodAndRationale}
+              </Text>
+            </Box>
+
+            <Box>
+              <Label>Variables</Label>
+              <Box as="table" width="full" fontSize="sm" style={{ borderCollapse: "collapse" }}>
+                <tbody>
+                  {hypothesis.variables.map((v) => (
+                    <Box as="tr" key={v.name} borderTopWidth="1px" borderColor="whiteAlpha.100" verticalAlign="top">
+                      <Box as="td" py={2} pr={3} fontFamily="mono" fontSize="xs" color="orange.200" whiteSpace="nowrap">
+                        {v.name}
+                      </Box>
+                      <Box as="td" py={2} pr={3} color={C.muted} whiteSpace="nowrap">
+                        {v.role}
+                      </Box>
+                      <Box as="td" py={2} color={C.text}>
+                        {v.description}
+                      </Box>
+                    </Box>
+                  ))}
+                </tbody>
+              </Box>
+            </Box>
+
+            <Box>
+              <Label>Formal statement</Label>
+              <Text fontSize="sm" color="gray.400" fontStyle="italic" lineHeight="1.7">
+                {hypothesis.formalStatement}
+              </Text>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
     </Box>
   );
 }
