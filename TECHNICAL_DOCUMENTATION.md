@@ -110,9 +110,11 @@ flowchart TD
 | `.firebaserc` | Firebase project mapping targeting production deployment. |
 | `firebase_config.js` | Client-side Firebase configuration initializing Firebase App and Firebase Auth. Implements privacy consent gating helpers (`hasAnalyticsConsent`, `initAnalyticsIfConsented`, `logCurrentPageView`, `disableAnalytics`) with `measurementId` (`G-YYPYW7SSGM`) ensuring `getAnalytics(app)` is never executed without explicit user opt-in consent. |
 | `PRIVACY.md` | Comprehensive GDPR and German TDDDG (§ 25) privacy policy document defining data controller identity, academic research legal grounds (Art. 6(1)(f) & Art. 89), data minimization, local NLP architecture, author right to erasure (Art. 17), infrastructure logs, and opt-in analytics. Single source of truth rendered dynamically on the `/privacy` web route. |
+| `PrivacyPolicy.md` | Exact root reference copy of `PRIVACY.md` with structured bullet lists, bold operational keys, and numbered statutory procedures. |
 | `index.html` | SPA entry point mounting the root `<div id="root">`. |
 | `Changelogs.md` | Architectural changelog tracking major frontend and backend milestones. |
 | `README.md` | User-facing documentation detailing setup instructions, technology stack badges, and analytical dashboard screenshots. |
+| `AboutProject.md` | Comprehensive GitHub and distribution documentation detailing Master's Thesis research, hypothesis specifications, architectural pipeline, terminology glossary, and technology stack. |
 | `TECHNICAL_DOCUMENTATION.md` | **(This file)** Complete technical reference, database schemas, API specs, and AI contributor guide. |
 
 ---
@@ -136,6 +138,7 @@ flowchart TD
 | `src/util/analytics.ts` | Client-side aggregation and data transformation helpers for charts and tables. |
 | `src/util/analyticsConsent.ts` | GDPR and German TDDDG (§ 25) consent management module handling `localStorage` persistence (`analytics_consent`), event dispatching (`analytics-consent-change`, `open-analytics-consent`), and the `useAnalyticsConsent` React hook. |
 | `src/util/dateTime.ts` | Date and timezone formatting utilities for synchronized local display. |
+| `src/data/aboutContent.ts` | Single typed source of truth for the About Project page: thesis metadata (frozen snapshot $N = 51,587$), author facts (Alfaz Khan), research question, platform tab walkthrough, 6-step architecture, data cleaning specs, H1–H7 definitions & snapshot metrics, reading results guidance, 34 glossary items, limitations & ethics, and categorized tech stack. |
 | `src/constants/Hypothesis-Content.json` | Academic formulations, titles, and interpretations for hypotheses `H1` through `H7`. |
 | `src/constants/exhaustiveEChartsOption.js` | Base theme configuration and layout templates for Apache ECharts visualizations. |
 
@@ -175,7 +178,20 @@ flowchart TD
 | `src/components/Pages/Admin Dashboard/Users/UsersSection.tsx` | User management table (create user, edit roles, adjust rate limits, generate/rotate API keys). |
 | `src/components/Pages/Authentication/Login.tsx` | Firebase Authentication login page supporting email/password sign-in, with persistent 1-click access to the Privacy Policy and Cookie Settings via `Footer`. |
 | `src/components/Pages/ProtectedRoute.tsx` | React Router guard checking user authentication and RBAC roles before rendering admin routes. |
-| `src/components/Pages/AboutProject/AboutProject.tsx` | Informational page detailing project methodology, thesis background, and research objectives. |
+| `src/components/Pages/AboutProject/AboutProject.tsx` | Master's Thesis informational portal shell assembling single `h1`, responsive two-column layout (~70ch prose + sticky `PageToc`), and all section components in exact required order. |
+| `src/components/Pages/AboutProject/AuthorThesisSection.tsx` | Header banner with academic metadata (MBA General Management, ISM Munich), The Question, author persona for Alfaz Khan, thesis as research instrument, and 3 core research contributions. |
+| `src/components/Pages/AboutProject/PlatformSection.tsx` | Guided walkthrough of the 8 real dashboard tabs using screenshots with captions, lazy loading, and accessible click-to-enlarge lightbox modal. |
+| `src/components/Pages/AboutProject/SystemArchitectureSection.tsx` | Hand-built inline SVG pipeline diagram and 6-step breakdown verified against backend code. |
+| `src/components/Pages/AboutProject/DataMethodSection.tsx` | 7-day maturity delay rationale, stored vs excluded fields, cleaning filters ($N = 51,587$), dynamic city list, and local offline NLP models. |
+| `src/components/Pages/AboutProject/Hypotheses/HypothesesSection.tsx` | Interactive explorer for the seven academic hypotheses (`H1`–`H7`) grouped across the four research pillars, with accordion Expand/Collapse all controls and live KPI link. |
+| `src/components/Pages/AboutProject/Hypotheses/HypothesisCard.tsx` | Modular hypothesis card presenting formal academic statement, theoretical motivation, operationalized variables, method rationale, snapshot results, verdicts (`Supported`, `Supported, small effect`, `Inconclusive`), and embedded ECharts (H1, H5, H6, H7). |
+| `src/components/Pages/AboutProject/ReadingResultsSection.tsx` | Statistical guidance explaining p-values, large sample size effects, effect sizes, and correlation vs causation, featuring the two honest empirical examples. |
+| `src/components/Pages/AboutProject/TerminologySection.tsx` | Alphabetical, searchable glossary defining 34 mathematical, NLP, and civic terms with formal equations and anchor IDs (`#glossary-${id}`). |
+| `src/components/Pages/AboutProject/GlossaryTerm.tsx` | Accessible inline term component with dotted underline, `tabIndex={0}`, accessible tooltip, and smooth scrolling to glossary entry. |
+| `src/components/Pages/AboutProject/LimitationsEthicsSection.tsx` | Methodological limitations bullets, research ethics, Art. 17 GDPR erasure, link to `/privacy`, and `TODO_ALFAZ:` for Reddit TOS. |
+| `src/components/Pages/AboutProject/TechStackSection.tsx` | Compact 2-column table categorized across Frontend, Backend, NLP, Data, and Hosting/Testing from `package.json` and `Scraping/requirements.txt`. |
+| `src/components/Pages/AboutProject/PageToc.tsx` | Sticky semantic `<nav aria-label="Table of contents">` with scroll-spy on desktop, compact native select on mobile. |
+| `src/components/Pages/AboutProject/AboutProject.test.tsx` | Unit and integration test suite (16 tests) validating component rendering, lightbox interactions, and verbatim consistency with `AboutProject.md`. |
 | `src/components/ui-components/Footer.tsx` | Persistent site-wide footer component rendered across all pages, providing 1-click links to `Privacy Policy`, `Cookie Settings` trigger, `About Project`, and mounting `ConsentBanner`. |
 | `src/components/ui-components/*` | Reusable UI building blocks: Chakra primitives, modals/dialogs, feedbacks/spinners, form controls, tables, and charts. |
 
@@ -496,13 +512,13 @@ The platform computes empirical hypothesis tests organized across 4 research pil
   - **H1 (Negativity-Engagement Dynamic)**: Tests whether negative sentiment ($P_{neg}$) correlates positively with comment depth (`num_comments`) and negatively with approval (`upvote_ratio`).
   - **H2 (Polarization & Virality Dynamic)**: Tests whether emotional polarity magnitude $|P_{pos} - P_{neg}|$ correlates with higher net karma scores.
 - **Pillar 2: Thematic Ambiguity & Structural Specificity**
-  - **H3 (Topic Ambiguity vs. Clarity)**: Computes Shannon entropy across the 29-topic distribution ($H = -\sum p_i \log_2 p_i$) and measures its penalizing effect on log-transformed karma scores.
-  - **H4 (Entity Specificity & Consensus)**: Tests whether named entity density (`MONEY`, `ORG`, `GPE`, `LOC`) moderates the relationship between negative sentiment and consensus approval.
+  - **H3 (Topic Ambiguity vs. Clarity)**: Computes Shannon entropy across the 30-topic distribution ($H = -\sum_{i=1}^{30} p_i \ln(p_i)$ in natural log units / nats, verified from `calculate_shannon_entropy` in `Scraping/database/kpis.py`) and measures its penalizing effect on log-transformed karma scores ($\beta_1 = -0.5053, p < 0.001$).
+  - **H4 (Entity Specificity & Consensus)**: Tests whether named entity density (`MONEY`, `ORG`, `GPE`, `LOC`) moderates the relationship between negative sentiment and consensus approval. In the thesis snapshot ($N = 51,587$), default SpaCy pipelines produced sparse entity extraction on non-English posts, resulting in a rank-deficient design matrix (result: inconclusive).
 - **Pillar 3: Civic Friction vs. Cultural Lifestyle**
-  - **H5 (Civic Friction vs. Lifestyle Consensus)**: Compares administrative/housing topics against cultural/lifestyle topics, confirming significantly elevated negative sentiment in administrative discourse.
+  - **H5 (Civic Friction vs. Lifestyle Consensus)**: Compares administrative/housing topics (8 topics) against cultural/lifestyle topics (7 topics) via Welch's t-test, confirming significantly elevated negative sentiment ($0.3842$ vs $0.3315, t = +5.98, p < 0.001$) and lower approval ($0.7356$ vs $0.7690, t = -5.42, p < 0.001$).
 - **Pillar 4: Temporal & Scale-Normalized Dynamics**
-  - **H6 (Diurnal & Temporal Affect Cycles)**: Evaluates local time-of-day submissions, testing whether late-night posts display higher negative grievance compared to daytime submissions.
-  - **H7 (Scaled Community Virality & Lexical Diversity)**: Normalizes engagement against `subreddits.total_users` and tests for an inverted U-shape relationship between lexical Type-Token Ratio (TTR) and community comments.
+  - **H6 (Diurnal & Temporal Affect Cycles)**: Evaluates local time-of-day submissions across four 6-hour windows aligned to municipal IANA timezones via one-way ANOVA ($F = 15.46, p = 4.76 \times 10^{-10}$). While the initial theoretical hypothesis predicted late-night grievance venting, empirical computation in `Scraping/database/kpis.py` across the thesis snapshot reveals Morning posts exhibit the highest negative sentiment ($0.3679$) and Night submissions the lowest ($0.3399$), with diurnal window explaining $< 0.1\%$ of sentiment variance ($\eta^2 < 0.001$).
+  - **H7 (Scaled Community Virality & Lexical Diversity)**: Normalizes engagement against subreddit scale using $\text{Normalized Comments} = (\text{num\_comments} / \text{total\_users}) \times 10,000.0$ controlling for $\ln(1 + \text{total\_users})$, confirming a statistically significant inverted U-shape quadratic relationship between lexical Type-Token Ratio (TTR) and community comments ($\beta_1 = +1080.13, \beta_2 = -707.26, p < 0.001$, peak at $\text{TTR}^* \approx 0.764$).
 
 ---
 

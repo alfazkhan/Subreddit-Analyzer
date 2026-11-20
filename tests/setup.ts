@@ -14,3 +14,16 @@ Object.defineProperty(window, "matchMedia", {
 		dispatchEvent: vi.fn(),
 	})),
 });
+
+if (typeof window !== "undefined") {
+	window.scrollTo = vi.fn();
+	Element.prototype.scrollIntoView = vi.fn();
+}
+
+if (!globalThis.ResizeObserver) {
+	globalThis.ResizeObserver = class ResizeObserver {
+		observe = vi.fn();
+		unobserve = vi.fn();
+		disconnect = vi.fn();
+	};
+}

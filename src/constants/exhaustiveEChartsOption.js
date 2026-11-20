@@ -497,3 +497,5 @@ const exhaustiveEChartsOption = {
     }
   ]
 };
+
+export default exhaustiveEChartsOption;

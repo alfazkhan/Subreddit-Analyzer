@@ -149,8 +149,79 @@ export interface AuthCredentials {
 
 // AboutProject component types
 export interface AboutProjectProps {
-  // No props currently, but keeping for future extensibility
+  // Keeping for router extensibility
 }
+
+export type HypothesisVerdictType =
+  | "Supported"
+  | "Supported, small effect"
+  | "Inconclusive";
+
+export interface HypothesisCardData {
+  id: string;
+  pillarId: number;
+  pillarTitle: string;
+  name: string;
+  plainQuestion: string;
+  formalStatement: string;
+  variables: {
+    name: string;
+    role: "Dependent" | "Independent" | "Control" | "Moderator";
+    description: string;
+  }[];
+  methodAndRationale: string;
+  snapshotResult: string;
+  verdict: HypothesisVerdictType;
+  verdictDetail: string;
+  whatItTellsUs: string;
+  whatItDoesNotTellUs: string;
+  chartType?: "h1_bars" | "h5_bars" | "h6_bars" | "h7_curve" | "none";
+  calloutNote?: string;
+}
+
+export interface PillarData {
+  id: number;
+  number: number;
+  title: string;
+  subtitle: string;
+  hypotheses: HypothesisCardData[];
+}
+
+export interface GlossaryItem {
+  id: string;
+  term: string;
+  category: "Statistics" | "NLP & Linguistics" | "Civic & Platform" | "Architecture";
+  plainDefinition: string;
+  formula?: string;
+  whereUsed: string;
+}
+
+export interface PlatformTabScreenshot {
+  tabValue: string;
+  tabLabel: string;
+  imageSrc: string;
+  caption: string;
+  altText: string;
+}
+
+export interface PipelineStep {
+  stepNumber: number;
+  title: string;
+  system: string;
+  description: string;
+  details: string;
+}
+
+export interface TechStackCategory {
+  category: "Frontend" | "Backend" | "Data & Persistence" | "NLP & Machine Learning" | "Hosting, Testing & CI";
+  technologies: {
+    name: string;
+    version?: string;
+    purpose: string;
+    source: string;
+  }[];
+}
+
 
 // AlertDialog component types
 export interface AlertDialogHandle {
